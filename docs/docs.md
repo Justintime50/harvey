@@ -4,9 +4,28 @@
 
 Each repository that uses Harvey must have a `harvey.sh` file in the root directory of the project. Below you'll find common examples of configuration files based on language.
 
-The beauty of how Harvey is configured is in the fact that you can almost take any `.travis.yml` file and convert it straight across to a `harvey.sh` file.
+With Harvey, you can take almost any `.travis.yml` file and convert it straight across to a `harvey.sh` file.
 
-**Criteria**
+**Harvey Configuration Criteria**
+- Each repo needs a `.harvey` file in their root directory stored in git
+- Each `.harvey` config file will house information about your tests and build
+- This file must follow proper JSON standards (start and end with `{ }`, contain commans after each item, and be surrounded by quotes)
+
+The following example will run a full pipeline (tests, build and deploy), tag it with a unique name, and provide the data for the test stage:
+
+```javascript
+{
+    "pipeline": "full",
+    "tag": "justin-test",
+    "data": {
+        "project": "justinpaulhammond.com",
+        "language": "php",
+        "version": "7.4"
+    }
+}
+```
+
+**Shell Test Criteria**
 - Each repo needs a `harvey.sh` file in their root directory stored in git
 - Each `harvey.sh` file must have `#!/bin/sh` as the first line
 - Each `harvey.sh` file must conform to shell scripting standards (DO NOT use bash, sh is used as some of the testing docker containers do not have bash pre-installed)

@@ -111,8 +111,8 @@ import harvey
 
 
 """Playground"""
-# with open('./git.json') as file:
-#     # json = json.load(file.read())
-#     # print(file.read())
-#     request = requests.post('http://127.0.0.1:5000/webhook', data=json.dumps(file.read()), headers=harvey.Client.JSON_HEADERS)
-#     print(request)
+with open('./git.json', 'r') as file:
+    # json = json.load(file)
+    # print(file.read())
+    request = requests.post('http://127.0.0.1:5000/webhook', data=file, headers=harvey.Client.JSON_HEADERS)
+    print(request)

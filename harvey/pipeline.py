@@ -17,8 +17,7 @@ class Pipeline(Client):
     def test(cls, data):
         # Pull changes and run tests (no deploy)
         startTime = datetime.now()
-        Git.pull(data)
-
+        # Git.pull(data)
         test = Stage.test(data)
 
         print(f'Execution time: {datetime.now() - startTime}')
@@ -28,8 +27,7 @@ class Pipeline(Client):
     def deploy(cls, data, tag):
         # Pull changes and build/deploy (no tests)
         startTime = datetime.now()
-        Git.pull(data)
-
+        # Git.pull(data)
         Stage.build(data, tag)
         deploy = Stage.deploy(data)
 
@@ -40,12 +38,9 @@ class Pipeline(Client):
     def full(cls, data, tag):
         # Pull changes, run tests, build image, start container
         startTime = datetime.now()
-        Git.pull(data)
-
+        # Git.pull(data)
         Stage.test(data)
-
         Stage.build(data, tag)
-
         deploy = Stage.deploy(tag)
 
         print(f'Execution time: {datetime.now() - startTime}')

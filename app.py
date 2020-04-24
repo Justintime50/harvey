@@ -58,7 +58,9 @@ def remove_image(id):
 @api.route('/webhook', methods=['POST'])
 def receive_webhook():
     data = json.loads(request.data)
-    return harvey.Webhook.receive(data)
+    # data = request.data
+    harvey.Webhook.receive(data)
+    return "OK"
 
 """Git Endpoints"""
 @api.route('/pull', methods=['POST'])
