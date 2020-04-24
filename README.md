@@ -7,7 +7,7 @@ Your personal CI/CD and Docker orchestration platform.
 [![Build Status](https://travis-ci.org/Justintime50/harvey.svg?branch=master)](https://travis-ci.org/Justintime50/harvey)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
-<img src="assets/showcase.png" style="max-width:250px">
+<img src="assets/showcase.png" style="max-width:200px">
 
 </div>
 
@@ -15,7 +15,7 @@ Your personal CI/CD and Docker orchestration platform.
 
 Harvey was born because Rancher has too much overhead and GitLab is too RAM hungry to self-host on my small personal server. CI's like Travis are fantastic for open source but pricy for private use and can't be self hosted - deployments across servers looked like a nightmare so I created Harvey - the homegrown CI/CD and Docker orchestrator that kept things simple and lean. Preliminary tests have Harvey's pipelines coming in between just 30 seconds and 2 minutes to pull new changes and test, build, and deploy in production
 
-Harvey receives a webhook from your version control software of choice, pulls in the changes, tests them, builds them, then deploys them. When all is said and done - we'll even provide you a webhook to say "job's done".
+Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. When all is said and done - we'll even provide you a webhook to say "job's done".
 
 Harvey has lightweight testing functionality which is configurable via shell scripts. Harvey builds a unique self-isolated Docker container to test your code and returns the logs from your tests.
 
@@ -125,3 +125,4 @@ Harvey works! But just barely. There is a LOT to do to make this production read
 - Better logging (include output from everything in the log, not just container logs meaning the build output and each steps output)
 - Add a way for each project to be configurable (enabled/disabled, test pipeline or full?)
 - Fix passing data via API (error: `TypeError: full_pipeline() missing 2 required positional arguments: 'data' and 'tag'`)
+- Replace `Thread` with `multiprocessing` in `app.py` for better performance
