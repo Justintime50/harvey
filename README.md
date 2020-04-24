@@ -7,7 +7,7 @@ Your personal CI/CD and Docker orchestration platform.
 [![Build Status](https://travis-ci.org/Justintime50/harvey.svg?branch=master)](https://travis-ci.org/Justintime50/harvey)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
-<img src="assets/showcase.png" style="max-width:300px">
+<img src="assets/showcase.png" style="max-width:250px">
 
 </div>
 
@@ -84,6 +84,10 @@ These are some ideas you can pass. Any docker `image:tag` combo could work. Most
 - If no language is provided, an `Alpine Linux` container with `Shellcheck` pre-installed will be used.
 - If no version is provided, the `latest` tag will be used.
 
+### Documentation
+
+Find the [docs here](dos/docs.md).
+
 ## Flow
 
 1. GitHub webhook shoots off to the server stating when a new commit hits master for an enabled repo
@@ -104,7 +108,7 @@ Harvey works! But just barely. There is a LOT to do to make this production read
 - Authentication
 - Documentation
 - Remove `requirements` and put them in setup (prod & dev)
-- Add `pylint-exit` as a shell function that can be called upoon in `harvey.sh` files
+- Add `pylint-exit` as a shell function that can be called upon in `harvey.sh` files
 - Fix `latin` encoding for logs which messes with output
 - Need to add some logic to flush logs after a certain date?
 - Add logic to webhooks to only build on the master branch commits (possibly based on the `refs` attribute in the GitHub json?)
