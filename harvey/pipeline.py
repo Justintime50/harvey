@@ -14,34 +14,31 @@ from .git import Git
 
 class Pipeline(Client):
     @classmethod
-    def test(cls, data):
+    def test(cls, config, webhook):
         # Pull changes and run tests (no deploy)
         startTime = datetime.now()
-        # Git.pull(data)
-        test = Stage.test(data)
+        test = Stage.test(config, webhook)
 
         print(f'Execution time: {datetime.now() - startTime}')
         return test
 
     @classmethod
-    def deploy(cls, data, tag):
+    def deploy(cls, config, webhook):
         # Pull changes and build/deploy (no tests)
         startTime = datetime.now()
-        # Git.pull(data)
-        Stage.build(data, tag)
-        deploy = Stage.deploy(data)
+        Stage.build(config, webhook)
+        deploy = Stage.deploy(config, webhook)
 
         print(f'Execution time: {datetime.now() - startTime}')
         return deploy
 
     @classmethod
-    def full(cls, data, tag):
+    def full(cls, config, webhook):
         # Pull changes, run tests, build image, start container
         startTime = datetime.now()
-        # Git.pull(data)
-        Stage.test(data)
-        Stage.build(data, tag)
-        deploy = Stage.deploy(tag)
+        Stage.test(config, webhook)
+        Stage.build(config, webhook)
+        deploy = Stage.deploy(config, webhook)
 
         print(f'Execution time: {datetime.now() - startTime}')
         return deploy

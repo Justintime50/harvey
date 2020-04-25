@@ -11,13 +11,12 @@ requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via req
 
 class Stage(Client):
     @classmethod
-    def test(cls, data):
-        TAG = uuid.uuid4().hex
-        CONTEXT = 'test'
+    def test(cls, config, webhook):
+        context = 'test'
 
         # Build the image
         try:
-            image = Image.build(data, TAG, CONTEXT)
+            image = Image.build(config, webhook, context)
             print(image, "\nImage created")
         except:
             # TODO: Does not catch if image isn't built
@@ -25,7 +24,7 @@ class Stage(Client):
 
         # Create a container
         try:
-            container = Container.create(TAG)
+            container = Container.create(image)
             print(container, "\nContainer created")
         except:
             # TODO: Does not catch if image does not exist
@@ -54,7 +53,7 @@ class Stage(Client):
         # Remove container and image after it's done
         try:
             Container.remove(container['Id'])
-            Image.remove(TAG)
+            Image.remove(image)
             print("Container and image removed")
         except:
             print("Error: Harvey could not remove container and/or image")
@@ -63,11 +62,11 @@ class Stage(Client):
         return test
 
     @classmethod
-    def build(cls, data, tag):
+    def build(cls, config, webhook):
         # Build the image
         try:
-            Image.remove(tag)
-            image = Image.build(data, tag)
+            Image.remove(f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}')
+            image = Image.build(config, webhook)
             print(image, "\nImage created")
         except:
             sys.exit("Error: Harvey could not finish the build stage")
@@ -75,27 +74,26 @@ class Stage(Client):
         return image
 
     @classmethod
-    def deploy(cls, tag):
+    def deploy(cls, config, webhook):
         # Tear down the old container if one exists
         try:
-            resp = requests.get(Client.BASE_URL + f'containers/{tag}/json')
+            resp = requests.get(Client.BASE_URL + f'containers/{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}/json')
             resp.raise_for_status()
             try:
-                Container.stop(tag)
+                Container.stop(f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}')
                 print("Container stopping")
-                Container.wait(tag)
+                Container.wait(f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}')
                 print("Container waiting")
-                remove = Container.remove(tag)
+                remove = Container.remove(f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}')
                 print(remove, "\nOld container removed")
             except:
                 sys.exit("Error: Harvey failed during old/new container swap")
         except requests.exceptions.HTTPError as err:
             print(err)
 
-
         # Create a container
         try:
-            container = Container.create(tag)
+            container = Container.create(f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}')
             print(container, "\nContainer created")
         except:
             sys.exit("Error: Harvey could not create the container in the deploy stage")

@@ -16,12 +16,10 @@ import harvey
 
 """Build an image"""
 # image = harvey.Image.build(
-#     data = {
+#     config = {
 #         'language': 'python',
 #         'version': '3.7',
-#         'project': 'test',
 #     },
-#     tag = 'harvey/python-test',
 # )
 # print(image)
 
@@ -33,7 +31,7 @@ import harvey
 
 """Create a container"""
 # container = harvey.Container.create(
-#     data = {
+#     config = {
 #         "Image": "lala", 
 #     }
 # )
@@ -53,44 +51,29 @@ import harvey
 
 """Complete Test"""
 # stage_test = harvey.Stage.test(
-#     data = {
-#         # 'language': 'php',
-#         # 'version': 'latest',
-#         'project': 'dotfiles',
+#     config = {
+#         'language': 'php',
+#         'version': 'latest',
 #     },
 # )
 # print(stage_test)
 
 """Build Stage"""
-# stage_build = harvey.Stage.build(
-#     data = {
-#         'project': 'justinpaulhammond.com',
-#         # 'dockerfile': 'Dockerfile-dev'
-#     },
-#     tag = 'justin-test'
-# )
+# stage_build = harvey.Stage.build()
 # print(stage_build)
 
 """Deploy Stage"""
-# stage_deploy = harvey.Stage.deploy(
-#     tag = 'justin-test'
-# )
+# stage_deploy = harvey.Stage.deploy()
 # print(stage_deploy)
 
 """Full Pipeline"""
 # pipeline = harvey.Pipeline.full(
-#     data = {
-#         'project': 'justinpaulhammond.com',
+#     config = {
 #         'language': 'php', # for tests
 #         'version': 'latest', # for tests
 #     },
-#     tag = 'justin-test'
 # )
 # print(pipeline)
-
-"""Webhook"""
-# json = open('data.json', 'rb').read()
-# hook = requests.post('http://127.0.0.1:5000/git', data=json, headers=Client.JSON_HEADERS)
 
 """Pull Project"""
 # pull = harvey.Webhook.pull(
@@ -99,20 +82,7 @@ import harvey
 #     }
 # )
 
-"""Via API"""
-# lala = {
-#     'data': {
-#         'project': 'justinpaulhammond.com',
-#         'language': 'php', # for tests
-#         'version': 'latest', # for tests
-#     },
-#     'tag': 'justin-test'
-# }
-
-
-"""Playground"""
-with open('./git.json', 'r') as file:
-    # json = json.load(file)
-    # print(file.read())
-    request = requests.post('http://127.0.0.1:5000/webhook', data=file, headers=harvey.Client.JSON_HEADERS)
+"""API Entrypoint (Webhook)"""
+with open('./git_webhook.json', 'r') as file:
+    request = requests.post('http://127.0.0.1:5000/harvey', data=file, headers=harvey.Client.JSON_HEADERS)
     print(request)

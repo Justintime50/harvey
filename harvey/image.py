@@ -1,5 +1,6 @@
 import requests
 import json
+import uuid
 import requests_unixsocket
 from .client import Client
 import os
@@ -8,44 +9,49 @@ requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via req
 
 class Image(Client):
     @classmethod
-    def build(cls, data, tag='latest-build', context=''):
+    def build(cls, config, webhook, context=''):
         # TODO: Use the Docker API for building instead of a shell command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
         # json = open('./harvey/build.json', 'rb').read()
         # data = requests.post(Client.BASE_URL + 'build', params=json, data=tar, headers=Client.TAR_HEADERS)
         
         # Global variables
-        if "dockerfile" in data:
-            dockerfile = f'-f {data["dockerfile"]}'
+        if "dockerfile" in config:
+            dockerfile = f'-f {config["dockerfile"]}'
         else:
             dockerfile = ''
-        if tag:
-            tag = f'-t {tag}'
-        else:
-            tag = ''
+        # if "tag" in config:
+        #     tag = f'-t {config["tag"]}'
+        # else:
+        #     tag = ''
 
         # Project is required to know how to build and in what context (test vs deploy)
-        if "project" in data and context == 'test':
-            project = f'--build-arg PROJECT={data["project"]}'
+        if context == 'test':
+            project = f'--build-arg PROJECT={webhook["repository"]["full_name"].lower()}'
             context = ''
-        elif "project" in data and context != 'test':
+            tag = uuid.uuid4().hex
+            tag_arg = f'-t {tag}'
+        else:
             project = ''
-            context = f'/projects/{data["project"]}'
+            context = f'/projects/{webhook["repository"]["full_name"].lower()}'
+            tag = f'{webhook["repository"]["owner"]["name"].lower()}-{webhook["repository"]["name"].lower()}'
+            tag_arg = f'-t {tag}'
 
         # For testing only:
-        if "language" in data:
-            language = f'--build-arg LANGUAGE={data["language"]}'
+        if "language" in config:
+            language = f'--build-arg LANGUAGE={config["language"]}'
         else:
             language = ''
-        if "version" in data:
-            version = f'--build-arg VERSION={data["version"]}'
+        if "version" in config:
+            version = f'--build-arg VERSION={config["version"]}'
         else:
             version = ''
 
         # Build the image and stream the output
-        stream = os.popen(f'cd docker{context} && docker build --no-cache {dockerfile} {tag} {language} {version} {project} .')
+        stream = os.popen(f'cd docker{context} && docker build --no-cache {dockerfile} {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
-        return output
+        print(output)
+        return tag
 
     @classmethod
     def retrieve(cls, id):

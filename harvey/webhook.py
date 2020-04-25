@@ -7,23 +7,23 @@ from .git import Git
 
 class Webhook():
     @classmethod
-    def receive(cls, data):
-        # Receive a webhook
-        print(f"New commit by: {data['commits'][0]['author']['name']}")
-        Git.pull(data)
+    def receive(cls, webhook):
+        # Receive a webhook and pull in changes from GitHub
+        print(f'New commit by: {webhook["commits"][0]["author"]["name"]}\nCommit made on repo: {webhook["repository"]["name"]}')
+        Git.pull(webhook)
 
-        # Open config file
-        with open(f'docker/projects/{data["repository"]["name"]}/.harvey', 'r') as file:
+        # Open the project's config file to assign pipeline variables
+        with open(f'docker/projects/{webhook["repository"]["full_name"].lower()}/.harvey', 'r') as file:
             config = json.loads(file.read())
             print(config)
 
         # Start a pipeline based on configuration
         if config["pipeline"] == 'test':
-            pipeline = Pipeline.test(config["data"])
+            pipeline = Pipeline.test(config, webhook)
         elif config["pipeline"] == 'deploy':
-            pipeline = Pipeline.deploy(config["data"], config["tag"])
+            pipeline = Pipeline.deploy(config, webhook)
         elif config["pipeline"] == 'full':
-            pipeline = Pipeline.full(config["data"], config["tag"])
+            pipeline = Pipeline.full(config, webhook)
         elif not config["pipeline"]:
             sys.exit("Error: Harvey could not run, there was no pipeline specified")
 
