@@ -113,27 +113,3 @@ Here are some common examples of testing environments you can use. Any Docker `i
 ## Resources
 
 - [pylint-exit](https://pypi.org/project/pylint-exit/)
-
-## TODO
-
-Harvey works! But just barely. There is a LOT to do to make this production ready, especially if used by multiple users:
-
-- Authentication
-- Remove `requirements` and put them in setup (prod & dev)
-- Add `pylint-exit` as a shell function that can be called upon in `harvey.sh` files
-- Fix `latin` encoding for logs which messes with output
-- Need to add some logic to flush logs after a certain date?
-- Add logic to webhooks to only build on the master branch commits (possibly based on the `refs` attribute in the GitHub json?)
-- Introduce try/catch logic to ensure each step of the process works correctly
-- Ensure that tests fail with code `exit 1` so that the build phase/deploy isn't triggered
-- Figure out a good way to implement a docker-in-docker concept (which yes, is tricky and bad - but people may want to test their docker containers)
-- Explore dockerizing this project (difficult as we use the Docker socket to connect to the docker instance - putting this inside Docker makes connecting difficult)
-- Security audit - ensure only authenticated users can do actions, ensure people can only interact with their own images and containers, ensure this application cannot bleed out onto the bare-bones OS
-- Fix ALL the TODO items found throughout the project
-- Ensure we have the right mix of cache vs no-cache. It's imperative that builds are unique each time and pull in data properly, but it's also important for speed we cache what we can without having residue from previous runs
-- Ensure that we aren't leaving dangling images or containers lying around eating up resources and disk space
-- Ingest environment variables into the container
-- Better logging (include output from everything in the log, not just container logs meaning the build output and each steps output)
-- Add a way for each project to be configurable (enabled/disabled, test pipeline or full?)
-- Fix passing data via API (error: `TypeError: full_pipeline() missing 2 required positional arguments: 'data' and 'tag'`)
-- Replace `Thread` with `multiprocessing` in `app.py` for better performance
