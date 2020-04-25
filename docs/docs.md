@@ -18,6 +18,11 @@ The following example will run a full pipeline (tests, build and deploy), tag it
 }
 ```
 
+**Possible Pipeline Values**
+- `full` - test, build, deploy stages will be run
+- `deploy` - build, deploy stages will be run
+- `test` - test stage will be run
+
 ## Harvey Testing Examples
 
 Each repository that uses Harvey's testing functionality must have a `harvey.sh` file in the root directory of the project. Below you'll find common examples of configuration files based on language.
