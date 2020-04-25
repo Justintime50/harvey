@@ -25,7 +25,7 @@ class Image(Client):
         # else:
         #     tag = ''
 
-        # Project is required to know how to build and in what context (test vs deploy)
+        # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
             project = f'--build-arg PROJECT={webhook["repository"]["full_name"].lower()}'
             context = ''

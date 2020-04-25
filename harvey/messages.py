@@ -1,5 +1,6 @@
 """Message logic once a pipeline has exited"""
 import os
+import sys
 import requests
 from dotenv import load_dotenv
 import slack
@@ -20,6 +21,6 @@ class Messages():
             )
             print("Slack message Sent!")
         except:
-            print("Error: Harvey could not send the Slack message")
+            sys.exit("Error: Harvey could not send the Slack message")
 
 # TODO: Add email functionality
