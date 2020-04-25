@@ -15,9 +15,18 @@ Your personal CI/CD and Docker orchestration platform.
 
 Harvey was born because Rancher has too much overhead and GitLab is too RAM hungry to self-host on my small personal server. CI's like Travis are fantastic for open source but pricy for private use and can't be self hosted - deployments across servers looked like a nightmare so I created Harvey - the homegrown CI/CD and Docker orchestrator that kept things simple and lean. Preliminary tests have Harvey's pipelines coming in between just 30 seconds and 2 minutes to pull new changes and test, build, and deploy in production
 
-Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. When all is said and done - we'll even provide you a webhook to say "job's done".
+## How it Works
 
-Harvey has lightweight testing functionality which is configurable via shell scripts. Harvey builds a unique self-isolated Docker container to test your code and returns the logs from your tests.
+Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. When all is said and done - we'll even provide you a message to say "job's done".
+
+1. GitHub webhook fires to your self-hosted endpoint stating that a new commit hit an enabled repo
+    - Your server pulls in the new changes for that repo via Git
+1. Next we test your code based on the criteria provided
+1. Then we build your docker image locally
+1. Next we spin up the new docker container and tear down the old one once it's up and running, making downtime barely a blip
+1. Finally we shoot off a message to notify users the build was a success or not
+
+Harvey has lightweight testing functionality which is configurable via shell scripts. Harvey builds a unique self-isolated Docker container to test your code and returns the logs from your tests when finished.
 
 ## Install
 
@@ -26,8 +35,8 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 1. Install Docker & login
 1. Ensure you've added your ssh key to the ssh agent for private repos `ssh-add`
 1. Enable logging (below)
-1. Download this projec and see documentation/examples for usage
-1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/webhook`, send as json)
+1. Download this project and see documentation/examples for usage
+1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/harvey`, send the payload as JSON)
 
 **NOTE:** It is not recommended to use Harvey alongside other CI/CD or Docker orchestration platforms on the same machine.
 
@@ -37,17 +46,34 @@ The [following](https://docs.docker.com/config/containers/logging/json-file/#usa
 
 ```js
 {
-  "log-driver": "json-file",
-  "log-opts": {
-    "max-size": "10m",
-    "max-file": "3" 
-  }
+    "log-driver": "json-file",
+    "log-opts": {
+        "max-size": "10m",
+        "max-file": "3" 
+    }
 }
 ```
 
 ## Usage
 
-NOTE: This has only been tested on macOS.
+**NOTE:** This has only been tested on macOS.
+
+Find the full [docs here](docs/docs.md). 
+
+Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
+
+```javascript
+{
+    "repository": {
+        "name": "justinpaulhammond.com",
+        "full_name": "Justintime50/justinpaulhammond.com",
+        "url": "https://github.com/Justintime50/justinpaulhammond.com",
+    }
+    "owner": {
+        "name": "Justintime50",
+    }
+}
+```
 
 ### Scripting
 
@@ -66,12 +92,12 @@ python3 app.py
 
 **Example API Call:**
 ```bash
-curl -X GET http://127.0.0.1:5000/containers/fe3087b2004cac28b820dd48661dd2b4d974293a1b9968a2d8fcc969c0325707
+curl -X GET http://127.0.0.1:5000/containers/test-project
 ```
 
 #### Supported Language Strings
 
-These are some ideas you can pass. Any docker `image:tag` combo could work. Most common for testing:
+Here are some common examples of testing environments you can use. Any Docker `image:tag` combo should work.
 
 - `python` (3.6, 3.7, 3.8)
 - `php` (7.2, 7.3, 7.4)
@@ -84,19 +110,6 @@ These are some ideas you can pass. Any docker `image:tag` combo could work. Most
 - If no language is provided, an `Alpine Linux` container with `Shellcheck` pre-installed will be used.
 - If no version is provided, the `latest` tag will be used.
 
-### Documentation
-
-Find the [docs here](dos/docs.md).
-
-## Flow
-
-1. GitHub webhook shoots off to the server stating when a new commit hits master for an enabled repo
-    - Git pulls in the changes for that repo
-1. Next we test (custom config file, basically a list of bash comands to run - built inside a unique testing container then torn down when done)
-1. Next we build your docker image locally
-1. Next we spin up the new docker container and replace the old one once it's up and running
-1. Finally we shoot off a webhook to notify users the build was a success or not
-
 ## Resources
 
 - [pylint-exit](https://pypi.org/project/pylint-exit/)
@@ -106,14 +119,12 @@ Find the [docs here](dos/docs.md).
 Harvey works! But just barely. There is a LOT to do to make this production ready, especially if used by multiple users:
 
 - Authentication
-- Documentation
 - Remove `requirements` and put them in setup (prod & dev)
 - Add `pylint-exit` as a shell function that can be called upon in `harvey.sh` files
 - Fix `latin` encoding for logs which messes with output
 - Need to add some logic to flush logs after a certain date?
 - Add logic to webhooks to only build on the master branch commits (possibly based on the `refs` attribute in the GitHub json?)
 - Introduce try/catch logic to ensure each step of the process works correctly
-- Fix the need for double tags when building
 - Ensure that tests fail with code `exit 1` so that the build phase/deploy isn't triggered
 - Figure out a good way to implement a docker-in-docker concept (which yes, is tricky and bad - but people may want to test their docker containers)
 - Explore dockerizing this project (difficult as we use the Docker socket to connect to the docker instance - putting this inside Docker makes connecting difficult)
