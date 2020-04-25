@@ -48,7 +48,7 @@ class Image(Client):
             version = ''
 
         # Build the image and stream the output
-        stream = os.popen(f'cd docker{context} && docker build --no-cache {dockerfile} {tag_arg} {language} {version} {project} .')
+        stream = os.popen(f'cd docker{context} && docker build {dockerfile} {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
         print(output)
         return tag
