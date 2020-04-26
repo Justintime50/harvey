@@ -1,7 +1,7 @@
 """Message logic once a pipeline has exited"""
+# pylint: disable=W0511,R0903
 import os
 import sys
-import requests
 from dotenv import load_dotenv
 import slack
 
@@ -9,6 +9,7 @@ import slack
 load_dotenv()
 
 class Messages():
+    """Send message methods"""
     @classmethod
     def slack(cls, message):
         """Send Slack messages via a bot"""
