@@ -1,6 +1,6 @@
-import requests_unixsocket
-
+# pylint: disable=R0903,C0114
 class Client():
+    """Contains all the data to craft the requests client"""
     VERSION = 'v1.40' # Docker API version
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{VERSION}/'
     JSON_HEADERS = {'Content-Type': 'application/json'}

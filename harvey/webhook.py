@@ -1,19 +1,23 @@
-from flask import request
+"""Import webhook modules"""
+# pylint: disable=R0903
 import json
-import os
 import sys
 from .pipeline import Pipeline
 from .git import Git
 
 class Webhook():
+    """Webhook methods"""
     @classmethod
     def receive(cls, webhook):
-        # Receive a webhook and pull in changes from GitHub
-        print(f'New commit by: {webhook["commits"][0]["author"]["name"]}\nCommit made on repo: {webhook["repository"]["name"]}')
+        """Receive a webhook and pull in changes from GitHub"""
+        repo_name = webhook["repository"]["name"].lower()
+        full_name = webhook["repository"]["full_name"].lower()
+        print(f'New commit by: {webhook["commits"][0]["author"]["name"]} \
+            \nCommit made on repo: {repo_name}')
         Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
-        with open(f'docker/projects/{webhook["repository"]["full_name"].lower()}/.harvey', 'r') as file:
+        with open(f'docker/projects/{full_name}/.harvey', 'r') as file:
             config = json.loads(file.read())
             print(config)
 

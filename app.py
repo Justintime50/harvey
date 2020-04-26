@@ -1,120 +1,107 @@
-from flask import Flask, request
+"""Import API modules"""
+# pylint: disable=W0511
 from threading import Thread
 import json
+from flask import Flask, request
 import harvey
 
-api = Flask(__name__)
+API = Flask(__name__)
 
-"""Container Endpoints"""
-@api.route('/containers/create', methods=['POST'])
+@API.route('/containers/create', methods=['POST'])
 def create_container():
+    """Create a Docker container"""
     tag = request.tag
     response = json.dumps(harvey.Container.create(tag))
     return response
-    
-@api.route('/containers/<id>/start', methods=['POST'])
-def start_container(id):
-    start = harvey.Container.start(id)
+
+@API.route('/containers/<container_id>/start', methods=['POST'])
+def start_container(container_id):
+    """Start a Docker container"""
+    start = harvey.Container.start(container_id)
     response = str(start)
     return response
 
-@api.route('/containers/<id>/stop', methods=['POST'])
-def stop_container(id):
-    start = harvey.Container.stop(id)
-    response = str(start)
+@API.route('/containers/<container_id>/stop', methods=['POST'])
+def stop_container(container_id):
+    """Stop a Docker container"""
+    stop = harvey.Container.stop(container_id)
+    response = str(stop)
     return response
 
-@api.route('/containers/<id>', methods=['GET'])
-def retrieve_container(id):
-    response = json.dumps(harvey.Container.retrieve(id))
+@API.route('/containers/<container_id>', methods=['GET'])
+def retrieve_container(container_id):
+    """Retrieve a Docker container"""
+    response = json.dumps(harvey.Container.retrieve(container_id))
     return response
 
-@api.route('/containers', methods=['GET'])
+@API.route('/containers', methods=['GET'])
 def all_containers():
+    """Retrieve all Docker containers"""
     response = json.dumps(harvey.Container.all())
     return response
 
-@api.route('/containers/<id>/logs', methods=['GET'])
-def logs_container(id):
-    response = str(harvey.Container.logs(id))
+@API.route('/containers/<container_id>/logs', methods=['GET'])
+def logs_container(container_id):
+    """Retrieve logs from a Docker container"""
+    response = str(harvey.Container.logs(container_id))
     return response
 
-@api.route('/containers/<id>/wait', methods=['POST'])
-def wait_container(id):
-    response = json.dumps(harvey.Container.wait(id))
+@API.route('/containers/<container_id>/wait', methods=['POST'])
+def wait_container(container_id):
+    """Wait for a Docker container to exit"""
+    response = json.dumps(harvey.Container.wait(container_id))
     return response
 
-@api.route('/containers/<id>/remove', methods=['DELETE'])
-def remove_container(id):
-    remove = harvey.Container.remove(id)
+@API.route('/containers/<container_id>/remove', methods=['DELETE'])
+def remove_container(container_id):
+    """Remove (delete) a Docker container"""
+    remove = harvey.Container.remove(container_id)
     response = str(remove)
     return response
 
-"""Image Endpoints"""
-@api.route('/build', methods=['POST'])
+@API.route('/build', methods=['POST'])
 def build_image():
+    """Build a Docker image"""
     data = json.loads(request.data)
     tag = json.loads(request.tag)
     context = json.loads(request.context)
-
     build = harvey.Image.build(data, tag, context)
     return build
 
-@api.route('/images/<id>', methods=['GET'])
-def retrieve_image(id):
-    response = json.dumps(harvey.Image.retrieve(id))
+@API.route('/images/<image_id>', methods=['GET'])
+def retrieve_image(image_id):
+    """Retrieve a Docker image"""
+    response = json.dumps(harvey.Image.retrieve(image_id))
     return response
 
-@api.route('/images', methods=['GET'])
+@API.route('/images', methods=['GET'])
 def all_images():
+    """Retrieve all Docker images"""
     response = json.dumps(harvey.Image.all())
     return response
 
-@api.route('/images/<id>/remove', methods=['DELETE'])
-def remove_image(id):
-    remove = harvey.Image.remove(id)
+@API.route('/images/<image_id>/remove', methods=['DELETE'])
+def remove_image(image_id):
+    """Remove (delete) a Docker image"""
+    remove = harvey.Image.remove(image_id)
     response = str(remove)
     return response
 
-"""Webhook Endpoints"""
-@api.route('/harvey', methods=['POST'])
+@API.route('/harvey', methods=['POST'])
 def receive_webhook():
+    """Receive a Webhook - this is the entrypoint for Harvey"""
     data = json.loads(request.data)
     # TODO: Ensure this is the best way to accomplish this
     Thread(target=harvey.Webhook.receive, args=(data,)).start()
     return "OK"
 
-"""Git Endpoints"""
-@api.route('/pull', methods=['POST'])
+@API.route('/pull', methods=['POST'])
 def pull_project():
+    """Pull/clone GitHub project"""
     data = json.loads(request.data)
     pull = harvey.Git.pull(data)
     response = str(pull)
     return response
 
-"""Pipeline Endpoints"""
-@api.route('/pipeline/test', methods=['POST'])
-def test_pipeline():
-    data = json.loads(request.data)
-    test = harvey.Pipeline.test(data)
-    response = json.dumps(test)
-    return response
-
-@api.route('/pipeline/deploy', methods=['POST'])
-def deploy_pipeline():
-    data = json.loads(request.data)
-    tag = json.loads(request.tag)
-    deploy = harvey.Pipeline.deploy(data, tag)
-    response = json.dumps(deploy)
-    return response
-
-@api.route('/pipeline/full', methods=['POST'])
-def full_pipeline():
-    data = json.loads(request.data)
-    tag = json.loads(request.tag)
-    full = harvey.Pipeline.full(data, tag)
-    response = json.dumps(full)
-    return response
-
 if __name__ == '__main__':
-    api.run()
+    API.run()
