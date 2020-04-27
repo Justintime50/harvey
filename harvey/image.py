@@ -57,6 +57,7 @@ class Image(Client):
             version = ''
 
         # Build the image and stream the output
+        # TODO: Add try/catch for the subprocess here
         stream = os.popen(f'cd docker{context} && docker build {dockerfile} \
             {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
