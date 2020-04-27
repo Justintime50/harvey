@@ -1,5 +1,5 @@
 """Import all Harvey modules"""
-from .client import Client
+from .globals import Global
 from .container import Container
 from .git import Git
 from .image import Image

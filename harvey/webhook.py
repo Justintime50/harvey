@@ -4,8 +4,9 @@ import json
 import sys
 from .pipeline import Pipeline
 from .git import Git
+from .globals import Global
 
-class Webhook():
+class Webhook(Global):
     """Webhook methods"""
     @classmethod
     def receive(cls, webhook):
@@ -17,7 +18,7 @@ class Webhook():
         Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
-        with open(f'docker/projects/{full_name}/.harvey.json', 'r') as file:
+        with open(f'{Global.PROJECTS_PATH}{full_name}/harvey.json', 'r') as file:
             config = json.loads(file.read())
             print(config)
 
@@ -43,7 +44,7 @@ class Webhook():
         Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
-        with open(f'docker/projects/{full_name}/.harvey.json', 'r') as file:
+        with open(f'{Global.PROJECTS_PATH}{full_name}/harvey.json', 'r') as file:
             config = json.loads(file.read())
             print(config)
 

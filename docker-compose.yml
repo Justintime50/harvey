@@ -1,0 +1,12 @@
+version: "3.7"
+services: 
+    harvey:
+        build: .
+        user: root
+        volumes:
+            - /private/var/run/docker.sock:/var/run/docker.sock # macOS: allow us to interact with host containers
+            - /usr/bin/docker:/usr/bin/docker
+            # - /var/run/docker.sock:/var/run/docker.sock # Linux: allow us to interact with host containers
+            - ./docker:/var/www/html/docker # volume each project for persistence
+        ports:
+            - "5000:5000"

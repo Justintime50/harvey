@@ -5,11 +5,11 @@ import uuid
 import os
 import requests
 import requests_unixsocket
-from .client import Client
+from .globals import Global
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
-class Image(Client):
+class Image(Global):
     """Docker image methods"""
     @classmethod
     def build(cls, config, webhook, context=''):
@@ -21,8 +21,8 @@ class Image(Client):
             # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
         # json = open('./harvey/build.json', 'rb').read()
-        # data = requests.post(Client.BASE_URL + 'build', \
-        # params=json, data=tar, headers=Client.TAR_HEADERS)
+        # data = requests.post(Global.BASE_URL + 'build', \
+        # params=json, data=tar, headers=Global.TAR_HEADERS)
 
         # Global variables
         if "dockerfile" in config:
@@ -37,12 +37,12 @@ class Image(Client):
         # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
             project = f'--build-arg PROJECT={full_name}'
-            context = ''
+            context = f'{Global.TEST_PATH}'
             tag = uuid.uuid4().hex
             tag_arg = f'-t {tag}'
         else:
             project = ''
-            context = f'/projects/{full_name}'
+            context = f'{Global.PROJECTS_PATH}{full_name}'
             tag = f'{owner_name}-{repo_name}'
             tag_arg = f'-t {tag}'
 
@@ -58,7 +58,7 @@ class Image(Client):
 
         # Build the image and stream the output
         # TODO: Add try/catch for the subprocess here
-        stream = os.popen(f'cd docker{context} && docker build {dockerfile} \
+        stream = os.popen(f'cd {context} && docker build {dockerfile} \
             {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
         print(output)
@@ -67,18 +67,18 @@ class Image(Client):
     @classmethod
     def retrieve(cls, image_id):
         """Retrieve a Docker image"""
-        data = requests.get(Client.BASE_URL + f'images/{image_id}/json')
+        data = requests.get(Global.BASE_URL + f'images/{image_id}/json')
         return data.json()
 
     @classmethod
     def all(cls):
         """Retrieve all Docker images"""
-        data = requests.get(Client.BASE_URL + f'images/json')
+        data = requests.get(Global.BASE_URL + f'images/json')
         return data.json()
 
     @classmethod
     def remove(cls, image_id):
         """Remove (delete) a Docker image"""
-        data = requests.delete(Client.BASE_URL + f'images/{image_id}', \
-            data=json.dumps({'force': True}), headers=Client.JSON_HEADERS)
+        data = requests.delete(Global.BASE_URL + f'images/{image_id}', \
+            data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
         return data

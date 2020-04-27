@@ -1,13 +1,13 @@
 """Import Pipeline modules"""
 # pylint: disable=W0511
 from datetime import datetime
-from .client import Client
+from .globals import Global
 from .stage import Stage
 
 # TODO: Add logic to check that tests pass before moving to build
 # TODO: Add logic to check that build passes before moving to deploy
 
-class Pipeline(Client):
+class Pipeline(Global):
     """Pipeline methods"""
     @classmethod
     def test(cls, config, webhook):

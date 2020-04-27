@@ -2,3 +2,5 @@ flask
 requests
 requests_unixsocket
 pylint
+python-dotenv
+slack
