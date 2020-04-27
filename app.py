@@ -95,6 +95,14 @@ def receive_webhook():
     Thread(target=harvey.Webhook.receive, args=(data,)).start()
     return "OK"
 
+@API.route('/harvey/compose', methods=['POST'])
+def receive_webhook_compose():
+    """Receive a Webhook - this is the entrypoint for Harvey"""
+    data = json.loads(request.data)
+    # TODO: Ensure this is the best way to accomplish this
+    Thread(target=harvey.Webhook.compose, args=(data,)).start()
+    return "OK"
+
 @API.route('/pull', methods=['POST'])
 def pull_project():
     """Pull/clone GitHub project"""

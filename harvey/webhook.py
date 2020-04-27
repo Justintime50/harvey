@@ -17,7 +17,7 @@ class Webhook():
         Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
-        with open(f'docker/projects/{full_name}/.harvey', 'r') as file:
+        with open(f'docker/projects/{full_name}/.harvey.json', 'r') as file:
             config = json.loads(file.read())
             print(config)
 
@@ -28,6 +28,32 @@ class Webhook():
             pipeline = Pipeline.deploy(config, webhook)
         elif config["pipeline"] == 'full':
             pipeline = Pipeline.full(config, webhook)
+        elif not config["pipeline"]:
+            sys.exit("Error: Harvey could not run, there was no pipeline specified")
+
+        return pipeline
+
+    @classmethod
+    def compose(cls, webhook):
+        """Receive a webhook and pull in changes from GitHub"""
+        repo_name = webhook["repository"]["name"].lower()
+        full_name = webhook["repository"]["full_name"].lower()
+        print(f'New commit by: {webhook["commits"][0]["author"]["name"]} \
+            \nCommit made on repo: {repo_name}')
+        Git.pull(webhook)
+
+        # Open the project's config file to assign pipeline variables
+        with open(f'docker/projects/{full_name}/.harvey.json', 'r') as file:
+            config = json.loads(file.read())
+            print(config)
+
+        # Start a pipeline based on configuration
+        if config["pipeline"] == 'test':
+            pipeline = Pipeline.test(config, webhook)
+        elif config["pipeline"] == 'deploy':
+            pipeline = Pipeline.deploy_compose(config, webhook)
+        elif config["pipeline"] == 'full':
+            pipeline = Pipeline.full_compose(config, webhook)
         elif not config["pipeline"]:
             sys.exit("Error: Harvey could not run, there was no pipeline specified")
 

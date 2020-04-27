@@ -38,3 +38,22 @@ class Pipeline(Client):
 
         print(f'Execution time: {datetime.now() - start_time}')
         return deploy
+
+    @classmethod
+    def deploy_compose(cls, config, webhook):
+        """Pull changes and build/deploy (no tests) - USING A DOCKER COMPOSE FILE"""
+        start_time = datetime.now()
+        deploy = Stage.build_deploy_compose(config, webhook)
+
+        print(f'Execution time: {datetime.now() - start_time}')
+        return deploy
+
+    @classmethod
+    def full_compose(cls, config, webhook):
+        """Pull changes, run tests, build image, start container - USING A DOCKER COMPOSE FILE"""
+        start_time = datetime.now()
+        Stage.test(config, webhook)
+        deploy = Stage.build_deploy_compose(config, webhook)
+
+        print(f'Execution time: {datetime.now() - start_time}')
+        return deploy
