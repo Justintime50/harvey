@@ -15,7 +15,7 @@ class Pipeline(Client):
         start_time = datetime.now()
         test = Stage.test(config, webhook)
 
-        print(f'Execution time: {datetime.now() - start_time}')
+        print(f'Test pipeline execution time: {datetime.now() - start_time}')
         return test
 
     @classmethod
@@ -25,7 +25,7 @@ class Pipeline(Client):
         Stage.build(config, webhook)
         deploy = Stage.deploy(webhook)
 
-        print(f'Execution time: {datetime.now() - start_time}')
+        print(f'Deploy pipeline execution time: {datetime.now() - start_time}')
         return deploy
 
     @classmethod
@@ -36,7 +36,7 @@ class Pipeline(Client):
         Stage.build(config, webhook)
         deploy = Stage.deploy(webhook)
 
-        print(f'Execution time: {datetime.now() - start_time}')
+        print(f'Full pipeline execution time: {datetime.now() - start_time}')
         return deploy
 
     @classmethod
@@ -45,7 +45,7 @@ class Pipeline(Client):
         start_time = datetime.now()
         deploy = Stage.build_deploy_compose(config, webhook)
 
-        print(f'Execution time: {datetime.now() - start_time}')
+        print(f'Deploy pipeline execution time: {datetime.now() - start_time}')
         return deploy
 
     @classmethod
@@ -55,5 +55,5 @@ class Pipeline(Client):
         Stage.test(config, webhook)
         deploy = Stage.build_deploy_compose(config, webhook)
 
-        print(f'Execution time: {datetime.now() - start_time}')
+        print(f'Full pipeline execution time: {datetime.now() - start_time}')
         return deploy

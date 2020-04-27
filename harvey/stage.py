@@ -2,6 +2,7 @@
 # pylint: disable=W0511
 import sys
 import os
+from datetime import datetime
 import requests
 import requests_unixsocket
 from .client import Client
@@ -15,6 +16,7 @@ class Stage(Client):
     @classmethod
     def test(cls, config, webhook):
         """Test Stage"""
+        start_time = datetime.now()
         context = 'test'
 
         # Build the image
@@ -62,11 +64,13 @@ class Stage(Client):
             print("Error: Harvey could not remove container and/or image")
 
         test = image + logs
+        print(f'Test stage execution time: {datetime.now() - start_time}')
         return test
 
     @classmethod
     def build(cls, config, webhook):
         """Build Stage"""
+        start_time = datetime.now()
         repo_name = webhook["repository"]["name"].lower()
         owner_name = webhook["repository"]["owner"]["name"].lower()
         # Build the image
@@ -77,11 +81,13 @@ class Stage(Client):
         except:
             sys.exit("Error: Harvey could not finish the build stage")
 
+        print(f'Build stage execution time: {datetime.now() - start_time}')
         return image
 
     @classmethod
     def deploy(cls, webhook):
         """Deploy Stage"""
+        start_time = datetime.now()
         repo_name = webhook["repository"]["name"].lower()
         owner_name = webhook["repository"]["owner"]["name"].lower()
         # Tear down the old container if one exists
@@ -114,11 +120,13 @@ class Stage(Client):
         except:
             sys.exit("Error: Harvey could not start the container in the deploy stage")
 
+        print(f'Deploy stage execution time: {datetime.now() - start_time}')
         return start
 
     @classmethod
     def build_deploy_compose(cls, config, webhook):
         """Build Stage - USING A DOCKER COMPOSE FILE"""
+        start_time = datetime.now()
         full_name = webhook["repository"]["full_name"].lower()
         context = f'/projects/{full_name}'
         if "compose" in config:
@@ -133,5 +141,6 @@ class Stage(Client):
             print("Docker compose successful")
         except:
             sys.exit("Error: Harvey could not finish the build/deploy compose stage")
-    
+
+        print(f'Build/Deploy stage execution time: {datetime.now() - start_time}')
         return output
