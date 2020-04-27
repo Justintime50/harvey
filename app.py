@@ -112,4 +112,4 @@ def pull_project():
     return response
 
 if __name__ == '__main__':
-    API.run()
+    API.run(host='0.0.0.0')

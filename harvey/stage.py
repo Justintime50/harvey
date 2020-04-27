@@ -5,13 +5,13 @@ import os
 from datetime import datetime
 import requests
 import requests_unixsocket
-from .client import Client
+from .globals import Global
 from .container import Container
 from .image import Image
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
-class Stage(Client):
+class Stage(Global):
     """Stage methods"""
     @classmethod
     def test(cls, config, webhook):
@@ -92,7 +92,7 @@ class Stage(Client):
         owner_name = webhook["repository"]["owner"]["name"].lower()
         # Tear down the old container if one exists
         try:
-            resp = requests.get(Client.BASE_URL + f'containers/{owner_name}-{repo_name}/json')
+            resp = requests.get(Global.BASE_URL + f'containers/{owner_name}-{repo_name}/json')
             resp.raise_for_status()
             try:
                 Container.stop(f'{owner_name}-{repo_name}')
@@ -136,7 +136,7 @@ class Stage(Client):
 
         # Build the image and container from the docker-compose file
         try:
-            compose = os.popen(f'cd docker{context} && docker-compose {compose} up -d --build')
+            compose = os.popen(f'cd {Global.TEST_PATH}{context} && docker-compose {compose} up -d --build')
             output = compose.read()
             print("Docker compose successful")
         except:

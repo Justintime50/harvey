@@ -84,5 +84,5 @@ import harvey
 
 """API Entrypoint (Webhook)"""
 with open('./git_webhook.json', 'r') as file:
-    request = requests.post('http://127.0.0.1:5000/harvey', data=file, headers=harvey.Client.JSON_HEADERS)
+    request = requests.post('http://127.0.0.1:5000/harvey', data=file, headers=harvey.Global.JSON_HEADERS)
     print(request)
