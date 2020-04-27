@@ -7,7 +7,7 @@ Your personal CI/CD and Docker orchestration platform.
 [![Build Status](https://travis-ci.org/Justintime50/harvey.svg?branch=master)](https://travis-ci.org/Justintime50/harvey)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
-<img src="assets/showcase.png" style="max-width:200px">
+<img src="assets/showcase.png" style="width:150px">
 
 </div>
 
@@ -58,7 +58,7 @@ The [following](https://docs.docker.com/config/containers/logging/json-file/#usa
 
 **NOTE:** This has only been tested on macOS.
 
-Find the full [docs here](docs/docs.md). 
+Find the full [docs here](docs/README.md). 
 
 Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
 
@@ -113,3 +113,4 @@ Here are some common examples of testing environments you can use. Any Docker `i
 ## Resources
 
 - [pylint-exit](https://pypi.org/project/pylint-exit/)
+- [Use docker-compose in production](https://docs.docker.com/compose/production/)

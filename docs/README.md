@@ -3,20 +3,21 @@
 ## Harvey Configuration Examples
 
 **Harvey Configuration Criteria**
-- Each repo needs a `.harvey` file in the root directory stored in git
-- Each `.harvey` config file will house information about your tests and build
+- Each repo needs a `.harvey.json` file in the root directory stored in git
+- Each `.harvey.json` config file will house information about your tests and build
 - This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, and be surrounded by quotes)
 
 The following example will run a full pipeline (tests, build and deploy), tag it with a unique name based on the GitHub project. Provide the language and version for the test stage:
 
-```shell
-# .harvey file in JSON format:
+```javascript
 {
     "pipeline": "full",
     "language": "php",
     "version": "7.4"
 }
 ```
+
+* Optional `compose` value can be passed to specify the `docker-compose` file to use if building from a docker-compose file and hitting the `/harvey/compose` endpoint.
 
 **Possible Pipeline Values**
 - `full` - test, build, deploy stages will be run

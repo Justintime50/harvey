@@ -1,6 +1,7 @@
 """Import stage modules"""
 # pylint: disable=W0511
 import sys
+import os
 import requests
 import requests_unixsocket
 from .client import Client
@@ -114,3 +115,23 @@ class Stage(Client):
             sys.exit("Error: Harvey could not start the container in the deploy stage")
 
         return start
+
+    @classmethod
+    def build_deploy_compose(cls, config, webhook):
+        """Build Stage - USING A DOCKER COMPOSE FILE"""
+        full_name = webhook["repository"]["full_name"].lower()
+        context = f'/projects/{full_name}'
+        if "compose" in config:
+            compose = f'-f {config["compose"]}'
+        else:
+            compose = ''
+
+        # Build the image and container from the docker-compose file
+        try:
+            compose = os.popen(f'cd docker{context} && docker-compose {compose} up -d --build')
+            output = compose.read()
+            print("Docker compose successful")
+        except:
+            sys.exit("Error: Harvey could not finish the build/deploy compose stage")
+    
+        return output
