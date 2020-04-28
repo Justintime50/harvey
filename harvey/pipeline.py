@@ -5,6 +5,7 @@ import sys
 import os
 from .globals import Global
 from .stage import Stage
+from .messages import Message
 
 # TODO: Add logic to check that tests pass before moving to build
 # TODO: Add logic to check that build passes before moving to deploy
@@ -30,6 +31,8 @@ class Pipeline(Global):
         except:
             sys.exit("Error: Harvey could not save log file")
 
+        Message.slack(test_output)
+
         return test
 
     @classmethod
@@ -51,6 +54,8 @@ class Pipeline(Global):
                 log.write(deploy_output)
         except:
             sys.exit("Error: Harvey could not save log file")
+
+        Message.slack(deploy_output)
 
         return deploy
 
@@ -75,6 +80,8 @@ class Pipeline(Global):
         except:
             sys.exit("Error: Harvey could not save log file")
 
+        Message.slack(full_output)
+
         return deploy
 
     @classmethod
@@ -95,6 +102,8 @@ class Pipeline(Global):
                 log.write(deploy_output)
         except:
             sys.exit("Error: Harvey could not save log file")
+
+        Message.slack(deploy_output)
 
         return deploy
 
@@ -117,5 +126,7 @@ class Pipeline(Global):
                 log.write(full_output)
         except:
             sys.exit("Error: Harvey could not save log file")
+
+        Message.slack(full_output)
 
         return deploy
