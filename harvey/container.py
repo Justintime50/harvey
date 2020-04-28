@@ -57,14 +57,6 @@ class Container(Global):
         # }), headers=Global.ATTACH_HEADERS)
         data = requests.get(Global.BASE_URL + f'containers/{container_id}/logs', \
             params={'stdout': True, 'stderr': True})
-        try:
-            if not os.path.exists('logs'):
-                os.makedirs('logs')
-            with open(f'logs/{datetime.today()}.txt', 'w+') as log:
-                # TODO: We may want to save project name in filename as well
-                log.write(str(data.content.decode('latin1')))
-        except:
-            sys.exit("Error: Harvey could not save log file")
         return data.content.decode('latin1')
 
     @classmethod
