@@ -8,7 +8,7 @@ import slack
 # Setup variables
 load_dotenv()
 
-class Messages():
+class Message():
     """Send message methods"""
     @classmethod
     def slack(cls, message):
