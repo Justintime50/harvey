@@ -29,40 +29,36 @@ class Image(Global):
             dockerfile = f'-f {config["dockerfile"]}'
         else:
             dockerfile = ''
-        # if "tag" in config:
-        #     tag = f'-t {config["tag"]}'
-        # else:
-        #     tag = ''
 
         # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
             project = f'--build-arg PROJECT={full_name}'
-            context = f'{Global.TEST_PATH}'
+            path = f'{Global.TEST_PATH}'
             tag = uuid.uuid4().hex
             tag_arg = f'-t {tag}'
         else:
             project = ''
-            context = f'{Global.PROJECTS_PATH}{full_name}'
+            path = f'{Global.PROJECTS_PATH}{full_name}'
             tag = f'{owner_name}-{repo_name}'
             tag_arg = f'-t {tag}'
 
         # For testing only:
-        if "language" in config:
+        if "language" in config and context == 'test':
             language = f'--build-arg LANGUAGE={config["language"]}'
         else:
             language = ''
-        if "version" in config:
+        if "version" in config and context == 'test':
             version = f'--build-arg VERSION={config["version"]}'
         else:
             version = ''
 
         # Build the image and stream the output
         # TODO: Add try/catch for the subprocess here
-        stream = os.popen(f'cd {context} && docker build {dockerfile} \
+        stream = os.popen(f'cd {path} && docker build {dockerfile} \
             {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
         print(output)
-        return tag
+        return tag, output
 
     @classmethod
     def retrieve(cls, image_id):
