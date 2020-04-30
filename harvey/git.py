@@ -3,6 +3,8 @@
 import os
 import sys
 from .globals import Global
+from .utils import Utils
+from .messages import Message
 
 class Git(Global):
     """Git methods"""
@@ -15,21 +17,26 @@ class Git(Global):
 
         if not os.path.exists(f'{Global.PROJECTS_PATH}'):
             os.makedirs(f'{Global.PROJECTS_PATH}', exist_ok=True)
-        if not os.path.exists(f'{Global.PROJECTS_PATH}{full_name}'):
+        if not os.path.exists(f'{Global.PROJECTS_PATH}/{full_name}'):
             try:
-                git_message = f'Project does not exist, cloning {full_name}'
-                print(git_message)
+                final_output = f'\nProject does not exist, cloning {full_name}\n'
+                print(final_output)
                 os.system(f'cd {Global.PROJECTS_PATH} && mkdir {owner_name} \
                     && cd {owner_name} && git clone {url}')
             except:
-                sys.exit("Error: Harvey could not clone project")
+                final_output = 'Error: Harvey could not clone project'
+                Utils.logs(final_output)
+                Message.slack(final_output)
+                sys.exit()
         else:
             try:
-                git_message = f'Fetching and pulling changes from {full_name}'
-                print(git_message)
-                os.system(f'cd {Global.PROJECTS_PATH}{full_name} && git fetch && git pull')
+                final_output = f'\nFetching and pulling changes from {full_name}\n'
+                print(final_output)
+                os.system(f'cd {Global.PROJECTS_PATH}/{full_name} && git fetch && git pull')
             except:
-                sys.exit("Error: Harvey could not pull project")
+                final_output = 'Error: Harvey could not pull project'
+                Utils.logs(final_output)
+                Message.slack(final_output)
+                sys.exit()
 
-        output = git_message
-        return output
+        return final_output

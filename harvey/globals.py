@@ -7,5 +7,6 @@ class Global():
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}
     ATTACH_HEADERS = {'Content-Type': 'application/vnd.docker.raw-stream'}
-    PROJECTS_PATH = 'docker/projects/'
+    PROJECTS_PATH = 'docker/projects'
     TEST_PATH = 'docker'
+    LOGS_PATH = 'logs'
