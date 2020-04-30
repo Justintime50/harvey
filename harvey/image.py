@@ -38,7 +38,7 @@ class Image(Global):
             tag_arg = f'-t {tag}'
         else:
             project = ''
-            path = f'{Global.PROJECTS_PATH}{full_name}'
+            path = f'{Global.PROJECTS_PATH}/{full_name}'
             tag = f'{owner_name}-{repo_name}'
             tag_arg = f'-t {tag}'
 
@@ -57,7 +57,6 @@ class Image(Global):
         stream = os.popen(f'cd {path} && docker build {dockerfile} \
             {tag_arg} {language} {version} {project} .')
         output = stream.read() # TODO: Make this stream live output
-        print(output)
         return tag, output
 
     @classmethod
