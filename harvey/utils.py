@@ -27,7 +27,7 @@ class Utils(Global):
         """
         Utils.logs(final_output)
         Message.slack(final_output)
-        # Container.remove(container['Id']) # TODO: How do we want to handle this?
+        # Container.remove(container['Id']) # TODO: How do we want to handle this? (we don't want to tear down the old working container)
         Image.remove(image)
         # TODO: Uncomment when you consolidate the full_name variable
         # if os.path.exists(os.path.join(Global.PROJECTS_PATH, full_name)):

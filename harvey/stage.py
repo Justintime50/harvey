@@ -26,7 +26,7 @@ class Stage(Global):
         except:
             # TODO: Does not catch if image isn't built
             final_output = output + '\nError: Harvey could not build the image'
-            Utils.kill(final_output, image)
+            Utils.kill(final_output, image[0])
 
         # Create a container
         try:
@@ -36,7 +36,7 @@ class Stage(Global):
         except:
             # TODO: Does not catch if image does not exist
             final_output = output + image_output + '\nError: Harvey could not create the container'
-            Utils.kill(final_output, image, container)
+            Utils.kill(final_output, image[0])
 
         # Start the container
         try:
@@ -45,7 +45,7 @@ class Stage(Global):
             print(start_output)
         except:
             final_output = output + image_output + container_output + '\nError: Harvey could not start the container'
-            Utils.kill(final_output, image, container)
+            Utils.kill(final_output, image[0], container)
 
         # Wait for container to exit
         try:
@@ -54,7 +54,7 @@ class Stage(Global):
             print(wait_output)
         except:
             final_output = output + image_output + container_output + start_output + '\nError: Harvey could not wait for the container'
-            Utils.kill(final_output, image, container)
+            Utils.kill(final_output, image[0], container)
 
         # Return logs
         try:
@@ -64,7 +64,7 @@ class Stage(Global):
             print(logs_output)
         except:
             final_output = output + image_output + container_output + start_output + wait_output + '\nError: Harvey could not create the container logs'
-            Utils.kill(final_output, image, container)
+            Utils.kill(final_output, image[0], container)
 
         # Remove container and image after it's done
         try:
@@ -74,7 +74,7 @@ class Stage(Global):
             print(remove_output)
         except:
             final_output = output + image_output + container_output + start_output + wait_output + logs_output + '\nError: Harvey could not remove the container and/or image'
-            Utils.kill(final_output, image, container)
+            Utils.kill(final_output, image[0], container)
 
         execution_time = f'Test stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{container_output}\n{start_output}\n{wait_output}\n\
@@ -97,7 +97,7 @@ class Stage(Global):
             print(image_output)
         except:
             final_output = output + '\nError: Harvey could not finish the build stage'
-            Utils.kill(final_output, image)
+            Utils.kill(final_output)
 
         execution_time = f'Build stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{execution_time}\n'
@@ -130,7 +130,7 @@ class Stage(Global):
             print(create_output)
         except:
             final_output = output + stop_output + wait_output + remove_output + '\nError: Harvey could not create the container in the deploy stage'
-            Utils.kill(final_output, container)
+            Utils.kill(final_output)
 
         # Start the container
         try:
@@ -139,7 +139,7 @@ class Stage(Global):
             print(start_output)
         except:
             final_output = output + stop_output + wait_output + remove_output + create_output + '\nError: Harvey could not start the container in the deploy stage'
-            Utils.kill(final_output, container)
+            Utils.kill(final_output)
 
         execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
         final_output = f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n{start_output}\n{execution_time}\n'
