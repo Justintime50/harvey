@@ -2,11 +2,7 @@
 # pylint: disable=W0511,R0903
 import os
 import sys
-from dotenv import load_dotenv
 import slack
-
-# Setup variables
-load_dotenv()
 
 class Message():
     """Send message methods"""

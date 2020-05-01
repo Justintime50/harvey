@@ -1,6 +1,6 @@
 # pylint: disable=R0903,C0114
 class Global():
-    """Contains all the data to craft the requests client"""
+    """Contains global configuration for Harvey"""
     DOCKER_VERSION = 'v1.40' # Docker API version
     HARVEY_VERSION = '0.1.0' # Harvey release
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'

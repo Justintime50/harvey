@@ -6,7 +6,7 @@ from .container import Container
 from .image import Image
 from .messages import Message
 
-class Utils(Global):
+class Utils():
     """Harvey Utilities used throughout the program"""
     @classmethod
     def logs(cls, final_output):

@@ -10,7 +10,7 @@ from .globals import Global
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
-class Image(Global):
+class Image():
     """Docker image methods"""
     @classmethod
     def build(cls, config, webhook, context=''):
@@ -18,6 +18,7 @@ class Image(Global):
         full_name = webhook["repository"]["full_name"].lower()
         repo_name = webhook["repository"]["name"].lower()
         owner_name = webhook["repository"]["owner"]["name"].lower()
+
         # TODO: Use the Docker API for building instead of a shell \
             # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()

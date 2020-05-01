@@ -8,7 +8,7 @@ from .utils import Utils
 # TODO: Add logic to check that tests pass before moving to build
 # TODO: Add logic to check that build passes before moving to deploy
 
-class Pipeline(Global):
+class Pipeline():
     """Pipeline methods"""
     @classmethod
     def test(cls, config, webhook, output):

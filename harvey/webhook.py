@@ -8,7 +8,7 @@ from .git import Git
 from .globals import Global
 from .utils import Utils
 
-class Webhook(Global):
+class Webhook():
     """Webhook methods"""
     @classmethod
     def init(cls, webhook):

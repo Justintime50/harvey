@@ -14,30 +14,28 @@ API = Flask(__name__)
 @API.route('/harvey', methods=['POST'])
 def receive_webhook():
     """Receive a Webhook - this is the entrypoint for Harvey"""
-    return webhook()
+    target = harvey.Webhook.receive
+    return webhook(target)
 
 @API.route('/harvey/compose', methods=['POST'])
 def receive_webhook_compose():
     """Receive a Webhook, build from compose file - this is the entrypoint for Harvey"""
-    return webhook()
+    target = harvey.Webhook.compose
+    return webhook(target)
 
-def webhook():
+def webhook(target):
     data = request.data
     signature = request.headers.get('X-Hub-Signature')
-
-    # TODO: Ensure "Thread" is the best way to accomplish concurrency
-
     if os.getenv('MODE') == 'test':
-        Thread(target=harvey.Webhook.receive, args=(json.loads(data),)).start()
+        Thread(target=target, args=(json.loads(data),)).start()
         return "OK"
-
-    if decode(data, signature):
-        Thread(target=harvey.Webhook.receive, args=(json.loads(data),)).start()
+    if decode_webhook(data, signature):
+        Thread(target=target, args=(json.loads(data),)).start()
         return "OK"
     else:
         return abort(403)
 
-def decode(data, signature):
+def decode_webhook(data, signature):
     secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
     mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)

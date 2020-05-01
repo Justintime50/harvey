@@ -10,7 +10,7 @@ from .utils import Utils
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
-class Stage(Global):
+class Stage():
     """Stage methods"""
     @classmethod
     def test(cls, config, webhook, output):
