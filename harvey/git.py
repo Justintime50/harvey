@@ -4,6 +4,7 @@ import os
 import shutil
 import subprocess
 from .globals import Global
+from .utils import Utils
 
 class Git(Global):
     """Git methods"""
@@ -19,6 +20,7 @@ class Git(Global):
             final_output = subprocess.call(f'git clone --depth=50 --branch=master {url} {os.path.join(Global.PROJECTS_PATH, full_name)}', stdin=None, stdout=None, stderr=None, shell=True)
             print(final_output)
         except:
-            final_output = '\nError: Harvey could not clone project'
+            final_output = '\nError: Harvey could not clone the project'
+            Utils.kill(final_output)
 
         return final_output
