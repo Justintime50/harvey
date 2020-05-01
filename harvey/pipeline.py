@@ -1,11 +1,8 @@
 """Import Pipeline modules"""
 # pylint: disable=W0511
 from datetime import datetime
-import sys
-import os
 from .globals import Global
 from .stage import Stage
-from .messages import Message
 from .utils import Utils
 
 # TODO: Add logic to check that tests pass before moving to build
@@ -17,13 +14,12 @@ class Pipeline(Global):
     def test(cls, config, webhook, output):
         """Pull changes and run tests (no deploy)"""
         start_time = datetime.now()
-        test = Stage.test(config, webhook)
+        test = Stage.test(config, webhook, output)
         execution_time = f'Test pipeline execution time: {datetime.now() - start_time}'
         success = f'Test pipeline succeeded!'
         final_output = f'{output}\n{test}\n{execution_time}\n{success}'
 
-        Utils.logs(final_output)
-        Message.slack(final_output)
+        Utils.success(final_output)
 
         return test
 
@@ -31,14 +27,13 @@ class Pipeline(Global):
     def deploy(cls, config, webhook, output):
         """Pull changes and build/deploy (no tests)"""
         start_time = datetime.now()
-        build = Stage.build(config, webhook)
-        deploy = Stage.deploy(webhook)
+        build = Stage.build(config, webhook, output)
+        deploy = Stage.deploy(webhook, output)
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
         success = f'Deploy pipeline succeeded!'
         final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.logs(final_output)
-        Message.slack(final_output)
+        Utils.success(final_output)
 
         return deploy
 
@@ -46,15 +41,14 @@ class Pipeline(Global):
     def full(cls, config, webhook, output):
         """Pull changes, run tests, build image, start container"""
         start_time = datetime.now()
-        test = Stage.test(config, webhook)
-        build = Stage.build(config, webhook)
-        deploy = Stage.deploy(webhook)
+        test = Stage.test(config, webhook, output)
+        build = Stage.build(config, webhook, output)
+        deploy = Stage.deploy(webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
         success = f'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.logs(final_output)
-        Message.slack(final_output)
+        Utils.success(final_output)
 
         return deploy
 
@@ -62,13 +56,12 @@ class Pipeline(Global):
     def deploy_compose(cls, config, webhook, output):
         """Pull changes and build/deploy (no tests) - USING A DOCKER COMPOSE FILE"""
         start_time = datetime.now()
-        deploy = Stage.build_deploy_compose(config, webhook)
+        deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
         success = f'Deploy pipeline succeeded!'
         final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.logs(final_output)
-        Message.slack(final_output)
+        Utils.success(final_output)
 
         return deploy
 
@@ -76,13 +69,12 @@ class Pipeline(Global):
     def full_compose(cls, config, webhook, output):
         """Pull changes, run tests, build image, start container - USING A DOCKER COMPOSE FILE"""
         start_time = datetime.now()
-        test = Stage.test(config, webhook)
-        deploy = Stage.build_deploy_compose(config, webhook)
+        test = Stage.test(config, webhook, output)
+        deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
         success = f'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.logs(final_output)
-        Message.slack(final_output)
+        Utils.success(final_output)
 
         return deploy

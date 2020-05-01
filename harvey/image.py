@@ -3,6 +3,7 @@
 import json
 import uuid
 import os
+import subprocess
 import requests
 import requests_unixsocket
 from .globals import Global
@@ -33,14 +34,14 @@ class Image(Global):
         # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
             project = f'--build-arg PROJECT={full_name}'
-            path = f'{Global.TEST_PATH}'
+            path = Global.PROJECTS_PATH
             tag = uuid.uuid4().hex
-            tag_arg = f'-t {tag}'
         else:
             project = ''
-            path = f'{Global.PROJECTS_PATH}/{full_name}'
+            path = os.path.join(Global.PROJECTS_PATH, full_name)
             tag = f'{owner_name}-{repo_name}'
-            tag_arg = f'-t {tag}'
+
+        tag_arg = f'-t {tag}'
 
         # For testing only:
         if "language" in config and context == 'test':
@@ -54,9 +55,9 @@ class Image(Global):
 
         # Build the image and stream the output
         # TODO: Add try/catch for the subprocess here
-        stream = os.popen(f'cd {path} && docker build {dockerfile} \
-            {tag_arg} {language} {version} {project} .')
-        output = stream.read() # TODO: Make this stream live output
+        image = subprocess.call(f'cd {path} && docker build {dockerfile} \
+            {tag_arg} {language} {version} {project} .', stdin=None, stdout=None, stderr=None, shell=True)
+        output = image # TODO: Make this stream live output
         return tag, output
 
     @classmethod

@@ -1,6 +1,7 @@
 __pycache__
 .DS_Store
-docker/projects
+projects/*
+!projects/Dockerfile
 logs
 *.json
 .env
