@@ -1,22 +1,19 @@
 """Import stage modules"""
 # pylint: disable=W0511
-import sys
-import os
 from datetime import datetime
-import requests
+import subprocess
 import requests_unixsocket
 from .globals import Global
 from .container import Container
 from .image import Image
 from .utils import Utils
-from .messages import Message
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
 class Stage(Global):
     """Stage methods"""
     @classmethod
-    def test(cls, config, webhook):
+    def test(cls, config, webhook, output):
         """Test Stage"""
         start_time = datetime.now()
         context = 'test'
@@ -28,10 +25,8 @@ class Stage(Global):
             print(image_output)
         except:
             # TODO: Does not catch if image isn't built
-            final_output = 'Error: Harvey could not build image'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + '\nError: Harvey could not build the image'
+            Utils.kill(final_output, image)
 
         # Create a container
         try:
@@ -40,10 +35,8 @@ class Stage(Global):
             print(container_output)
         except:
             # TODO: Does not catch if image does not exist
-            final_output = image_output + 'Error: Harvey could not create container'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + image_output + '\nError: Harvey could not create the container'
+            Utils.kill(final_output, image, container)
 
         # Start the container
         try:
@@ -51,10 +44,8 @@ class Stage(Global):
             start_output = 'Test container started'
             print(start_output)
         except:
-            final_output = image_output + container_output + 'Error: Harvey could not start container'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + image_output + container_output + '\nError: Harvey could not start the container'
+            Utils.kill(final_output, image, container)
 
         # Wait for container to exit
         try:
@@ -62,10 +53,8 @@ class Stage(Global):
             wait_output = 'Waiting for Test container to exit'
             print(wait_output)
         except:
-            final_output = image_output + container_output + start_output + 'Error: Harvey could not wait for container'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + image_output + container_output + start_output + '\nError: Harvey could not wait for the container'
+            Utils.kill(final_output, image, container)
 
         # Return logs
         try:
@@ -74,22 +63,18 @@ class Stage(Global):
                 + logs + '============================================================\n'
             print(logs_output)
         except:
-            final_output = image_output + container_output + start_output + wait_output + 'Error: Harvey could not create container logs'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + image_output + container_output + start_output + wait_output + '\nError: Harvey could not create the container logs'
+            Utils.kill(final_output, image, container)
 
         # Remove container and image after it's done
         try:
             Container.remove(container['Id'])
-            Image.remove(image)
+            Image.remove(image[0])
             remove_output = 'Test container and image removed'
             print(remove_output)
         except:
-            final_output = image_output + container_output + start_output + wait_output + logs_output + 'Error: Harvey could not remove container and/or image'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + image_output + container_output + start_output + wait_output + logs_output + '\nError: Harvey could not remove the container and/or image'
+            Utils.kill(final_output, image, container)
 
         execution_time = f'Test stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{container_output}\n{start_output}\n{wait_output}\n\
@@ -99,7 +84,7 @@ class Stage(Global):
         return final_output
 
     @classmethod
-    def build(cls, config, webhook):
+    def build(cls, config, webhook, output):
         """Build Stage"""
         start_time = datetime.now()
         repo_name = webhook["repository"]["name"].lower()
@@ -111,10 +96,8 @@ class Stage(Global):
             image_output = f'Project image created\n{image[1]}'
             print(image_output)
         except:
-            final_output = 'Error: Harvey could not finish the build stage'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + '\nError: Harvey could not finish the build stage'
+            Utils.kill(final_output, image)
 
         execution_time = f'Build stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{execution_time}\n'
@@ -123,34 +106,22 @@ class Stage(Global):
         return final_output
 
     @classmethod
-    def deploy(cls, webhook):
+    def deploy(cls, webhook, output):
         """Deploy Stage"""
         start_time = datetime.now()
         repo_name = webhook["repository"]["name"].lower()
         owner_name = webhook["repository"]["owner"]["name"].lower()
         # Tear down the old container if one exists
-        # TODO: Verify this logic actually works as intended (checks if a container exists and skips if not)
-        try:
-            resp = requests.get(Global.BASE_URL + f'containers/{owner_name}-{repo_name}/json')
-            resp.raise_for_status()
-            try:
-                Container.stop(f'{owner_name}-{repo_name}')
-                stop_output = 'Old project container stopping'
-                print(stop_output)
-                Container.wait(f'{owner_name}-{repo_name}')
-                wait_output = 'Old project container waiting to exit'
-                print(wait_output)
-                Container.remove(f'{owner_name}-{repo_name}')
-                remove_output = 'Old project container removed'
-                print(remove_output)
-            except:
-                print("Error: Harvey failed during old/new container swap")
-                # TODO: Better error handling here
-        except requests.exceptions.HTTPError as err:
-            print(err)
-            stop_output = ''
-            wait_output = ''
-            remove_output = ''
+        # TODO: Add logic that checks if a container exists and skips these if not
+        Container.stop(f'{owner_name}-{repo_name}')
+        stop_output = 'Attempting to stop old project container'
+        print(stop_output)
+        Container.wait(f'{owner_name}-{repo_name}')
+        wait_output = 'Attempting to wait on old project container to exit'
+        print(wait_output)
+        Container.remove(f'{owner_name}-{repo_name}')
+        remove_output = 'Attempting to remove old project container'
+        print(remove_output)
 
         # Create a container
         try:
@@ -158,10 +129,8 @@ class Stage(Global):
             create_output = 'Project container created'
             print(create_output)
         except:
-            final_output = stop_output + wait_output + remove_output + 'Error: Harvey could not create the container in the deploy stage'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + stop_output + wait_output + remove_output + '\nError: Harvey could not create the container in the deploy stage'
+            Utils.kill(final_output, container)
 
         # Start the container
         try:
@@ -169,10 +138,8 @@ class Stage(Global):
             start_output = 'Project container started'
             print(start_output)
         except:
-            final_output = stop_output + wait_output + remove_output + create_output + 'Error: Harvey could not start the container in the deploy stage'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + stop_output + wait_output + remove_output + create_output + '\nError: Harvey could not start the container in the deploy stage'
+            Utils.kill(final_output, container)
 
         execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
         final_output = f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n{start_output}\n{execution_time}\n'
@@ -181,7 +148,7 @@ class Stage(Global):
         return final_output
 
     @classmethod
-    def build_deploy_compose(cls, config, webhook):
+    def build_deploy_compose(cls, config, webhook, output):
         """Build Stage - USING A DOCKER COMPOSE FILE"""
         start_time = datetime.now()
         full_name = webhook["repository"]["full_name"].lower()
@@ -192,14 +159,12 @@ class Stage(Global):
 
         # Build the image and container from the docker-compose file
         try:
-            compose = os.popen(f'cd {Global.PROJECTS_PATH}/{full_name} && docker-compose {compose} up -d --build')
-            compose_output = f'{compose.read()}'
+            compose = subprocess.call(f'cd {Global.PROJECTS_PATH}/{full_name} && docker-compose {compose} up -d --build', stdin=None, stdout=None, stderr=None, shell=True)
+            compose_output = compose
             print(compose_output)
         except:
-            final_output = 'Error: Harvey could not finish the build/deploy compose stage'
-            Utils.logs(final_output)
-            Message.slack(final_output)
-            sys.exit()
+            final_output = output + '\nError: Harvey could not finish the build/deploy compose stage'
+            Utils.kill(final_output)
 
         execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'
         final_output = f'{compose_output}\n{execution_time}\n'

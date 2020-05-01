@@ -34,7 +34,6 @@ With Harvey, you can take almost any `.travis.yml` file and convert it straight 
 - Each repo needs a `harvey.sh` file in the root directory stored in git
 - Each `harvey.sh` file must have `#!/bin/sh` as the first line
 - Each `harvey.sh` file must conform to shell scripting standards (**DO NOT** use bash, sh is used as some of the testing docker containers do not have bash pre-installed)
-- Each project is stored in the `project` directory in your testing Docker container. Either `cd project` before running your commands or specify this in your path when running commands that reference files.
 
 ### Shell
 
@@ -42,7 +41,7 @@ With Harvey, you can take almost any `.travis.yml` file and convert it straight 
 #!/bin/sh
 
 # TEST
-shellcheck project/src/*.sh
+shellcheck src/*.sh
 ```
 
 ### Python
@@ -55,13 +54,13 @@ pip install pylint > /dev/null 2>&1 && printf "%s\n" "Pylint installed"
 pip install pylint-exit > /dev/null 2>&1 && printf "%s\n" "Pylint exit installed"
 
 # TEST
-pylint project/pullbug/*.py --rcfile=.pylintrc || pylint-exit $?
+pylint pullbug/*.py --rcfile=.pylintrc || pylint-exit $?
 if [ $? -ne 0 ]; then
   echo "An error occurred while running pylint." >&2
   exit 1
 fi
 
-pylint project/examples/*.py --rcfile=.pylintrc || pylint-exit $?
+pylint examples/*.py --rcfile=.pylintrc || pylint-exit $?
 if [ $? -ne 0 ]; then
   echo "An error occurred while running pylint." >&2
   exit 1
@@ -72,8 +71,6 @@ fi
 
 ```shell
 #!/bin/sh
-
-cd project
 
 cd src
 
@@ -92,8 +89,6 @@ php composer.phar install --no-ansi --no-interaction --no-scripts --no-suggest -
 
 ```shell
 #!/bin/sh
-
-cd project
 
 # INSTALL
 npm i

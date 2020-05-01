@@ -25,7 +25,7 @@ def webhook():
     data = request.data
     signature = request.headers.get('X-Hub-Signature')
 
-    # TODO: Ensure this is the best way to accomplish concurrency
+    # TODO: Ensure "Thread" is the best way to accomplish concurrency
 
     if os.getenv('MODE') == 'test':
         Thread(target=harvey.Webhook.receive, args=(json.loads(data),)).start()

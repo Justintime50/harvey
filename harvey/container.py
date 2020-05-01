@@ -1,9 +1,6 @@
 """Import modules for containers"""
 #pylint: disable=W0511
 import json
-import sys
-import os
-from datetime import datetime
 import requests
 import requests_unixsocket
 from .globals import Global
