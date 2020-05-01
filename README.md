@@ -36,6 +36,7 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 1. Ensure you've added your ssh key to the ssh agent for private repos `ssh-add`
 1. Enable logging (below)
 1. Download this project and see documentation/examples for usage
+1. `cp .env.example .env` and setup enviornment variables
 1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/harvey`, send the payload as JSON)
 
 **NOTE:** It is not recommended to use Harvey alongside other CI/CD or Docker orchestration platforms on the same machine.
@@ -56,11 +57,9 @@ The [following](https://docs.docker.com/config/containers/logging/json-file/#usa
 
 ## Usage
 
-**NOTE:** This has only been tested on macOS.
-
 Find the full [docs here](docs/README.md). 
 
-Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
+Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret):
 
 ```javascript
 {
@@ -75,19 +74,19 @@ Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data
 }
 ```
 
+### Start API Server (for Webhook)
+
+**Start Server:**
+```bash
+python3 app.py
+```
+
 ### Scripting
 
 See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
 
 ```bash
 python3 examples.py
-```
-
-### API Server
-
-**Start Server:**
-```bash
-python3 app.py
 ```
 
 **Example API Call:**
