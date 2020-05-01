@@ -6,7 +6,7 @@ import subprocess
 from .globals import Global
 from .utils import Utils
 
-class Git(Global):
+class Git():
     """Git methods"""
     @classmethod
     def pull(cls, webhook):

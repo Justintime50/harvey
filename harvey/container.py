@@ -7,7 +7,7 @@ from .globals import Global
 
 requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
 
-class Container(Global):
+class Container():
     """Docker container methods"""
     @classmethod
     def create(cls, tag):
@@ -67,5 +67,4 @@ class Container(Global):
         """Remove (delete) a Docker container"""
         data = requests.delete(Global.BASE_URL + f'containers/{container_id}', \
             data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
-        # TODO: Do we want to also remove links and volumes?
         return data
