@@ -20,7 +20,7 @@ class Utils():
                 log.write(final_output)
         except OSError as os_error:
              # TODO: Add the repo/project name here
-            final_output = f'Error: Harvey could not save the log file.'
+            final_output = 'Error: Harvey could not save the log file.'
             print(os_error)
             Utils.kill(final_output)
 

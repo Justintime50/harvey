@@ -17,8 +17,8 @@ class Webhook():
         full_name = webhook["repository"]["full_name"].lower()
         preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n{datetime.now()}\n'
         print(preamble)
-        git_message = (f'New commit by: {webhook["commits"][0]["author"]["name"]} \
-            \nCommit made on repo: {repo_name}')
+        git_message = (f'New commit by: {webhook["commits"][0]["author"]["name"]}. \
+            \nCommit made on repo: {repo_name}.')
         git = Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
@@ -50,7 +50,7 @@ class Webhook():
             pipeline = Pipeline.full(init[0], webhook, init[1])
         elif not init[0]["pipeline"]:
             final_output = init[1] + '\nError: Harvey could not run, \
-                there was no pipeline specified'
+                there was no pipeline specified.'
             Utils.kill(final_output)
 
         return pipeline
@@ -69,7 +69,7 @@ class Webhook():
             pipeline = Pipeline.full_compose(init[0], webhook, init[1])
         elif not init[0]["pipeline"]:
             final_output = init[1] + '\nError: Harvey could not run, \
-                there was no pipeline specified'
+                there was no pipeline specified.'
             Utils.kill(final_output)
 
         return pipeline

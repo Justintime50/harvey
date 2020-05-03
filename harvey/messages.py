@@ -3,7 +3,6 @@
 import os
 import sys
 import slack
-from slack.errors import SlackApiError
 
 class Message():
     """Send message methods"""
@@ -17,8 +16,8 @@ class Message():
                 text=message
             )
             print('Slack message Sent!')
-        except SlackApiError:
-            final_output = 'Error: Harvey could not send the Slack message'
+        except slack.errors.SlackApiError:
+            final_output = 'Error: Harvey could not send the Slack message.'
             print(final_output)
             sys.exit(final_output)
             # TODO: Add Harvey logging here
