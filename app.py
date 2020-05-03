@@ -1,5 +1,5 @@
 """Import API modules"""
-# pylint: disable=W0511,R1705,W0612
+# pylint: disable=W0511,W0612
 from threading import Thread
 import json
 import os
@@ -32,8 +32,7 @@ def webhook(target):
     if decode_webhook(data, signature):
         Thread(target=target, args=(json.loads(data),)).start()
         return "OK"
-    else:
-        return abort(403)
+    return abort(403)
 
 def decode_webhook(data, signature):
     """Decode a webhook's secret key"""
@@ -50,9 +49,7 @@ def retrieve_pipeline(pipeline_id):
             with open(os.path.join(root, file), 'r') as output:
                 response = output.read()
             return response
-        # TODO: Fix this, currently if uncommented, it always throws a 404
-        # else:
-        #     return abort(404)
+    return abort(404)
 
 # @API.route('/containers/create', methods=['POST'])
 # def create_container():
