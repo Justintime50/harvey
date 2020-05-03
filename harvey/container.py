@@ -12,15 +12,24 @@ class Container():
     @classmethod
     def create(cls, tag):
         """Create a Docker container"""
-        data = requests.post(Global.BASE_URL + f'containers/create?name={tag}', \
-            data=json.dumps({'Image': tag}), headers=Global.JSON_HEADERS)
-        return data.json()
+        data = requests.post(Global.BASE_URL + f'containers/create', \
+            params=json.dumps({'name': tag}), data=json.dumps({'Image': tag}), \
+            headers=Global.JSON_HEADERS)
+        if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
+            response = data.json()
+        else:
+            response = False
+        return response
 
     @classmethod
     def start(cls, container_id):
         """Start a Docker container"""
         data = requests.post(Global.BASE_URL + f'containers/{container_id}/start')
-        return data
+        if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
+            response = data
+        else:
+            response = False
+        return response
 
     @classmethod
     def stop(cls, container_id):
@@ -60,7 +69,11 @@ class Container():
     def wait(cls, container_id):
         """Wait for a Docker container to exit"""
         data = requests.post(Global.BASE_URL + f'containers/{container_id}/wait')
-        return data.json()
+        if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
+            response = data.json()
+        else:
+            response = False
+        return response
 
     @classmethod
     def remove(cls, container_id):

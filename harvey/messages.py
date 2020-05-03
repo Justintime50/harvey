@@ -3,21 +3,24 @@
 import os
 import sys
 import slack
+from slack.errors import SlackApiError
 
 class Message():
     """Send message methods"""
     @classmethod
     def slack(cls, message):
         """Send Slack messages via a bot"""
-        # Make the POST request through the python slack client
-        slack_client = slack.WebClient(os.getenv("SLACK_BOT_TOKEN"))
+        slack_client = slack.WebClient(os.getenv('SLACK_BOT_TOKEN'))
         try:
             slack_client.chat_postMessage(
-                channel=os.getenv("SLACK_CHANNEL"),
+                channel=os.getenv('SLACK_CHANNEL'),
                 text=message
             )
-            print("Slack message Sent!")
-        except:
-            sys.exit("Error: Harvey could not send the Slack message")
+            print('Slack message Sent!')
+        except SlackApiError:
+            final_output = 'Error: Harvey could not send the Slack message'
+            print(final_output)
+            sys.exit(final_output)
+            # TODO: Add Harvey logging here
 
 # TODO: Add email functionality
