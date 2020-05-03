@@ -3,7 +3,6 @@
 from threading import Thread
 import json
 import os
-import dotenv
 import hmac
 import hashlib
 from flask import Flask, request, abort
