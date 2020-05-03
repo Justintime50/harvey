@@ -1,5 +1,5 @@
 """Import API modules"""
-# pylint: disable=W0511
+# pylint: disable=W0511,R1705
 from threading import Thread
 import json
 import os
@@ -24,6 +24,7 @@ def receive_webhook_compose():
     return webhook(target)
 
 def webhook(target):
+    """Initiate details to receive a webhook"""
     data = request.data
     signature = request.headers.get('X-Hub-Signature')
     if os.getenv('MODE') == 'test':
@@ -36,6 +37,7 @@ def webhook(target):
         return abort(403)
 
 def decode_webhook(data, signature):
+    """Decode a webhook's secret key"""
     secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
     mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)

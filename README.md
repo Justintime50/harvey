@@ -4,10 +4,10 @@
 
 Your personal CI/CD and Docker orchestration platform.
 
-[![Build Status](https://travis-ci.org/Justintime50/harvey.svg?branch=master)](https://travis-ci.org/Justintime50/harvey)
+[![Build Status](https://travis-ci.com/Justintime50/harvey.svg?branch=master)](https://travis-ci.com/Justintime50/harvey)
 [![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
 
-<img src="assets/showcase.png" style="width:150px">
+<img src="assets/showcase.png">
 
 </div>
 

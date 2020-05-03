@@ -8,4 +8,5 @@ class Global():
     TAR_HEADERS = {'Content-Type': 'application/tar'}
     ATTACH_HEADERS = {'Content-Type': 'application/vnd.docker.raw-stream'}
     PROJECTS_PATH = 'projects'
-    LOGS_PATH = 'logs'
+    PROJECTS_LOG_PATH = 'logs/projects'
+    HARVEY_LOG_PATH = 'logs/harvey'

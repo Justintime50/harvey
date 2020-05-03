@@ -1,12 +1,10 @@
 """Import Pipeline modules"""
 # pylint: disable=W0511
 from datetime import datetime
-from .globals import Global
 from .stage import Stage
 from .utils import Utils
 
 # TODO: Add logic to check that tests pass before moving to build
-# TODO: Add logic to check that build passes before moving to deploy
 
 class Pipeline():
     """Pipeline methods"""

@@ -54,12 +54,12 @@ class Image():
         else:
             version = ''
 
-        # Build the image and stream the output
-        # TODO: Add try/catch for the subprocess here
-        image = subprocess.call(f'cd {path} && docker build {dockerfile} \
-            {tag_arg} {language} {version} {project} .', stdin=None, stdout=None, stderr=None, shell=True)
-        output = image # TODO: Make this stream live output
-        return tag, output
+        # Build the image (exceptions handled at stage level)
+        image = subprocess.check_call(f'cd {path} && docker build \
+            {dockerfile} {tag_arg} {language} {version} {project} .', \
+            stdin=None, stdout=None, stderr=None, shell=True)
+
+        return tag, image
 
     @classmethod
     def retrieve(cls, image_id):
