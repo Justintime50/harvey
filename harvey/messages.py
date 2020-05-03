@@ -1,5 +1,5 @@
 """Message logic once a pipeline has exited"""
-# pylint: disable=W0511,R0903
+# pylint: disable=W0511,R0903,E1101
 import os
 import sys
 import slack
