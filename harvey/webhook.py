@@ -13,26 +13,27 @@ class Webhook():
     @classmethod
     def init(cls, webhook):
         """Initiate everything needed for a webhook function"""
-        repo_name = webhook["repository"]["name"].lower()
-        full_name = webhook["repository"]["full_name"].lower()
         preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n{datetime.now()}\n'
+        pipeline_id = f'Pipeline ID: {Global.repo_commit_id(webhook)}\n'
         print(preamble)
-        git_message = (f'New commit by: {webhook["commits"][0]["author"]["name"]}. \
-            \nCommit made on repo: {repo_name}.')
+        git_message = (f'New commit by: {Global.repo_commit_author(webhook)}. \
+            \nCommit made on repo: {Global.repo_full_name(webhook)}.')
         git = Git.pull(webhook)
 
         # Open the project's config file to assign pipeline variables
         try:
-            filename = os.path.join(Global.PROJECTS_PATH, full_name, 'harvey.json')
-            with open(filename, 'rb') as file:
+            filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), \
+                'harvey.json')
+            with open(filename, 'r') as file:
                 config = json.loads(file.read())
                 print(config)
         except FileNotFoundError as fnf_error:
-            final_output = f'Error: Harvey could not fine "harvey.json" file in {full_name}.'
+            final_output = f'Error: Harvey could not fine "harvey.json" file in \
+                {Global.repo_full_name(webhook)}.'
             print(fnf_error)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
-        output = f'{preamble}\nConfiguration:\n{config}\n{git_message}\n{git}\n'
+        output = f'{preamble}\n{pipeline_id}\nConfiguration:\n{config}\n{git_message}\n{git}\n'
 
         return config, output
 
@@ -51,7 +52,7 @@ class Webhook():
         elif not init[0]["pipeline"]:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         return pipeline
 
@@ -70,6 +71,6 @@ class Webhook():
         elif not init[0]["pipeline"]:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         return pipeline

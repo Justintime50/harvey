@@ -15,10 +15,6 @@ class Image():
     @classmethod
     def build(cls, config, webhook, context=''):
         """Build a Docker image"""
-        full_name = webhook["repository"]["full_name"].lower()
-        repo_name = webhook["repository"]["name"].lower()
-        owner_name = webhook["repository"]["owner"]["name"].lower()
-
         # TODO: Use the Docker API for building instead of a shell \
             # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
@@ -34,13 +30,13 @@ class Image():
 
         # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
-            project = f'--build-arg PROJECT={full_name}'
+            project = f'--build-arg PROJECT={Global.repo_full_name(webhook)}'
             path = Global.PROJECTS_PATH
             tag = uuid.uuid4().hex
         else:
             project = ''
-            path = os.path.join(Global.PROJECTS_PATH, full_name)
-            tag = f'{owner_name}-{repo_name}'
+            path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
+            tag = f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}'
 
         tag_arg = f'-t {tag}'
 
