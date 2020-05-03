@@ -12,7 +12,7 @@ class Container():
     @classmethod
     def create(cls, tag):
         """Create a Docker container"""
-        data = requests.post(Global.BASE_URL + f'containers/create', \
+        data = requests.post(Global.BASE_URL + 'containers/create', \
             params=json.dumps({'name': tag}), data=json.dumps({'Image': tag}), \
             headers=Global.JSON_HEADERS)
         if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
@@ -46,7 +46,7 @@ class Container():
     @classmethod
     def all(cls):
         """List all Docker containers"""
-        data = requests.get(Global.BASE_URL + f'containers/json')
+        data = requests.get(Global.BASE_URL + 'containers/json')
         return data.json()
 
     @classmethod

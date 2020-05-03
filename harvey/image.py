@@ -70,7 +70,7 @@ class Image():
     @classmethod
     def all(cls):
         """Retrieve all Docker images"""
-        data = requests.get(Global.BASE_URL + f'images/json')
+        data = requests.get(Global.BASE_URL + 'images/json')
         return data.json()
 
     @classmethod

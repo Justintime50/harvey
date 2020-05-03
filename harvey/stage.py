@@ -18,33 +18,33 @@ class Stage():
         # Build the image
         try:
             image = Image.build(config, webhook, context)
-            image_output = f'Test image created\n{image[1]}'
+            image_output = f'Test image created\n{image[1]}.'
             print(image_output)
         except subprocess.CalledProcessError:
             # TODO: Figure out how to send docker build output if this fails
-            final_output = output + f'\nError: Harvey could not build the Test image.'
+            final_output = output + '\nError: Harvey could not build the Test image.'
             print(final_output)
             Utils.kill(final_output)
 
         # Create a container
         container = Container.create(image[0])
         if container is not False:
-            container_output = 'Test container created'
+            container_output = 'Test container created.'
             print(container_output)
         else:
             final_output = output + image_output + \
-                '\nError: Harvey could not create the Test container'
+                '\nError: Harvey could not create the Test container.'
             Image.remove(image[0])
             Utils.kill(final_output)
 
         # Start the container
         start = Container.start(container['Id'])
         if start is not False:
-            start_output = 'Test container started'
+            start_output = 'Test container started.'
             print(start_output)
         else:
             final_output = output + image_output + container_output + \
-                '\nError: Harvey could not start the container'
+                '\nError: Harvey could not start the container.'
             Image.remove(image[0])
             Container.remove(container)
             Utils.kill(final_output)
@@ -52,11 +52,11 @@ class Stage():
         # Wait for container to exit
         wait = Container.wait(container['Id'])
         if wait is not False:
-            wait_output = 'Waiting for Test container to exit'
+            wait_output = 'Waiting for Test container to exit.'
             print(wait_output)
         else:
             final_output = output + image_output + container_output + start_output + \
-                '\nError: Harvey could not wait for the container'
+                '\nError: Harvey could not wait for the container.'
             Image.remove(image[0])
             Container.remove(container)
             Utils.kill(final_output)
@@ -70,7 +70,7 @@ class Stage():
             print(logs_output)
         else:
             final_output = output + image_output + container_output + start_output + wait_output + \
-                '\nError: Harvey could not create the container logs'
+                '\nError: Harvey could not create the container logs.'
             Image.remove(image[0])
             Container.remove(container)
             Utils.kill(final_output)
@@ -79,12 +79,12 @@ class Stage():
         remove = Container.remove(container['Id'])
         if remove is not False:
             Image.remove(image[0])
-            remove_output = 'Test container and image removed'
+            remove_output = 'Test container and image removed.'
             print(remove_output)
         else:
             final_output = output + image_output + container_output + start_output + \
                 wait_output + logs_output + \
-                '\nError: Harvey could not remove the container and/or image'
+                '\nError: Harvey could not remove the container and/or image.'
             Image.remove(image[0])
             Container.remove(container)
             Utils.kill(final_output)
@@ -110,7 +110,7 @@ class Stage():
             image_output = f'Project image created\n{image[1]}'
             print(image_output)
         except subprocess.CalledProcessError:
-            final_output = output + '\nError: Harvey could not finish the build stage'
+            final_output = output + '\nError: Harvey could not finish the build stage.'
             Utils.kill(final_output)
 
         execution_time = f'Build stage execution time: {datetime.now() - start_time}'
@@ -129,33 +129,33 @@ class Stage():
         # Tear down the old container if one exists
         # TODO: Add logic that checks if a container exists and skips these if not
         Container.stop(f'{owner_name}-{repo_name}')
-        stop_output = 'Attempting to stop old project container'
+        stop_output = 'Attempting to stop old project container.'
         print(stop_output)
         Container.wait(f'{owner_name}-{repo_name}')
-        wait_output = 'Attempting to wait on old project container to exit'
+        wait_output = 'Attempting to wait on old project container to exit.'
         print(wait_output)
         Container.remove(f'{owner_name}-{repo_name}')
-        remove_output = 'Attempting to remove old project container'
+        remove_output = 'Attempting to remove old project container.'
         print(remove_output)
 
         # Create a container
         container = Container.create(f'{owner_name}-{repo_name}')
         if container is not False:
-            create_output = 'Project container created'
+            create_output = 'Project container created.'
             print(create_output)
         else:
             final_output = output + stop_output + wait_output + remove_output + \
-                '\nError: Harvey could not create the container in the deploy stage'
+                '\nError: Harvey could not create the container in the deploy stage.'
             Utils.kill(final_output)
 
         # Start the container
         start = Container.start(container['Id'])
         if start is not False:
-            start_output = 'Project container started'
+            start_output = 'Project container started.'
             print(start_output)
         else:
             final_output = output + stop_output + wait_output + remove_output + \
-                create_output + '\nError: Harvey could not start the container in the deploy stage'
+                create_output + '\nError: Harvey could not start the container in the deploy stage.'
             Utils.kill(final_output)
 
         execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
@@ -184,7 +184,7 @@ class Stage():
             print(compose_output)
         except subprocess.CalledProcessError:
             final_output = output + '\nError: Harvey could not finish the \
-                build/deploy compose stage'
+                build/deploy compose stage.'
             Utils.kill(final_output)
 
         execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'

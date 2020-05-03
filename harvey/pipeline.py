@@ -14,7 +14,7 @@ class Pipeline():
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
         execution_time = f'Test pipeline execution time: {datetime.now() - start_time}'
-        success = f'Test pipeline succeeded!'
+        success = 'Test pipeline succeeded!'
         final_output = f'{output}\n{test}\n{execution_time}\n{success}'
 
         Utils.success(final_output)
@@ -28,7 +28,7 @@ class Pipeline():
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
-        success = f'Deploy pipeline succeeded!'
+        success = 'Deploy pipeline succeeded!'
         final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
         Utils.success(final_output)
@@ -43,7 +43,7 @@ class Pipeline():
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
-        success = f'Full pipeline succeeded!'
+        success = 'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
         Utils.success(final_output)
@@ -56,7 +56,7 @@ class Pipeline():
         start_time = datetime.now()
         deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
-        success = f'Deploy pipeline succeeded!'
+        success = 'Deploy pipeline succeeded!'
         final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
 
         Utils.success(final_output)
@@ -70,7 +70,7 @@ class Pipeline():
         test = Stage.test(config, webhook, output)
         deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
-        success = f'Full pipeline succeeded!'
+        success = 'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{deploy}\n{execution_time}\n{success}'
 
         Utils.success(final_output)
