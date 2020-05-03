@@ -2,6 +2,7 @@
 # pylint: disable=W0511,R0914,R0915
 from datetime import datetime
 import subprocess
+import os
 from .globals import Global
 from .container import Container
 from .image import Image
@@ -24,7 +25,7 @@ class Stage():
             # TODO: Figure out how to send docker build output if this fails
             final_output = output + '\nError: Harvey could not build the Test image.'
             print(final_output)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Create a container
         container = Container.create(image[0])
@@ -35,7 +36,7 @@ class Stage():
             final_output = output + image_output + \
                 '\nError: Harvey could not create the Test container.'
             Image.remove(image[0])
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Start the container
         start = Container.start(container['Id'])
@@ -47,7 +48,7 @@ class Stage():
                 '\nError: Harvey could not start the container.'
             Image.remove(image[0])
             Container.remove(container)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Wait for container to exit
         wait = Container.wait(container['Id'])
@@ -59,7 +60,7 @@ class Stage():
                 '\nError: Harvey could not wait for the container.'
             Image.remove(image[0])
             Container.remove(container)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Return logs
         logs = Container.logs(container['Id'])
@@ -73,7 +74,7 @@ class Stage():
                 '\nError: Harvey could not create the container logs.'
             Image.remove(image[0])
             Container.remove(container)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Remove container and image after it's done
         remove = Container.remove(container['Id'])
@@ -87,7 +88,7 @@ class Stage():
                 '\nError: Harvey could not remove the container and/or image.'
             Image.remove(image[0])
             Container.remove(container)
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         execution_time = f'Test stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{container_output}\n{start_output}\n{wait_output}\n\
@@ -100,18 +101,16 @@ class Stage():
     def build(cls, config, webhook, output):
         """Build Stage"""
         start_time = datetime.now()
-        repo_name = webhook["repository"]["name"].lower()
-        owner_name = webhook["repository"]["owner"]["name"].lower()
 
         # Build the image
         try:
-            Image.remove(f'{owner_name}-{repo_name}')
+            Image.remove(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
             image = Image.build(config, webhook)
             image_output = f'Project image created\n{image[1]}'
             print(image_output)
         except subprocess.CalledProcessError:
             final_output = output + '\nError: Harvey could not finish the build stage.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         execution_time = f'Build stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{execution_time}\n'
@@ -123,30 +122,29 @@ class Stage():
     def deploy(cls, webhook, output):
         """Deploy Stage"""
         start_time = datetime.now()
-        repo_name = webhook["repository"]["name"].lower()
-        owner_name = webhook["repository"]["owner"]["name"].lower()
 
         # Tear down the old container if one exists
         # TODO: Add logic that checks if a container exists and skips these if not
-        Container.stop(f'{owner_name}-{repo_name}')
+        Container.stop(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         stop_output = 'Attempting to stop old project container.'
         print(stop_output)
-        Container.wait(f'{owner_name}-{repo_name}')
+        Container.wait(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         wait_output = 'Attempting to wait on old project container to exit.'
         print(wait_output)
-        Container.remove(f'{owner_name}-{repo_name}')
+        Container.remove(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         remove_output = 'Attempting to remove old project container.'
         print(remove_output)
 
         # Create a container
-        container = Container.create(f'{owner_name}-{repo_name}')
+        container = Container.create( \
+            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         if container is not False:
             create_output = 'Project container created.'
             print(create_output)
         else:
             final_output = output + stop_output + wait_output + remove_output + \
                 '\nError: Harvey could not create the container in the deploy stage.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         # Start the container
         start = Container.start(container['Id'])
@@ -156,7 +154,7 @@ class Stage():
         else:
             final_output = output + stop_output + wait_output + remove_output + \
                 create_output + '\nError: Harvey could not start the container in the deploy stage.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
         final_output = f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n\
@@ -169,7 +167,6 @@ class Stage():
     def build_deploy_compose(cls, config, webhook, output):
         """Build Stage - USING A DOCKER COMPOSE FILE"""
         start_time = datetime.now()
-        full_name = webhook["repository"]["full_name"].lower()
         if "compose" in config:
             compose = f'-f {config["compose"]}'
         else:
@@ -177,7 +174,8 @@ class Stage():
 
         # Build the image and container from the docker-compose file
         try:
-            compose = subprocess.call(f'cd {Global.PROJECTS_PATH}/{full_name} \
+            compose = subprocess.call(f'cd \
+                {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
                 && docker-compose {compose} up -d --build', \
                 stdin=None, stdout=None, stderr=None, shell=True)
             compose_output = compose
@@ -185,7 +183,7 @@ class Stage():
         except subprocess.CalledProcessError:
             final_output = output + '\nError: Harvey could not finish the \
                 build/deploy compose stage.'
-            Utils.kill(final_output)
+            Utils.kill(final_output, webhook)
 
         execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'
         final_output = f'{compose_output}\n{execution_time}\n'

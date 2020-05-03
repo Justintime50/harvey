@@ -17,7 +17,7 @@ class Pipeline():
         success = 'Test pipeline succeeded!'
         final_output = f'{output}\n{test}\n{execution_time}\n{success}'
 
-        Utils.success(final_output)
+        Utils.success(final_output, webhook)
 
         return test
 
@@ -31,7 +31,7 @@ class Pipeline():
         success = 'Deploy pipeline succeeded!'
         final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.success(final_output)
+        Utils.success(final_output, webhook)
 
         return deploy
 
@@ -46,7 +46,7 @@ class Pipeline():
         success = 'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{build}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.success(final_output)
+        Utils.success(final_output, webhook)
 
         return deploy
 
@@ -59,7 +59,7 @@ class Pipeline():
         success = 'Deploy pipeline succeeded!'
         final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.success(final_output)
+        Utils.success(final_output, webhook)
 
         return deploy
 
@@ -73,6 +73,6 @@ class Pipeline():
         success = 'Full pipeline succeeded!'
         final_output = f'{output}\n{test}\n{deploy}\n{execution_time}\n{success}'
 
-        Utils.success(final_output)
+        Utils.success(final_output, webhook)
 
         return deploy

@@ -83,6 +83,10 @@ import harvey
 # )
 
 """API Entrypoint (Webhook)"""
-with open('./git_webhook.json', 'r') as file:
-    request = requests.post('http://127.0.0.1:5000/harvey', data=file, headers=harvey.Global.JSON_HEADERS)
-    print(request)
+# with open('./git_webhook.json', 'r') as file:
+#     request = requests.post('http://127.0.0.1:5000/harvey', data=file, headers=harvey.Global.JSON_HEADERS)
+#     print(request)
+
+"""Retrieve a Pipeline by ID"""
+request = requests.get('http://127.0.0.1:5000/pipeline/f599cde2f2a0ad562bb7982328fe0aeee9d22b1c', headers=harvey.Global.JSON_HEADERS)
+print(request.text)

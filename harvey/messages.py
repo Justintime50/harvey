@@ -15,7 +15,7 @@ class Message():
                 channel=os.getenv('SLACK_CHANNEL'),
                 text=message
             )
-            print('Slack message Sent!')
+            print('Slack message sent!')
         except slack.errors.SlackApiError:
             final_output = 'Error: Harvey could not send the Slack message.'
             print(final_output)

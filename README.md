@@ -11,7 +11,7 @@ Your personal CI/CD and Docker orchestration platform.
 
 </div>
 
-***NOTE:** Harvey is still in development with MANY items needing attention (see TODO section below). While usable, it's not suggested to use Harvey in production just yet.*
+***NOTE:** Harvey is still in development with MANY items needing attention. While usable, it's not suggested to use Harvey in production just yet.*
 
 Harvey was born because Rancher has too much overhead and GitLab is too RAM hungry to self-host on my small personal server. CI's like Travis are fantastic for open source but pricy for private use and can't be self hosted - deployments across servers looked like a nightmare so I created Harvey - the homegrown CI/CD and Docker orchestrator that kept things simple and lean. Harvey can run multiple pipelines concurrently and initial tests have Harvey's pipelines coming in between just 20 seconds and 2 minutes to pull new changes and test, build, and deploy in production.
 
@@ -76,12 +76,13 @@ Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data
 
 ### Start API Server (for Webhook)
 
-**Start Server:**
+**Start Harvey:**
+
 ```bash
 python3 app.py
 ```
 
-### Scripting
+### Example Python Functions
 
 See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
 
@@ -90,8 +91,11 @@ python3 examples.py
 ```
 
 **Example API Call:**
+
+Retrieve the pipeline output from Harvey using a commit ID.
+
 ```bash
-curl -X GET http://127.0.0.1:5000/containers/test-project
+curl -X GET http://127.0.0.1:5000/pipeline/f599cde2f2a0ad562bb7982328fe0aeee9d22b1c
 ```
 
 #### Supported Language Strings

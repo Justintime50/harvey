@@ -1,5 +1,5 @@
 """Import API modules"""
-# pylint: disable=W0511,R1705
+# pylint: disable=W0511,R1705,W0612
 from threading import Thread
 import json
 import os
@@ -40,6 +40,19 @@ def decode_webhook(data, signature):
     secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
     mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
+
+@API.route('/pipeline/<pipeline_id>', methods=['GET'])
+def retrieve_pipeline(pipeline_id):
+    """Retrieve a pipeline's logs by ID"""
+    file = f'{pipeline_id}.log'
+    for root, dirs, files in os.walk(harvey.Global.PROJECTS_LOG_PATH):
+        if file in files:
+            with open(os.path.join(root, file), 'r') as output:
+                response = output.read()
+            return response
+        # TODO: Fix this, currently if uncommented, it always throws a 404
+        # else:
+        #     return abort(404)
 
 # @API.route('/containers/create', methods=['POST'])
 # def create_container():
