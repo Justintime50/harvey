@@ -2,6 +2,7 @@ __pycache__
 .DS_Store
 projects/*
 !projects/Dockerfile
+!projects/.harvey
 logs
 *.json
 .env
