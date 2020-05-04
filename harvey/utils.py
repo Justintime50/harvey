@@ -2,7 +2,6 @@
 # pylint: disable=W0511
 import os
 import sys
-import shutil
 from .globals import Global
 from .messages import Message
 

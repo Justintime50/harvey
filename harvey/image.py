@@ -51,11 +51,11 @@ class Image():
             version = ''
 
         # Build the image (exceptions handled at stage level)
-        image = subprocess.check_call(f'cd {path} && docker build \
+        image = subprocess.check_output(f'cd {path} && docker build \
             {dockerfile} {tag_arg} {language} {version} {project} .', \
-            stdin=None, stdout=None, stderr=None, shell=True, timeout=1800)
+            stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
 
-        return tag, image
+        return tag, image.decode('UTF-8')
 
     @classmethod
     def retrieve(cls, image_id):

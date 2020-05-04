@@ -13,7 +13,9 @@ class Webhook():
     @classmethod
     def init(cls, webhook):
         """Initiate everything needed for a webhook function"""
-        preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n{datetime.now()}\n'
+        start_time = datetime.now()
+        preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n' + \
+            f'Pipeline Started: {start_time}'
         pipeline_id = f'Pipeline ID: {Global.repo_commit_id(webhook)}\n'
         print(preamble)
         git_message = (f'New commit by: {Global.repo_commit_author(webhook)}. \
@@ -26,14 +28,17 @@ class Webhook():
                 'harvey.json')
             with open(filename, 'r') as file:
                 config = json.loads(file.read())
-                print(config)
+                print(json.dumps(config, indent=4))
         except FileNotFoundError as fnf_error:
             final_output = f'Error: Harvey could not fine "harvey.json" file in \
                 {Global.repo_full_name(webhook)}.'
             print(fnf_error)
             Utils.kill(final_output, webhook)
 
-        output = f'{preamble}\n{pipeline_id}\nConfiguration:\n{config}\n{git_message}\n{git}\n'
+        execution_time = f'Startup execution time: {datetime.now() - start_time}\n'
+        output = f'{preamble}\n{pipeline_id}Configuration:\n{json.dumps(config, indent=4)}' + \
+            f'\n\n{git_message}\n{git}\n{execution_time}'
+        print(execution_time)
 
         return config, output
 

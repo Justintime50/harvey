@@ -10,6 +10,8 @@ class Global():
     PROJECTS_PATH = 'projects'
     PROJECTS_LOG_PATH = 'logs/projects'
     HARVEY_LOG_PATH = 'logs/harvey'
+    BUILD_TIMEOUT = 1800
+    GIT_TIMEOUT = 60
 
     @classmethod
     def repo_name(cls, webhook):

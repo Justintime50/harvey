@@ -19,7 +19,7 @@ class Stage():
         # Build the image
         try:
             image = Image.build(config, webhook, context)
-            image_output = f'Test image created\n{image[1]}.'
+            image_output = f'Test image created.\n{image[1]}'
             print(image_output)
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out building the Test image.'
@@ -94,7 +94,7 @@ class Stage():
             Container.remove(container)
             Utils.kill(final_output, webhook)
 
-        execution_time = f'Test stage execution time: {datetime.now() - start_time}'
+        execution_time = f'\nTest stage execution time: {datetime.now() - start_time}'
         final_output = f'{image_output}\n{container_output}\n{start_output}\n{wait_output}\n\
             {logs_output}\n{remove_output}\n{execution_time}\n'
         print(execution_time)
@@ -164,9 +164,9 @@ class Stage():
                 create_output + '\nError: Harvey could not start the container in the deploy stage.'
             Utils.kill(final_output, webhook)
 
-        execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
-        final_output = f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n\
-            {start_output}\n{execution_time}\n'
+        execution_time = f'\nDeploy stage execution time: {datetime.now() - start_time}'
+        final_output = f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n' + \
+            f'{start_output}\n{execution_time}\n'
         print(execution_time)
 
         return final_output
@@ -182,10 +182,10 @@ class Stage():
 
         # Build the image and container from the docker-compose file
         try:
-            compose = subprocess.call(f'cd \
+            compose = subprocess.check_output(f'cd \
                 {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
                 && docker-compose {compose} up -d --build', \
-                stdin=None, stdout=None, stderr=None, shell=True)
+                stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
             compose_output = compose
             print(compose_output)
         except subprocess.TimeoutExpired:
