@@ -1,5 +1,10 @@
 # Documentation
 
+## Things to Know
+
+- Harvey will timeout builds at 30 minutes.
+- Harvey will shallow clone your project with the latest 10 commits.
+
 ## Harvey Configuration Examples
 
 **Harvey Configuration Criteria**

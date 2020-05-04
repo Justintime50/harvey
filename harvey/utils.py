@@ -32,8 +32,6 @@ class Utils():
         """
         Utils.project_logs(final_output, webhook)
         Message.slack(final_output)
-        if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
-            shutil.rmtree(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook)))
         sys.exit()
 
     @classmethod
@@ -41,5 +39,3 @@ class Utils():
         """Log output and send message on pipeline success"""
         Utils.project_logs(final_output, webhook)
         Message.slack(final_output)
-        if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
-            shutil.rmtree(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook)))
