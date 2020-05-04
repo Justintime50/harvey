@@ -9,13 +9,13 @@ class Git():
     """Git methods"""
     @classmethod
     def pull(cls, webhook):
-        """Clone project using git"""
+        """Clone/pull project using Git"""
         if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
             try:
-                final_output = subprocess.check_call( \
+                final_output = subprocess.check_output( \
                     f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
                     && git fetch && git pull', \
-                    stdin=None, stdout=None, stderr=None, shell=True, timeout=60)
+                    stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:
                 final_output = 'Error: Harvey timed out during git pull operation.'
@@ -27,10 +27,10 @@ class Git():
                 Utils.kill(final_output, webhook)
         else:
             try:
-                final_output = subprocess.check_call(f'git clone --depth=10 --branch=master \
+                final_output = subprocess.check_output(f'git clone --depth=10 --branch=master \
                     {Global.repo_url(webhook)} \
                     {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}', \
-                    stdin=None, stdout=None, stderr=None, shell=True, timeout=60)
+                    stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:
                 final_output = 'Error: Harvey timed out during git clone operation.'
@@ -41,4 +41,4 @@ class Git():
                 print(final_output)
                 Utils.kill(final_output, webhook)
 
-        return final_output
+        return final_output.decode('UTF-8')
