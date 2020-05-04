@@ -53,7 +53,7 @@ class Image():
         # Build the image (exceptions handled at stage level)
         image = subprocess.check_call(f'cd {path} && docker build \
             {dockerfile} {tag_arg} {language} {version} {project} .', \
-            stdin=None, stdout=None, stderr=None, shell=True)
+            stdin=None, stdout=None, stderr=None, shell=True, timeout=1800)
 
         return tag, image
 

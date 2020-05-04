@@ -29,7 +29,7 @@ class Global():
     @classmethod
     def repo_url(cls, webhook):
         """Return the repo's URL from the webhook JSON"""
-        return webhook["repository"]["url"]
+        return webhook["repository"]["ssh_url"] # Use SSH URL so private repos can be cloned/pulled
 
     @classmethod
     def repo_owner_name(cls, webhook):

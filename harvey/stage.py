@@ -21,6 +21,10 @@ class Stage():
             image = Image.build(config, webhook, context)
             image_output = f'Test image created\n{image[1]}.'
             print(image_output)
+        except subprocess.TimeoutExpired:
+            final_output = 'Error: Harvey timed out building the Test image.'
+            print(final_output)
+            Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
             # TODO: Figure out how to send docker build output if this fails
             final_output = output + '\nError: Harvey could not build the Test image.'
@@ -108,6 +112,10 @@ class Stage():
             image = Image.build(config, webhook)
             image_output = f'Project image created\n{image[1]}'
             print(image_output)
+        except subprocess.TimeoutExpired:
+            final_output = 'Error: Harvey timed out during the build stage.'
+            print(final_output)
+            Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
             final_output = output + '\nError: Harvey could not finish the build stage.'
             Utils.kill(final_output, webhook)
@@ -180,6 +188,10 @@ class Stage():
                 stdin=None, stdout=None, stderr=None, shell=True)
             compose_output = compose
             print(compose_output)
+        except subprocess.TimeoutExpired:
+            final_output = 'Error: Harvey timed out during the docker compose build/deploy stage.'
+            print(final_output)
+            Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
             final_output = output + '\nError: Harvey could not finish the \
                 build/deploy compose stage.'
