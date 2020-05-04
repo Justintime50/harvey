@@ -10,9 +10,9 @@
 ## Harvey Configuration Examples
 
 **Harvey Configuration Criteria**
-- Each repo needs a `.harvey.json` file in the root directory stored in git
-- Each `.harvey.json` config file will house information about your tests and build
-- This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, and be surrounded by quotes)
+- Each repo needs a `harvey.json` file in the root directory stored in git
+- Each `harvey.json` config file will house information about your tests and build/deploy
+- This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 
 The following example will run a full pipeline (tests, build and deploy), tag it with a unique name based on the GitHub project. Provide the language and version for the test stage:
 
@@ -24,7 +24,8 @@ The following example will run a full pipeline (tests, build and deploy), tag it
 }
 ```
 
-* Optional `compose` value can be passed to specify the `docker-compose` file to use if building from a docker-compose file and hitting the `/harvey/compose` endpoint.
+* Optional: `compose` value can be passed to specify the `docker-compose` file to use **if** building from a docker-compose file and hitting the `/harvey/compose` endpoint.
+* Optional: `dockerfile` value can be passed to specify the name of the Dockerfile to build from (including path if not in root directory).
 
 **Possible Pipeline Values**
 - `full` - test, build, deploy stages will be run
@@ -35,72 +36,70 @@ The following example will run a full pipeline (tests, build and deploy), tag it
 
 Each repository that uses Harvey's testing functionality must have a `harvey.sh` file in the root directory of the project. Below you'll find common examples of configuration files based on language.
 
+Simply source the Harvey shell functions and add an or statement to each command you run to test if it succeeds or fails. Harvey will run all of your tests regardless of if they fail or succeed but only move on to the build/deploy stages if no tests fail. Harvey will output the entire set of logs for your tests which will show which commands passed or failed. Just add `|| harvey_fail` to the end of any command.
+
 With Harvey, you can take almost any `.travis.yml` file and convert it straight across to a `harvey.sh` file.
 
 **Shell Test Criteria**
 - Each repo needs a `harvey.sh` file in the root directory stored in git
 - Each `harvey.sh` file must have `#!/bin/sh` as the first line
-- Each `harvey.sh` file must conform to shell scripting standards (**DO NOT** use bash, sh is used as some of the testing docker containers do not have bash pre-installed)
+- Each `harvey.sh` file must conform to shell scripting standards
+- **DO NOT** use bash - sh is used as some of the testing docker containers do not have bash pre-installed
 
 ### Shell
 
 ```shell
 #!/bin/sh
+source /harvey/.harvey
 
 # TEST
-shellcheck src/*.sh
+shellcheck src/*.sh || harvey_fail
 ```
 
 ### Python
 
 ```shell
 #!/bin/sh
+source /harvey/.harvey
 
 # INSTALL
-pip install pylint > /dev/null 2>&1 && printf "%s\n" "Pylint installed"
-pip install pylint-exit > /dev/null 2>&1 && printf "%s\n" "Pylint exit installed"
+pip install pylint || harvey_fail
+pip install pylint-exit || harvey_fail
 
 # TEST
-pylint pullbug/*.py --rcfile=.pylintrc || pylint-exit $?
-if [ $? -ne 0 ]; then
-  echo "An error occurred while running pylint." >&2
-  exit 1
-fi
-
-pylint examples/*.py --rcfile=.pylintrc || pylint-exit $?
-if [ $? -ne 0 ]; then
-  echo "An error occurred while running pylint." >&2
-  exit 1
-fi
+pylint pullbug/*.py || harvey_fail
+pylint examples/*.py || harvey_fail
 ```
 
 ### PHP
 
 ```shell
 #!/bin/sh
+source /harvey/.harvey
 
-cd src
+cd src || harvey_fail
 
 # Use the following if you need to install composer in your test environment (if you do not already have a composer.phar file in your project)
-# php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');"
-# php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;"
-# php composer-setup.php
-# php -r "unlink('composer-setup.php');"
+# php -r "copy('https://getcomposer.org/installer', 'composer-setup.php');" || harvey_fail
+# php -r "if (hash_file('sha384', 'composer-setup.php') === 'e0012edf3e80b6978849f5eff0d4b4e4c79ff1609dd1e613307e16318854d24ae64f26d17af3ef0bf7cfb710ca74755a') { echo 'Installer verified'; } else { echo 'Installer corrupt'; unlink('composer-setup.php'); } echo PHP_EOL;" || harvey_fail
+# php composer-setup.php || harvey_fail
+# php -r "unlink('composer-setup.php');" || harvey_fail
 
-php composer.phar install --no-ansi --no-interaction --no-scripts --no-suggest --prefer-dist
+php composer.phar install --no-ansi --no-interaction --no-scripts --no-suggest --prefer-dist || harvey_fail
 
-./vendor/bin/phplint . --exclude=vendor
+./vendor/bin/phplint . --exclude=vendor || harvey_fail
 ```
 
 ### Node
 
 ```shell
 #!/bin/sh
+source /harvey/.harvey
 
 # INSTALL
-npm i
+npm i || harvey_fail
 
 # TEST
-npx eslint index.js
-npx eslint lib/data-router.js
+npx eslint index.js || harvey_fail
+npx eslint lib/data-router.js || harvey_fail
 ```

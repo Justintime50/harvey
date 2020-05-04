@@ -69,8 +69,8 @@ class Stage():
         # Return logs
         logs = Container.logs(container['Id'])
         if logs is not False:
-            logs_output = '\nTest logs:\
-                \n============================================================\n\n' \
+            logs_output = '\nTest logs:\n' + \
+                '============================================================\n' \
                 + logs + '============================================================\n'
             print(logs_output)
         else:

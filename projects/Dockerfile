@@ -4,6 +4,7 @@ FROM ${LANGUAGE}:${VERSION}
 
 ARG PROJECT=test
 COPY ./${PROJECT} /project
+COPY ./.harvey /harvey/.harvey
 
 WORKDIR /project
 

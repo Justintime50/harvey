@@ -13,6 +13,11 @@ class Pipeline():
         """Pull changes and run tests (no deploy)"""
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
+        if 'Error: the above command exited with code' in test:
+            execution_time = f'Test pipeline execution time: {datetime.now() - start_time}'
+            failed = 'Test pipeline failed!'
+            final_output = f'{output}\n{test}\n{execution_time}\n{failed}'
+            Utils.kill(final_output, webhook)
         execution_time = f'Test pipeline execution time: {datetime.now() - start_time}'
         success = 'Test pipeline succeeded!'
         final_output = f'{output}\n{test}\n{execution_time}\n{success}'
@@ -40,6 +45,11 @@ class Pipeline():
         """Pull changes, run tests, build image, start container"""
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
+        if 'Error: the above command exited with code' in test:
+            execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
+            failed = 'Full pipeline failed!'
+            final_output = f'{output}\n{test}\n{execution_time}\n{failed}'
+            Utils.kill(final_output, webhook)
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
@@ -68,6 +78,11 @@ class Pipeline():
         """Pull changes, run tests, build image, start container - USING A DOCKER COMPOSE FILE"""
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
+        if 'Error: the above command exited with code' in test:
+            execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
+            failed = 'Full pipeline failed!'
+            final_output = f'{output}\n{test}\n{execution_time}\n{failed}'
+            Utils.kill(final_output, webhook)
         deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
         success = 'Full pipeline succeeded!'

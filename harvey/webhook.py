@@ -30,7 +30,7 @@ class Webhook():
                 config = json.loads(file.read())
                 print(json.dumps(config, indent=4))
         except FileNotFoundError as fnf_error:
-            final_output = f'Error: Harvey could not fine "harvey.json" file in \
+            final_output = f'Error: Harvey could not find "harvey.json" file in \
                 {Global.repo_full_name(webhook)}.'
             print(fnf_error)
             Utils.kill(final_output, webhook)
@@ -48,13 +48,13 @@ class Webhook():
         init = Webhook.init(webhook)
 
         # Start a pipeline based on configuration
-        if init[0]["pipeline"] == 'test':
+        if init[0]['pipeline'] == 'test':
             pipeline = Pipeline.test(init[0], webhook, init[1])
-        elif init[0]["pipeline"] == 'deploy':
+        elif init[0]['pipeline'] == 'deploy':
             pipeline = Pipeline.deploy(init[0], webhook, init[1])
-        elif init[0]["pipeline"] == 'full':
+        elif init[0]['pipeline'] == 'full':
             pipeline = Pipeline.full(init[0], webhook, init[1])
-        elif not init[0]["pipeline"]:
+        elif not init[0]['pipeline']:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
             Utils.kill(final_output, webhook)
@@ -67,13 +67,13 @@ class Webhook():
         init = Webhook.init(webhook)
 
         # Start a pipeline based on configuration
-        if init[0]["pipeline"] == 'test':
+        if init[0]['pipeline'] == 'test':
             pipeline = Pipeline.test(init[0], webhook, init[1])
-        elif init[0]["pipeline"] == 'deploy':
+        elif init[0]['pipeline'] == 'deploy':
             pipeline = Pipeline.deploy_compose(init[0], webhook, init[1])
-        elif init[0]["pipeline"] == 'full':
+        elif init[0]['pipeline'] == 'full':
             pipeline = Pipeline.full_compose(init[0], webhook, init[1])
-        elif not init[0]["pipeline"]:
+        elif not init[0]['pipeline']:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
             Utils.kill(final_output, webhook)
