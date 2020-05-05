@@ -11,8 +11,6 @@ Your personal CI/CD and Docker orchestration platform.
 
 </div>
 
-***NOTE:** Harvey is still in development with MANY items needing attention. While usable, it's not suggested to use Harvey in production just yet.*
-
 Harvey was born because Rancher has too much overhead and GitLab is too RAM hungry to self-host on my small personal server. CI's like Travis are fantastic for open source but pricy for private use and can't be self hosted - deployments across servers looked like a nightmare so I created Harvey - the homegrown CI/CD and Docker orchestrator that kept things simple and lean. Harvey can run multiple pipelines concurrently and initial tests have Harvey's pipelines coming in between just 20 seconds and 2 minutes to pull new changes and test, build, and deploy in production.
 
 ## How it Works
