@@ -14,7 +14,7 @@ class Git():
             try:
                 final_output = subprocess.check_output( \
                     f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                    && git fetch && git pull', \
+                    && git pull origin master', \
                     stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:

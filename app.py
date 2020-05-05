@@ -26,13 +26,16 @@ def webhook(target):
     """Initiate details to receive a webhook"""
     data = request.data
     signature = request.headers.get('X-Hub-Signature')
-    if os.getenv('MODE') == 'test':
-        Thread(target=target, args=(json.loads(data),)).start()
-        return "OK"
-    if decode_webhook(data, signature):
-        Thread(target=target, args=(json.loads(data),)).start()
-        return "OK"
-    return abort(403)
+    parsed_data = json.loads(data)
+    if parsed_data['ref'] == 'refs/heads/master':
+        if os.getenv('MODE') == 'test':
+            Thread(target=target, args=(parsed_data,)).start()
+            return "200"
+        if decode_webhook(data, signature):
+            Thread(target=target, args=(parsed_data,)).start()
+            return "200"
+        return abort(403)
+    return abort(500, 'Harvey can only pull from the master branch.')
 
 def decode_webhook(data, signature):
     """Decode a webhook's secret key"""
