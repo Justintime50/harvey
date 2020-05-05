@@ -115,5 +115,4 @@ Here are some common examples of testing environments you can use. Any Docker `i
 
 ## Resources
 
-- [pylint-exit](https://pypi.org/project/pylint-exit/)
 - [Use docker-compose in production](https://docs.docker.com/compose/production/)
