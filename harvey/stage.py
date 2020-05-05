@@ -193,8 +193,8 @@ class Stage():
             print(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = output + '\nError: Harvey could not finish the \
-                build/deploy compose stage.'
+            final_output = output + '\nError: Harvey could not finish the' + \
+                'build/deploy compose stage.'
             Utils.kill(final_output, webhook)
 
         execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'
