@@ -82,6 +82,20 @@ Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data
 python3 app.py
 ```
 
+**Start Ngrok HTTP Bridge:**
+
+This will enable you to bridge from the web to your local machine without changing the default Flask server.
+
+```bash
+# Setup account (one time, go to ngrok.com to setup)
+./ngrok authtoken 123...
+
+# Run bridge
+./ngrok http 5000
+```
+
+Take the URL Ngrok provides and use that on your webhooks.
+
 ### Example Python Functions
 
 See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
