@@ -186,7 +186,7 @@ class Stage():
                 {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
                 && docker-compose {compose} up -d --build', \
                 stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
-            compose_output = compose
+            compose_output = compose.decode('UTF-8')
             print(compose_output)
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out during the docker compose build/deploy stage.'

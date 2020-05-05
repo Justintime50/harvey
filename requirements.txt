@@ -2,4 +2,4 @@ flask
 requests
 requests_unixsocket
 pylint
-slack
+slackclient
