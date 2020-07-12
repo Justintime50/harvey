@@ -14,8 +14,8 @@ class Git():
         if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
             try:
                 final_output = subprocess.check_output(
-                    f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                    && git pull origin master',
+                    f'git -C {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
+                    pull origin master',
                     stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:
