@@ -6,10 +6,15 @@ import hmac
 import hashlib
 # import multiprocessing
 from threading import Thread
+from dotenv import load_dotenv
 from flask import Flask, request, abort
 import harvey
 
+load_dotenv()
 API = Flask(__name__)
+HOST = os.getenv('HOST', '127.0.0.1')
+PORT = os.getenv('PORT', 5000)
+DEBUG = os.getenv('DEBUG', True)
 
 
 @API.route('/harvey', methods=['POST'])
@@ -152,4 +157,4 @@ def retrieve_pipeline(pipeline_id):
 
 
 if __name__ == '__main__':
-    API.run(host='0.0.0.0')
+    API.run(host=HOST, port=PORT, debug=DEBUG)

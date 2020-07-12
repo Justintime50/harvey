@@ -31,13 +31,13 @@ Harvey has lightweight testing functionality which is configurable via shell scr
 Because of the way Harvey was built with Docker (using sockets) this project that builds and orchestrates Docker images and containers cannot itself run in Docker and must be run on your bare-metal OS.
 
 ```bash
-pip3 install -e ."[dev]"
+make install
 ```
 
 1. Install Docker & login
 1. Ensure you've added your ssh key to the ssh agent: `ssh-add` followed by your password
-1. Enable logging (below)
-1. `cp .env.example .env` and setup enviornment variables
+1. Enable logging (see below)
+1. Setup enviornment variables in `.env`
 1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/harvey`, send the payload as JSON)
 
 **NOTE:** It is not recommended to use Harvey alongside other CI/CD or Docker orchestration platforms on the same machine.
@@ -80,19 +80,19 @@ Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data
 **Start Harvey:**
 
 ```bash
-python3 app.py
+make run
 ```
 
 **Start Ngrok HTTP Bridge:**
 
-This will enable you to bridge from the web to your local machine without changing the default Flask server.
+This will enable you to bridge from the web to your local machine without changing the default Flask server. Setup your account here: https://ngrok.com.
 
 ```bash
 # Setup account (one time, go to ngrok.com to setup)
-./ngrok authtoken 123...
+make bridge-auth TOKEN=123...
 
 # Run bridge
-./ngrok http 5000
+make bridge PORT=5000
 ```
 
 Take the URL Ngrok provides and use that on your webhooks.
@@ -127,6 +127,14 @@ Here are some common examples of testing environments you can use. Any Docker `i
 **Null Params**
 - If no language is provided, an `Alpine Linux` container with `Shellcheck` pre-installed will be used.
 - If no version is provided, the `latest` tag will be used.
+
+## Development
+
+Lint the project:
+
+```bash
+make lint
+```
 
 ## Resources
 

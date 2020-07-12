@@ -4,8 +4,6 @@ from datetime import datetime
 from .stage import Stage
 from .utils import Utils
 
-# TODO: Add logic to check that tests pass before moving to build
-
 
 class Pipeline():
     """Pipeline methods"""

@@ -1,17 +1,19 @@
 # pylint: disable=R0903,C0114
 class Global():
     """Contains global configuration for Harvey"""
+    # Setup variables that can be customized
     DOCKER_VERSION = 'v1.40'  # Docker API version
     HARVEY_VERSION = '0.1.0'  # Harvey release
+    PROJECTS_PATH = 'projects'
+    PROJECTS_LOG_PATH = 'logs/projects'
+    HARVEY_LOG_PATH = 'logs/harvey'
+    BUILD_TIMEOUT = 1800  # 30 minutes
+    GIT_TIMEOUT = 180
+    # Setup reusable variables
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}
     ATTACH_HEADERS = {'Content-Type': 'application/vnd.docker.raw-stream'}
-    PROJECTS_PATH = 'projects'
-    PROJECTS_LOG_PATH = 'logs/projects'
-    HARVEY_LOG_PATH = 'logs/harvey'
-    BUILD_TIMEOUT = 1800
-    GIT_TIMEOUT = 60
 
     @classmethod
     def repo_name(cls, webhook):
