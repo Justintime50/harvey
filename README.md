@@ -30,10 +30,13 @@ Harvey has lightweight testing functionality which is configurable via shell scr
 
 Because of the way Harvey was built with Docker (using sockets) this project that builds and orchestrates Docker images and containers cannot itself run in Docker and must be run on your bare-metal OS.
 
+```bash
+pip3 install -e ."[dev]"
+```
+
 1. Install Docker & login
-1. Ensure you've added your ssh key to the ssh agent for private repos `ssh-add`
+1. Ensure you've added your ssh key to the ssh agent: `ssh-add` followed by your password
 1. Enable logging (below)
-1. Download this project and see documentation/examples for usage
 1. `cp .env.example .env` and setup enviornment variables
 1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/harvey`, send the payload as JSON)
 

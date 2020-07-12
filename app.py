@@ -1,14 +1,15 @@
 """Import API modules"""
 # pylint: disable=W0511,W0612
-from threading import Thread
 import json
 import os
 import hmac
 import hashlib
+import multiprocessing
 from flask import Flask, request, abort
 import harvey
 
 API = Flask(__name__)
+
 
 @API.route('/harvey', methods=['POST'])
 def receive_webhook():
@@ -16,11 +17,13 @@ def receive_webhook():
     target = harvey.Webhook.receive
     return webhook(target)
 
+
 @API.route('/harvey/compose', methods=['POST'])
 def receive_webhook_compose():
     """Receive a Webhook, build from compose file - this is the entrypoint for Harvey"""
     target = harvey.Webhook.compose
     return webhook(target)
+
 
 def webhook(target):
     """Initiate details to receive a webhook"""
@@ -29,19 +32,21 @@ def webhook(target):
     parsed_data = json.loads(data)
     if parsed_data['ref'] == 'refs/heads/master':
         if os.getenv('MODE') == 'test':
-            Thread(target=target, args=(parsed_data,)).start()
+            multiprocessing.Process(target=target, args=(parsed_data,)).start()
             return "200"
         if decode_webhook(data, signature):
-            Thread(target=target, args=(parsed_data,)).start()
+            multiprocessing.Process(target=target, args=(parsed_data,)).start()
             return "200"
         return abort(403)
     return abort(500, 'Harvey can only pull from the master branch.')
+
 
 def decode_webhook(data, signature):
     """Decode a webhook's secret key"""
     secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
     mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
+
 
 @API.route('/pipeline/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
@@ -141,6 +146,7 @@ def retrieve_pipeline(pipeline_id):
 #     pull = harvey.Git.pull(data)
 #     response = str(pull)
 #     return response
+
 
 if __name__ == '__main__':
     API.run(host='0.0.0.0')

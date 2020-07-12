@@ -1,8 +1,8 @@
 # pylint: disable=R0903,C0114
 class Global():
     """Contains global configuration for Harvey"""
-    DOCKER_VERSION = 'v1.40' # Docker API version
-    HARVEY_VERSION = '0.1.0' # Harvey release
+    DOCKER_VERSION = 'v1.40'  # Docker API version
+    HARVEY_VERSION = '0.1.0'  # Harvey release
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}
@@ -31,7 +31,7 @@ class Global():
     @classmethod
     def repo_url(cls, webhook):
         """Return the repo's URL from the webhook JSON"""
-        return webhook["repository"]["ssh_url"] # Use SSH URL so private repos can be cloned/pulled
+        return webhook["repository"]["ssh_url"]  # Use SSH URL so private repos can be cloned/pulled
 
     @classmethod
     def repo_owner_name(cls, webhook):

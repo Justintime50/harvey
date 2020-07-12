@@ -5,17 +5,19 @@ import sys
 from .globals import Global
 from .messages import Message
 
+
 class Utils():
     """Harvey Utilities used throughout the program"""
     @classmethod
     def project_logs(cls, final_output, webhook):
         """Generate log file with all output"""
-        if not os.path.exists(os.path.join(Global.PROJECTS_LOG_PATH, \
-            Global.repo_full_name(webhook))):
-            os.makedirs(os.path.join(Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook)))
+        if not os.path.exists(os.path.join(Global.PROJECTS_LOG_PATH,
+                                           Global.repo_full_name(webhook))):
+            os.makedirs(os.path.join(Global.PROJECTS_LOG_PATH,
+                                     Global.repo_full_name(webhook)))
         try:
-            filename = os.path.join(Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook), \
-                Global.repo_commit_id(webhook)+'.log')
+            filename = os.path.join(Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook),
+                                    Global.repo_commit_id(webhook)+'.log')
             with open(filename, 'w') as log:
                 log.write(final_output)
         except OSError as os_error:

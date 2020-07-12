@@ -5,16 +5,18 @@ import requests
 import requests_unixsocket
 from .globals import Global
 
-requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
+# allows us to use requests_unixsocker via requests
+requests_unixsocket.monkeypatch()
+
 
 class Container():
     """Docker container methods"""
     @classmethod
     def create(cls, tag):
         """Create a Docker container"""
-        data = requests.post(Global.BASE_URL + 'containers/create', \
-            params=json.dumps({'name': tag}), data=json.dumps({'Image': tag}), \
-            headers=Global.JSON_HEADERS)
+        data = requests.post(Global.BASE_URL + 'containers/create',
+                             params=json.dumps({'name': tag}), data=json.dumps({'Image': tag}),
+                             headers=Global.JSON_HEADERS)
         if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
             response = data.json()
         else:
@@ -24,7 +26,8 @@ class Container():
     @classmethod
     def start(cls, container_id):
         """Start a Docker container"""
-        data = requests.post(Global.BASE_URL + f'containers/{container_id}/start')
+        data = requests.post(
+            Global.BASE_URL + f'containers/{container_id}/start')
         if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
             response = data
         else:
@@ -34,13 +37,15 @@ class Container():
     @classmethod
     def stop(cls, container_id):
         """Stop a Docker container"""
-        data = requests.post(Global.BASE_URL + f'containers/{container_id}/stop')
+        data = requests.post(
+            Global.BASE_URL + f'containers/{container_id}/stop')
         return data
 
     @classmethod
     def retrieve(cls, container_id):
         """Retrieve a Docker container"""
-        data = requests.get(Global.BASE_URL + f'containers/{container_id}/json')
+        data = requests.get(
+            Global.BASE_URL + f'containers/{container_id}/json')
         return data.json()
 
     @classmethod
@@ -61,14 +66,15 @@ class Container():
         #     'stdout': True,
         #     'stderr': True
         # }), headers=Global.ATTACH_HEADERS)
-        data = requests.get(Global.BASE_URL + f'containers/{container_id}/logs', \
-            params={'stdout': True, 'stderr': True})
+        data = requests.get(Global.BASE_URL + f'containers/{container_id}/logs',
+                            params={'stdout': True, 'stderr': True})
         return data.content.decode('latin1')
 
     @classmethod
     def wait(cls, container_id):
         """Wait for a Docker container to exit"""
-        data = requests.post(Global.BASE_URL + f'containers/{container_id}/wait')
+        data = requests.post(
+            Global.BASE_URL + f'containers/{container_id}/wait')
         if data.status_code == 200 or data.status_code == 201 or data.status_code == 204:
             response = data.json()
         else:
@@ -78,6 +84,6 @@ class Container():
     @classmethod
     def remove(cls, container_id):
         """Remove (delete) a Docker container"""
-        data = requests.delete(Global.BASE_URL + f'containers/{container_id}', \
-            data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
+        data = requests.delete(Global.BASE_URL + f'containers/{container_id}',
+                               data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
         return data

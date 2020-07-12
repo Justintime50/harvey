@@ -6,3 +6,4 @@ projects/*
 logs
 *.json
 .env
+*.egg-info
