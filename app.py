@@ -13,8 +13,8 @@ import harvey
 load_dotenv()
 API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
-PORT = os.getenv('PORT', 5000)
-DEBUG = os.getenv('DEBUG', True)
+PORT = os.getenv('PORT', '5000')
+DEBUG = os.getenv('DEBUG', 'True')
 
 
 @API.route('/harvey', methods=['POST'])
