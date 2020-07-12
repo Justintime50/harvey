@@ -4,7 +4,8 @@ import json
 import os
 import hmac
 import hashlib
-import multiprocessing
+# import multiprocessing
+from threading import Thread
 from flask import Flask, request, abort
 import harvey
 
@@ -32,10 +33,12 @@ def webhook(target):
     parsed_data = json.loads(data)
     if parsed_data['ref'] == 'refs/heads/master':
         if os.getenv('MODE') == 'test':
-            multiprocessing.Process(target=target, args=(parsed_data,)).start()
+            # multiprocessing.Process(target=target, args=(parsed_data,)).start()
+            Thread(target=target, args=(parsed_data,)).start()
             return "200"
         if decode_webhook(data, signature):
-            multiprocessing.Process(target=target, args=(parsed_data,)).start()
+            # multiprocessing.Process(target=target, args=(parsed_data,)).start()
+            Thread(target=target, args=(parsed_data,)).start()
             return "200"
         return abort(403)
     return abort(500, 'Harvey can only pull from the master branch.')
