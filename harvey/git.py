@@ -5,6 +5,7 @@ import subprocess
 from .globals import Global
 from .utils import Utils
 
+
 class Git():
     """Git methods"""
     @classmethod
@@ -12,9 +13,9 @@ class Git():
         """Clone/pull project using Git"""
         if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
             try:
-                final_output = subprocess.check_output( \
+                final_output = subprocess.check_output(
                     f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                    && git pull origin master', \
+                    && git pull origin master',
                     stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:
@@ -27,9 +28,9 @@ class Git():
                 Utils.kill(final_output, webhook)
         else:
             try:
-                final_output = subprocess.check_output(f'git clone --depth=10 --branch=master \
-                    {Global.repo_url(webhook)} \
-                    {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}', \
+                final_output = subprocess.check_output(
+                    f'git clone --depth=10 --branch=master {Global.repo_url(webhook)} \
+                    {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}',
                     stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
                 print(final_output)
             except subprocess.TimeoutExpired:

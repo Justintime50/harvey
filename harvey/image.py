@@ -8,7 +8,9 @@ import requests
 import requests_unixsocket
 from .globals import Global
 
-requests_unixsocket.monkeypatch() # allows us to use requests_unixsocker via requests
+# allows us to use requests_unixsocker via requests
+requests_unixsocket.monkeypatch()
+
 
 class Image():
     """Docker image methods"""
@@ -16,7 +18,7 @@ class Image():
     def build(cls, config, webhook, context=''):
         """Build a Docker image"""
         # TODO: Use the Docker API for building instead of a shell \
-            # command (haven't because I can't get it working)
+        # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
         # json = open('./harvey/build.json', 'rb').read()
         # data = requests.post(Global.BASE_URL + 'build', \
@@ -35,7 +37,8 @@ class Image():
             tag = uuid.uuid4().hex
         else:
             project = ''
-            path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
+            path = os.path.join(Global.PROJECTS_PATH,
+                                Global.repo_full_name(webhook))
             tag = f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}'
 
         tag_arg = f'-t {tag}'
@@ -51,8 +54,8 @@ class Image():
             version = ''
 
         # Build the image (exceptions handled at stage level)
-        image = subprocess.check_output(f'cd {path} && docker build \
-            {dockerfile} {tag_arg} {language} {version} {project} .', \
+        image = subprocess.check_output(
+            f'cd {path} && docker build {dockerfile} {tag_arg} {language} {version} {project} .',
             stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
 
         return tag, image.decode('UTF-8')
@@ -72,6 +75,6 @@ class Image():
     @classmethod
     def remove(cls, image_id):
         """Remove (delete) a Docker image"""
-        data = requests.delete(Global.BASE_URL + f'images/{image_id}', \
-            data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
+        data = requests.delete(Global.BASE_URL + f'images/{image_id}',
+                               data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
         return data

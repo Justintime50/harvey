@@ -4,6 +4,7 @@ import os
 import sys
 import slack
 
+
 class Message():
     """Send message methods"""
     @classmethod

@@ -8,6 +8,7 @@ from .git import Git
 from .globals import Global
 from .utils import Utils
 
+
 class Webhook():
     """Webhook methods"""
     @classmethod
@@ -24,8 +25,8 @@ class Webhook():
 
         # Open the project's config file to assign pipeline variables
         try:
-            filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), \
-                'harvey.json')
+            filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook),
+                                    'harvey.json')
             with open(filename, 'r') as file:
                 config = json.loads(file.read())
                 print(json.dumps(config, indent=4))

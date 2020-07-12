@@ -8,6 +8,7 @@ from .container import Container
 from .image import Image
 from .utils import Utils
 
+
 class Stage():
     """Stage methods"""
     @classmethod
@@ -108,7 +109,8 @@ class Stage():
 
         # Build the image
         try:
-            Image.remove(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+            Image.remove(
+                f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
             image = Image.build(config, webhook)
             image_output = f'Project image created\n{image[1]}'
             print(image_output)
@@ -133,18 +135,21 @@ class Stage():
 
         # Tear down the old container if one exists
         # TODO: Add logic that checks if a container exists and skips these if not
-        Container.stop(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+        Container.stop(
+            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         stop_output = 'Attempting to stop old project container.'
         print(stop_output)
-        Container.wait(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+        Container.wait(
+            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         wait_output = 'Attempting to wait on old project container to exit.'
         print(wait_output)
-        Container.remove(f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+        Container.remove(
+            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         remove_output = 'Attempting to remove old project container.'
         print(remove_output)
 
         # Create a container
-        container = Container.create( \
+        container = Container.create(
             f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
         if container is not False:
             create_output = 'Project container created.'
@@ -182,9 +187,9 @@ class Stage():
 
         # Build the image and container from the docker-compose file
         try:
-            compose = subprocess.check_output(f'cd \
-                {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                && docker-compose {compose} up -d --build', \
+            compose = subprocess.check_output(
+                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
+                && docker-compose {compose} up -d --build',
                 stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
             compose_output = compose.decode('UTF-8')
             print(compose_output)
