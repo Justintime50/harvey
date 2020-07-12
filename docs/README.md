@@ -3,7 +3,7 @@
 ## Things to Know
 
 - Harvey will timeout builds at 30 minutes.
-- Harvey will timeout git clone/pull after 60 seconds.
+- Harvey will timeout git clone/pull after 180 seconds.
 - Harvey will shallow clone your project with the latest 10 commits.
 - Harvey pulls/clones from the master branch.
 
