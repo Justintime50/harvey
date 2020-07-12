@@ -31,6 +31,7 @@ The following example will run a full pipeline (tests, build and deploy), tag it
 - `full` - test, build, deploy stages will be run
 - `deploy` - build, deploy stages will be run
 - `test` - test stage will be run
+- `pull` - pulls the project, this is useful if you have a custom deployment/testing workflow and simply want to pull the project changes
 
 ## Harvey Testing Examples
 

@@ -13,7 +13,7 @@ class Webhook():
     """Webhook methods"""
     @classmethod
     def init(cls, webhook):
-        """Initiate everything needed for a webhook function"""
+        """Initiate the logic for webhooks and pull the project"""
         start_time = datetime.now()
         preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n' + \
             f'Pipeline Started: {start_time}'
@@ -45,16 +45,17 @@ class Webhook():
 
     @classmethod
     def receive(cls, webhook):
-        """Receive a webhook and pull in changes from GitHub"""
+        """Receive a webhook and spin up a pipeline based on the config"""
         init = Webhook.init(webhook)
 
-        # Start a pipeline based on configuration
         if init[0]['pipeline'] == 'test':
             pipeline = Pipeline.test(init[0], webhook, init[1])
         elif init[0]['pipeline'] == 'deploy':
             pipeline = Pipeline.deploy(init[0], webhook, init[1])
         elif init[0]['pipeline'] == 'full':
             pipeline = Pipeline.full(init[0], webhook, init[1])
+        elif init[0]['pipeline'] == 'pull':
+            pipeline = Utils.success(init[1], webhook)
         elif not init[0]['pipeline']:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
@@ -64,16 +65,17 @@ class Webhook():
 
     @classmethod
     def compose(cls, webhook):
-        """Receive a webhook and pull in changes from GitHub"""
+        """Receive a webhook and spin up a pipeline based on the config"""
         init = Webhook.init(webhook)
 
-        # Start a pipeline based on configuration
         if init[0]['pipeline'] == 'test':
             pipeline = Pipeline.test(init[0], webhook, init[1])
         elif init[0]['pipeline'] == 'deploy':
             pipeline = Pipeline.deploy_compose(init[0], webhook, init[1])
         elif init[0]['pipeline'] == 'full':
             pipeline = Pipeline.full_compose(init[0], webhook, init[1])
+        elif init[0]['pipeline'] == 'pull':
+            pipeline = Utils.success(init[1], webhook)
         elif not init[0]['pipeline']:
             final_output = init[1] + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
