@@ -51,7 +51,7 @@ With Harvey, you can take almost any `.travis.yml` file and convert it straight 
 
 ```shell
 #!/bin/sh
-source /harvey/.harvey
+. /harvey/.harvey # Source the functions for Harvey
 
 # TEST
 shellcheck src/*.sh || harvey_fail
@@ -61,7 +61,7 @@ shellcheck src/*.sh || harvey_fail
 
 ```shell
 #!/bin/sh
-source /harvey/.harvey
+. /harvey/.harvey # Source the functions for Harvey
 
 # INSTALL
 pip install pylint || harvey_fail
@@ -76,7 +76,7 @@ pylint examples/*.py || harvey_fail
 
 ```shell
 #!/bin/sh
-source /harvey/.harvey
+. /harvey/.harvey # Source the functions for Harvey
 
 cd src || harvey_fail
 
@@ -95,7 +95,7 @@ php composer.phar install --no-ansi --no-interaction --no-scripts --no-suggest -
 
 ```shell
 #!/bin/sh
-source /harvey/.harvey
+. /harvey/.harvey # Source the functions for Harvey
 
 # INSTALL
 npm i || harvey_fail
