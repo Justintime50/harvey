@@ -2,6 +2,7 @@
 # pylint: disable=W0511,W0612
 import json
 import os
+import time
 import hmac
 import hashlib
 # import multiprocessing
@@ -15,6 +16,10 @@ API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
 DEBUG = os.getenv('DEBUG', 'True')
+
+
+# TODO: Move all of the logic out of this file and into Harvey itself
+# This file should only route requests to the proper functions
 
 
 @API.route('/harvey', methods=['POST'])
@@ -56,7 +61,7 @@ def decode_webhook(data, signature):
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
 
 
-@API.route('/pipeline/<pipeline_id>', methods=['GET'])
+@API.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
     """Retrieve a pipeline's logs by ID"""
     file = f'{pipeline_id}.log'
@@ -66,6 +71,21 @@ def retrieve_pipeline(pipeline_id):
                 response = output.read()
             return response
     return abort(404)
+
+
+@API.route('/pipelines', methods=['GET'])
+def retrieve_pipelines():
+    """Retrieve a list of pipelines"""
+    # TODO: 1) Do not expose log paths here
+    # TODO: 2) Replace this with retrieving from a DB instead
+    pipelines = {'pipelines': []}
+    for root, dirs, files in os.walk(harvey.Global.PROJECTS_LOG_PATH, topdown=True):
+        for file in files:
+            timestamp = time.ctime(os.path.getmtime(os.path.join(root, file)))
+            pipelines['pipelines'].append(
+                f'{timestamp}: {os.path.join(root, file)}')
+    return json.dumps(pipelines, indent=4)
+
 
 # @API.route('/containers/create', methods=['POST'])
 # def create_container():
