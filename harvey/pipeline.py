@@ -1,15 +1,13 @@
-"""Import Pipeline modules"""
-# pylint: disable=W0511
 from datetime import datetime
 from .stage import Stage
 from .utils import Utils
 
 
 class Pipeline():
-    """Pipeline methods"""
     @classmethod
     def test(cls, config, webhook, output):
-        """Pull changes and run tests (no deploy)"""
+        """Pull changes and run tests (no deploy)
+        """
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
         if 'Error: the above command exited with code' in test:
@@ -27,7 +25,8 @@ class Pipeline():
 
     @classmethod
     def deploy(cls, config, webhook, output):
-        """Pull changes and build/deploy (no tests)"""
+        """Pull changes and build/deploy (no tests)
+        """
         start_time = datetime.now()
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
@@ -41,7 +40,8 @@ class Pipeline():
 
     @classmethod
     def full(cls, config, webhook, output):
-        """Pull changes, run tests, build image, start container"""
+        """Pull changes, run tests, build image, start container
+        """
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
         if 'Error: the above command exited with code' in test:
@@ -61,7 +61,8 @@ class Pipeline():
 
     @classmethod
     def deploy_compose(cls, config, webhook, output):
-        """Pull changes and build/deploy (no tests) - USING A DOCKER COMPOSE FILE"""
+        """Pull changes and build/deploy (no tests) - USING A DOCKER COMPOSE FILE
+        """
         start_time = datetime.now()
         deploy = Stage.build_deploy_compose(config, webhook, output)
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
@@ -74,7 +75,8 @@ class Pipeline():
 
     @classmethod
     def full_compose(cls, config, webhook, output):
-        """Pull changes, run tests, build image, start container - USING A DOCKER COMPOSE FILE"""
+        """Pull changes, run tests, build image, start container - USING A DOCKER COMPOSE FILE
+        """
         start_time = datetime.now()
         test = Stage.test(config, webhook, output)
         if 'Error: the above command exited with code' in test:

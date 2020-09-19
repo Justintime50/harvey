@@ -1,5 +1,3 @@
-"""Import webhook modules"""
-# pylint: disable=R0903
 import json
 import os
 from datetime import datetime
@@ -10,10 +8,10 @@ from .utils import Utils
 
 
 class Webhook():
-    """Webhook methods"""
     @classmethod
     def init(cls, webhook):
-        """Initiate the logic for webhooks and pull the project"""
+        """Initiate the logic for webhooks and pull the project
+        """
         start_time = datetime.now()
         preamble = f'Running Harvey v{Global.HARVEY_VERSION}\n' + \
             f'Pipeline Started: {start_time}'
@@ -45,7 +43,8 @@ class Webhook():
 
     @classmethod
     def receive(cls, webhook):
-        """Receive a webhook and spin up a pipeline based on the config"""
+        """Receive a webhook and spin up a pipeline based on the config
+        """
         init = Webhook.init(webhook)
 
         if init[0]['pipeline'] == 'test':
@@ -65,7 +64,8 @@ class Webhook():
 
     @classmethod
     def compose(cls, webhook):
-        """Receive a webhook and spin up a pipeline based on the config"""
+        """Receive a webhook and spin up a pipeline based on the config
+        """
         init = Webhook.init(webhook)
 
         if init[0]['pipeline'] == 'test':

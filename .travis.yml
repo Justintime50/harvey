@@ -1,12 +1,26 @@
 language: python
 
 python:
-    - "3.6"
-    - "3.7"
-    - "3.8"
+    - '3.6'
+    - '3.7'
+    - '3.8'
 
 install: pip install -e ."[dev]"
 
 script: 
-    - pylint harvey/*.py
-    - pylint app.py
+    - flake8 harvey/*.py
+    - flake8 test/*.py
+    - flake8 examples/*.py
+    - pytest --cov=harvey
+
+deploy:
+    provider: pypi
+    username: "__token__"
+    password:
+        secure: v7+aBM/dBRdg1DZspAZKmUSOmu5hKDPerS0QWTbJXpRWd/v/kE0Zyl09EtClH605JxNsEtTlKA32Fh1eD2yAOTtcYgPAvRdoI936rySIXHepJpsRmmcBYH4h8OTOWkbZ8bH/YOS+uQoWLEYOqWX8M1RCb+XZw1GJM8RCHdmlkRh8nboYnnoy+P+j7nZ7KX7+/6Yv7tsgQ2RE53amH5ZCaI8l+Zu+SR3u4OtDhd5mu+HjZ+wYEp5lc8feABMoYPHxzZudz3Cq97s/43FJJQXm8eqtnyLGnD81X7BeQrgPEtQEfs2B+DSDdRDOuOsp7zLA++u6d2LO8nlzw6n1cgFCBHCumwahrTY7Olht91nArRmii110rg3GSIs/qgLh9h6rjB66h3u6pySwmQkJDX/cBSOHI0LvFrc+qd37rRTXScowsc774dlGTsaOEwyFYRsaeAjaX6T4MhDpup9e6DLvuGRdFuN5mvTXVAkKq9vQ3mt1iUbL71ZNtjH5JigvcfSH5pF2UtDUjjmdZ1BYVhYNkBfPmLza6A2+aPpEb9xdjlxJOJA/pDPv1937ds12dW+SogLvahqNF3CVtru/Oh9K5PxCNC22iKLbcR7EEPndKngOJtrGRf/da3sn2yTClvrTgMd0nXOrLIeo1DIxPYm5MnLBHKmVBp4nsvJpHGefycc=
+    on:
+        tags: true
+    skip_existing: true
+
+after_success:
+    - coveralls

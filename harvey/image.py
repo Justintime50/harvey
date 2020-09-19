@@ -1,5 +1,3 @@
-"""Import image modules"""
-# pylint: disable=W0511
 import json
 import uuid
 import os
@@ -13,10 +11,10 @@ requests_unixsocket.monkeypatch()
 
 
 class Image():
-    """Docker image methods"""
     @classmethod
     def build(cls, config, webhook, context=''):
-        """Build a Docker image"""
+        """Build a Docker image
+        """
         # TODO: Use the Docker API for building instead of a shell \
         # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
@@ -62,19 +60,25 @@ class Image():
 
     @classmethod
     def retrieve(cls, image_id):
-        """Retrieve a Docker image"""
+        """Retrieve a Docker image
+        """
         data = requests.get(Global.BASE_URL + f'images/{image_id}/json')
         return data.json()
 
     @classmethod
     def all(cls):
-        """Retrieve all Docker images"""
+        """Retrieve all Docker images
+        """
         data = requests.get(Global.BASE_URL + 'images/json')
         return data.json()
 
     @classmethod
     def remove(cls, image_id):
-        """Remove (delete) a Docker image"""
-        data = requests.delete(Global.BASE_URL + f'images/{image_id}',
-                               data=json.dumps({'force': True}), headers=Global.JSON_HEADERS)
+        """Remove (delete) a Docker image
+        """
+        data = requests.delete(
+            Global.BASE_URL + f'images/{image_id}',
+            data=json.dumps({'force': True}),
+            headers=Global.JSON_HEADERS
+        )
         return data
