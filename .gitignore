@@ -7,3 +7,5 @@ logs
 *.json
 .env
 *.egg-info
+venv
+htmlcov

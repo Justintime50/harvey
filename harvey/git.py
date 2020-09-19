@@ -1,5 +1,3 @@
-"""Import git modules"""
-# pylint: disable=R0903
 import os
 import subprocess
 from .globals import Global
@@ -7,19 +5,25 @@ from .utils import Utils
 
 
 class Git():
-    """Git methods"""
     @classmethod
     def pull(cls, webhook):
-        """Clone/pull project using Git"""
-        if os.path.exists(os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))):
+        """Clone/pull project using Git
+        """
+        project_path = os.path.join(
+            Global.PROJECTS_PATH, Global.repo_full_name(webhook)
+        )
+        if os.path.exists(project_path):
             try:
                 final_output = subprocess.check_output(
-                    f'git -C {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                    pull --ff-only origin master',
-                    stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
+                    f'git - C {project_path} pull - -ff-only origin master',
+                    stdin=None,
+                    stderr=None,
+                    shell=True,
+                    timeout=Global.GIT_TIMEOUT
+                )
                 print(final_output)
             except subprocess.TimeoutExpired:
-                final_output = 'Error: Harvey timed out during git pull operation.'
+                final_output = 'Error: Harvey timed out during git pull operation.'  # noqa
                 print(final_output)
                 Utils.kill(final_output, webhook)
             except subprocess.CalledProcessError:
@@ -30,8 +34,12 @@ class Git():
             try:
                 final_output = subprocess.check_output(
                     f'git clone --depth=10 --branch=master {Global.repo_url(webhook)} \
-                    {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}',
-                    stdin=None, stderr=None, shell=True, timeout=Global.GIT_TIMEOUT)
+                    {project_path}',
+                    stdin=None,
+                    stderr=None,
+                    shell=True,
+                    timeout=Global.GIT_TIMEOUT
+                )
                 print(final_output)
             except subprocess.TimeoutExpired:
                 final_output = 'Error: Harvey timed out during git clone operation.'

@@ -1,5 +1,3 @@
-"""Import stage modules"""
-# pylint: disable=W0511,R0914,R0915
 from datetime import datetime
 import subprocess
 import os
@@ -10,10 +8,10 @@ from .utils import Utils
 
 
 class Stage():
-    """Stage methods"""
     @classmethod
     def test(cls, config, webhook, output):
-        """Test Stage"""
+        """Test Stage
+        """
         start_time = datetime.now()
         context = 'test'
 
@@ -104,7 +102,8 @@ class Stage():
 
     @classmethod
     def build(cls, config, webhook, output):
-        """Build Stage"""
+        """Build Stage
+        """
         start_time = datetime.now()
 
         # Build the image
@@ -130,7 +129,8 @@ class Stage():
 
     @classmethod
     def deploy(cls, webhook, output):
-        """Deploy Stage"""
+        """Deploy Stage
+        """
         start_time = datetime.now()
 
         # Tear down the old container if one exists
@@ -178,7 +178,8 @@ class Stage():
 
     @classmethod
     def build_deploy_compose(cls, config, webhook, output):
-        """Build Stage - USING A DOCKER COMPOSE FILE"""
+        """Build Stage - USING A DOCKER COMPOSE FILE
+        """
         start_time = datetime.now()
         if "compose" in config:
             compose = f'-f {config["compose"]}'

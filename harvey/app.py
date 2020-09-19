@@ -1,15 +1,13 @@
-"""Import API modules"""
-# pylint: disable=W0511,W0612
 import json
 import os
 import time
 import hmac
 import hashlib
-# import multiprocessing
 from threading import Thread
 from dotenv import load_dotenv
 from flask import Flask, request, abort
-import harvey
+from harvey.webhook import Webhook
+from harvey.globals import Global
 
 load_dotenv()
 API = Flask(__name__)
@@ -25,29 +23,30 @@ DEBUG = os.getenv('DEBUG', 'True')
 @API.route('/harvey', methods=['POST'])
 def receive_webhook():
     """Receive a Webhook - this is the entrypoint for Harvey"""
-    target = harvey.Webhook.receive
+    target = Webhook.receive
     return webhook(target)
 
 
 @API.route('/harvey/compose', methods=['POST'])
 def receive_webhook_compose():
-    """Receive a Webhook, build from compose file - this is the entrypoint for Harvey"""
-    target = harvey.Webhook.compose
+    """Receive a Webhook, build from compose file.
+    This is the entrypoint for Harvey
+    """
+    target = Webhook.compose
     return webhook(target)
 
 
 def webhook(target):
-    """Initiate details to receive a webhook"""
+    """Initiate details to receive a webhook
+    """
     data = request.data
     signature = request.headers.get('X-Hub-Signature')
     parsed_data = json.loads(data)
     if parsed_data['ref'] == 'refs/heads/master':
         if os.getenv('MODE') == 'test':
-            # multiprocessing.Process(target=target, args=(parsed_data,)).start()
             Thread(target=target, args=(parsed_data,)).start()
             return "200"
         if decode_webhook(data, signature):
-            # multiprocessing.Process(target=target, args=(parsed_data,)).start()
             Thread(target=target, args=(parsed_data,)).start()
             return "200"
         return abort(403)
@@ -55,7 +54,8 @@ def webhook(target):
 
 
 def decode_webhook(data, signature):
-    """Decode a webhook's secret key"""
+    """Decode a webhook's secret key
+    """
     secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
     mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
     return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
@@ -63,9 +63,10 @@ def decode_webhook(data, signature):
 
 @API.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
-    """Retrieve a pipeline's logs by ID"""
+    """Retrieve a pipeline's logs by ID
+    """
     file = f'{pipeline_id}.log'
-    for root, dirs, files in os.walk(harvey.Global.PROJECTS_LOG_PATH):
+    for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH):
         if file in files:
             with open(os.path.join(root, file), 'r') as output:
                 response = output.read()
@@ -75,11 +76,12 @@ def retrieve_pipeline(pipeline_id):
 
 @API.route('/pipelines', methods=['GET'])
 def retrieve_pipelines():
-    """Retrieve a list of pipelines"""
+    """Retrieve a list of pipelines
+    """
     # TODO: 1) Do not expose log paths here
     # TODO: 2) Replace this with retrieving from a DB instead
     pipelines = {'pipelines': []}
-    for root, dirs, files in os.walk(harvey.Global.PROJECTS_LOG_PATH, topdown=True):
+    for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
         for file in files:
             timestamp = time.ctime(os.path.getmtime(os.path.join(root, file)))
             pipelines['pipelines'].append(

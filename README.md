@@ -5,11 +5,15 @@
 Your personal CI/CD and Docker orchestration platform.
 
 [![Build Status](https://travis-ci.com/Justintime50/harvey.svg?branch=master)](https://travis-ci.com/Justintime50/harvey)
-[![MIT Licence](https://badges.frapsoft.com/os/mit/mit.svg?v=103)](https://opensource.org/licenses/mit-license.php)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/harvey/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/harvey?branch=master)
+[![PyPi](https://img.shields.io/pypi/v/harvey-ci)](https://pypi.org/project/harvey-ci/)
+[![Licence](https://img.shields.io/github/license/justintime50/harvey)](LICENSE)
 
 <img src="assets/showcase.png">
 
 </div>
+
+**NOTE:** Harvey is still under development. Star or watch this repo to stay up to date on its development.
 
 Harvey was born because Rancher has too much overhead and GitLab is too RAM hungry to self-host on my small personal server. CI's like Travis are fantastic for open source but pricy for private use and can't be self hosted - deployments across servers looked like a nightmare so I created Harvey - the homegrown CI/CD and Docker orchestrator that kept things simple and lean. Harvey can run multiple pipelines concurrently and initial tests have Harvey's pipelines coming in between just 20 seconds and 2 minutes to pull new changes and test, build, and deploy in production.
 
@@ -31,7 +35,14 @@ Harvey has lightweight testing functionality which is configurable via shell scr
 Because of the way Harvey was built with Docker (using sockets) this project that builds and orchestrates Docker images and containers cannot itself run in Docker and must be run on your bare-metal OS.
 
 ```bash
+# Install Harvey
+# TODO: Not yet available via PyPi
+
+# Install locally
 make install
+
+# Get Makefile help
+make help
 ```
 
 1. Install Docker & login
@@ -102,7 +113,7 @@ Take the URL Ngrok provides and use that on your webhooks.
 See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
 
 ```bash
-python3 examples.py
+venv/bin/python examples.py
 ```
 
 **Example API Call:**
@@ -130,10 +141,12 @@ Here are some common examples of testing environments you can use. Any Docker `i
 
 ## Development
 
-Lint the project:
-
 ```bash
+# Lint the project
 make lint
+
+# Run tests
+make test
 ```
 
 ## Resources

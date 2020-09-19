@@ -13,7 +13,7 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.1.0',
+    version='0.2.0',
     description='Your personal CI/CD and Docker orchestration platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -29,7 +29,11 @@ setuptools.setup(
     install_requires=REQUIREMENTS,
     extras_require={
         'dev': [
-            'pylint >= 2.5.0',
+            'pytest >= 6.0.0',
+            'pytest-cov >= 2.10.0',
+            'coveralls >= 2.1.2',
+            'flake8 >= 3.8.0',
+            'mock >= 4.0.0',
         ]
     },
     python_requires='>=3.6',

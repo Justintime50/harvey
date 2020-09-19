@@ -1,5 +1,3 @@
-"""Import Utils modules"""
-# pylint: disable=W0511
 import os
 import sys
 from .globals import Global
@@ -7,8 +5,6 @@ from .messages import Message
 
 
 class Utils():
-    """Harvey Utilities used throughout the program
-    """
     @classmethod
     def kill(cls, final_output, webhook):
         """A kill util to write everything to logs, send messages,

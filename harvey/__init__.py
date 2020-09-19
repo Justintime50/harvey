@@ -1,10 +1,10 @@
-"""Import all Harvey modules"""
-from .globals import Global
-from .container import Container
-from .git import Git
-from .image import Image
-from .messages import Message
-from .pipeline import Pipeline
-from .stage import Stage
-from .utils import Utils, Logs
-from .webhook import Webhook
+# flake8: noqa
+from harvey.globals import Global
+from harvey.container import Container
+from harvey.git import Git
+from harvey.image import Image
+from harvey.messages import Message
+from harvey.pipeline import Pipeline
+from harvey.stage import Stage
+from harvey.utils import Utils, Logs
+from harvey.webhook import Webhook

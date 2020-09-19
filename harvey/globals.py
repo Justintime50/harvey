@@ -1,4 +1,3 @@
-# pylint: disable=R0903,C0114
 class Global():
     """Contains global configuration for Harvey"""
     # Setup variables that can be customized
