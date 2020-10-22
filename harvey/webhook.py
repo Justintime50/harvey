@@ -19,7 +19,7 @@ class Webhook():
         print(preamble)
         git_message = (f'New commit by: {Global.repo_commit_author(webhook)}. \
             \nCommit made on repo: {Global.repo_full_name(webhook)}.')
-        git = Git.pull(webhook)
+        git = Git.update_git_repo(webhook)
 
         # Open the project's config file to assign pipeline variables
         try:
