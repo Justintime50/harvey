@@ -173,10 +173,13 @@ def retrieve_pipelines():
 # def pull_project():
 #     """Pull/clone GitHub project"""
 #     data = json.loads(request.data)
-#     pull = harvey.Git.pull(data)
+#     pull = harvey.Git.pull_repo(data)
 #     response = str(pull)
 #     return response
 
+def main():
+    API.run(host=HOST, port=PORT, debug=DEBUG)
+
 
 if __name__ == '__main__':
-    API.run(host=HOST, port=PORT, debug=DEBUG)
+    main()

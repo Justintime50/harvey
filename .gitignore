@@ -9,3 +9,4 @@ logs
 *.egg-info
 venv
 htmlcov
+.coverage

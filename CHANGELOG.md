@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.3.0 (2020-10-22)
+
+* Refactored git logic into smaller units
+* Added unit tests for `git` modules
+* Changed `fast forward` git operation to `rebase`
+
 ## v0.2.0 (2020-09-18)
 
 * Added testing framework and code coverage

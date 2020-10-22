@@ -36,7 +36,7 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 
 ```bash
 # Install Harvey
-# TODO: Not yet available via PyPi
+pip3 install harvey-ci
 
 # Install locally
 make install
@@ -147,6 +147,9 @@ make lint
 
 # Run tests
 make test
+
+# Run test coverage
+make coverage
 ```
 
 ## Resources

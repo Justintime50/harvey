@@ -13,7 +13,7 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.2.0',
+    version='0.3.0',
     description='Your personal CI/CD and Docker orchestration platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -34,6 +34,11 @@ setuptools.setup(
             'coveralls >= 2.1.2',
             'flake8 >= 3.8.0',
             'mock >= 4.0.0',
+        ]
+    },
+    entry_points={
+        'console_scripts': [
+            'harvey-ci=harvey.app:main'
         ]
     },
     python_requires='>=3.6',
