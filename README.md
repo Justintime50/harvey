@@ -40,6 +40,7 @@ pip3 install harvey-ci
 
 # Install locally
 make install
+cp .env.example .env
 
 # Get Makefile help
 make help
@@ -86,6 +87,20 @@ Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data
 }
 ```
 
+### Configuration
+
+```
+Environment Variables:
+    SLACK           Set to "true" to send slack messages
+    SLACK_CHANNEL   The Slack channel to send messages to
+    SLACK_BOT_TOKEN The Slackbot token to use to authenticate each request to Slack
+    WEBHOOK_SECRET  The Webhook secret required by GitHub (if enabled) to secure your webhooks
+    MODE            Set to "test" to bypass the header and auth data from GitHub to test
+    HOST            The host Harvey will run on. Default: 127.0.0.1
+    PORT            The port Harvey will run on. Default: 5000
+    DEBUG           Whether the Flask API will run in debug mode or not
+```
+
 ### Start API Server (for Webhook)
 
 **Start Harvey:**
@@ -113,7 +128,7 @@ Take the URL Ngrok provides and use that on your webhooks.
 See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
 
 ```bash
-venv/bin/python examples.py
+venv/bin/python examples/examples.py
 ```
 
 **Example API Call:**

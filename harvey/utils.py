@@ -1,7 +1,7 @@
 import os
 import sys
-from .globals import Global
-from .messages import Message
+from harvey.globals import Global
+from harvey.message import Message
 
 
 class Utils():
@@ -11,7 +11,8 @@ class Utils():
         tear down Docker stuff, and quit
         """
         Logs.generate_logs(final_output, webhook)
-        Message.slack(final_output)
+        if os.getenv('SLACK'):
+            Message.send_slack_message(final_output)
         sys.exit()
 
     @classmethod
@@ -19,7 +20,8 @@ class Utils():
         """Log output and send message on pipeline success
         """
         Logs.generate_logs(final_output, webhook)
-        Message.slack(final_output)
+        if os.getenv('SLACK'):
+            Message.send_slack_message(final_output)
 
 
 class Logs():
