@@ -19,8 +19,8 @@ class Git():
         return output.decode('UTF-8')
 
     @classmethod
-    def clone_repo(cls, project_path, webhook):
-        """Clone a repo into the Harvey projects folder
+    def pull_repo(cls, project_path, webhook):
+        """Pull updates for a repo in the Harvey projects folder
         """
         try:
             final_output = subprocess.check_output(
@@ -31,6 +31,7 @@ class Git():
                 timeout=Global.GIT_TIMEOUT
             )
             print(final_output)
+            return final_output
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out during git pull operation.'
             print(final_output)
@@ -41,8 +42,8 @@ class Git():
             Utils.kill(final_output, webhook)
 
     @classmethod
-    def pull_repo(cls, project_path, webhook):
-        """Pull updates for a repo in the Harvey projects folder
+    def clone_repo(cls, project_path, webhook):
+        """Clone a repo into the Harvey projects folder
         """
         try:
             final_output = subprocess.check_output(
@@ -53,6 +54,7 @@ class Git():
                 timeout=Global.GIT_TIMEOUT
             )
             print(final_output)
+            return final_output
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out during git clone operation.'
             print(final_output)

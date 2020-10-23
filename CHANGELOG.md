@@ -1,9 +1,17 @@
 # CHANGELOG
 
+## v0.4.0 (2020-10-23)
+
+* Added a preamble Slack message when a pipeline starts. Now you'll get notified when a pipeline starts in addition to when it finishes (closes #39)
+* Added a `SLACK` env variable so you can decide if you want to send Slack messages or not
+* Added unit tests for the `message` module
+* Documented all env variables in the README
+* Fixed a bug where git clone/pull logic was swapped and wasn't returning anything
+
 ## v0.3.0 (2020-10-22)
 
 * Refactored git logic into smaller units
-* Added unit tests for `git` modules
+* Added unit tests for `git` module
 * Changed `fast forward` git operation to `rebase`
 
 ## v0.2.0 (2020-09-18)
