@@ -19,12 +19,6 @@ run: ## Run the service locally
 docker: ## Run the service in a docker container (always builds)
 	docker-compose up -d --build
 
-bridge-auth: ## Setup the Ngrok service by providing it your token
-	./ngrok authtoken $(TOKEN)
-
-bridge: ## Run the Ngrok service and provide it a port to run on
-	./ngrok http $(PORT)
-
 ## clean - Remove the virtual environment and clear out .pyc files
 clean:
 	rm -rf ~/.venv/harvey/ venv

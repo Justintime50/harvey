@@ -3,13 +3,13 @@ import os
 import time
 import hmac
 import hashlib
+import requests_unixsocket
 from threading import Thread
 from dotenv import load_dotenv
 from flask import Flask, request, abort
 from harvey.webhook import Webhook
 from harvey.globals import Global
 
-load_dotenv()
 API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
@@ -89,55 +89,59 @@ def retrieve_pipelines():
     return json.dumps(pipelines, indent=4)
 
 
+# @API.route('/containers/<container_id>/healthcheck', methods=['GET'])
+# def container_healthcheck():
+#     # TODO: Add this endpoint
+
 # @API.route('/containers/create', methods=['POST'])
 # def create_container():
 #     """Create a Docker container"""
 #     tag = request.tag
-#     response = json.dumps(harvey.Container.create(tag))
+#     response = json.dumps(harvey.Container.create_container(tag))
 #     return response
 
 # @API.route('/containers/<container_id>/start', methods=['POST'])
 # def start_container(container_id):
 #     """Start a Docker container"""
-#     start = harvey.Container.start(container_id)
+#     start = harvey.Container.start_container(container_id)
 #     response = str(start)
 #     return response
 
 # @API.route('/containers/<container_id>/stop', methods=['POST'])
 # def stop_container(container_id):
 #     """Stop a Docker container"""
-#     stop = harvey.Container.stop(container_id)
+#     stop = harvey.Container.stop_container(container_id)
 #     response = str(stop)
 #     return response
 
 # @API.route('/containers/<container_id>', methods=['GET'])
-# def retrieve_container(container_id):
+# def inspect_container(container_id):
 #     """Retrieve a Docker container"""
-#     response = json.dumps(harvey.Container.retrieve(container_id))
+#     response = json.dumps(harvey.Container.inspect_container(container_id))
 #     return response
 
 # @API.route('/containers', methods=['GET'])
 # def all_containers():
 #     """Retrieve all Docker containers"""
-#     response = json.dumps(harvey.Container.all())
+#     response = json.dumps(harvey.Container.list_containers())
 #     return response
 
 # @API.route('/containers/<container_id>/logs', methods=['GET'])
 # def logs_container(container_id):
 #     """Retrieve logs from a Docker container"""
-#     response = str(harvey.Container.logs(container_id))
+#     response = str(harvey.Container.inspect_container_logs(container_id))
 #     return response
 
 # @API.route('/containers/<container_id>/wait', methods=['POST'])
 # def wait_container(container_id):
 #     """Wait for a Docker container to exit"""
-#     response = json.dumps(harvey.Container.wait(container_id))
+#     response = json.dumps(harvey.Container.wait_container(container_id))
 #     return response
 
 # @API.route('/containers/<container_id>/remove', methods=['DELETE'])
 # def remove_container(container_id):
 #     """Remove (delete) a Docker container"""
-#     remove = harvey.Container.remove(container_id)
+#     remove = harvey.Container.remove_container(container_id)
 #     response = str(remove)
 #     return response
 
@@ -178,6 +182,9 @@ def retrieve_pipelines():
 #     return response
 
 def main():
+    # allows us to use requests_unixsocker via requests
+    requests_unixsocket.monkeypatch()
+    load_dotenv()
     API.run(host=HOST, port=PORT, debug=DEBUG)
 
 

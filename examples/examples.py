@@ -25,15 +25,15 @@ import harvey
 # print(image)
 
 # """Retrieve a single container"""
-# print(json.dumps(harvey.Container.retrieve(
+# print(json.dumps(harvey.Container.inspect_container(
 #     'fe3087b2004cac28b820dd48661dd2b4d974293a1b9968a2d8fcc969c0325707'
 # ), indent=4))
 
 # """Retrieve a list of container"""
-# print(json.dumps(harvey.Container.all(), indent=4))
+# print(json.dumps(harvey.Container.list_containers(), indent=4))
 
 # """Create a container"""
-# container = harvey.Container.create(
+# container = harvey.Container.create_container(
 #     config={
 #         "Image": "lala",
 #     }
@@ -41,16 +41,16 @@ import harvey
 # print(container, "created")
 
 # """Start a container"""
-# start = harvey.Container.start('nice_khayyam')
+# start = harvey.Container.start_container('nice_khayyam')
 # print(start, "started")
 
 # """Stop a container"""
-# container = harvey.Container.stop(
+# container = harvey.Container.stop_container(
 #     'fe3087b2004cac28b820dd48661dd2b4d974293a1b9968a2d8fcc969c0325707')
 # print(container.name, "stopped")
 
 # """List logs for a container"""
-# logs = harvey.Container.logs(
+# logs = harvey.Container.inspect_container_logs(
 #     '089cb9dda0da7c3e0289b6a2cea26837591599ebd531c5a493c4d30548acb38d'
 # )
 # print(logs)

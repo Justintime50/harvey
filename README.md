@@ -103,25 +103,9 @@ Environment Variables:
 
 ### Start API Server (for Webhook)
 
-**Start Harvey:**
-
 ```bash
 make run
 ```
-
-**Start Ngrok HTTP Bridge:**
-
-This will enable you to bridge from the web to your local machine without changing the default Flask server. Setup your account here: https://ngrok.com.
-
-```bash
-# Setup account (one time, go to ngrok.com to setup)
-make bridge-auth TOKEN=123...
-
-# Run bridge
-make bridge PORT=5000
-```
-
-Take the URL Ngrok provides and use that on your webhooks.
 
 ### Example Python Functions
 

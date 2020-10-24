@@ -1,10 +1,10 @@
 import json
 import os
 from datetime import datetime
-from .pipeline import Pipeline
-from .git import Git
-from .globals import Global
-from .utils import Utils
+from harvey.pipeline import Pipeline
+from harvey.git import Git
+from harvey.globals import Global
+from harvey.utils import Utils
 
 
 class Webhook():
@@ -45,18 +45,18 @@ class Webhook():
     def receive(cls, webhook):
         """Receive a webhook and spin up a pipeline based on the config
         """
-        init = Webhook.init(webhook)
+        webhook_config, webhook_output = Webhook.init(webhook)
 
-        if init[0]['pipeline'] == 'test':
-            pipeline = Pipeline.test(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'deploy':
-            pipeline = Pipeline.deploy(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'full':
-            pipeline = Pipeline.full(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'pull':
-            pipeline = Utils.success(init[1], webhook)
-        elif not init[0]['pipeline']:
-            final_output = init[1] + '\nError: Harvey could not run, \
+        if webhook_config['pipeline'] == 'test':
+            pipeline = Pipeline.test(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'deploy':
+            pipeline = Pipeline.deploy(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'full':
+            pipeline = Pipeline.full(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'pull':
+            pipeline = Utils.success(webhook_output, webhook)
+        elif not webhook_config['pipeline']:
+            final_output = webhook_output + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
             Utils.kill(final_output, webhook)
 
@@ -66,18 +66,18 @@ class Webhook():
     def compose(cls, webhook):
         """Receive a webhook and spin up a pipeline based on the config
         """
-        init = Webhook.init(webhook)
+        webhook_config, webhook_output = Webhook.init(webhook)
 
-        if init[0]['pipeline'] == 'test':
-            pipeline = Pipeline.test(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'deploy':
-            pipeline = Pipeline.deploy_compose(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'full':
-            pipeline = Pipeline.full_compose(init[0], webhook, init[1])
-        elif init[0]['pipeline'] == 'pull':
-            pipeline = Utils.success(init[1], webhook)
-        elif not init[0]['pipeline']:
-            final_output = init[1] + '\nError: Harvey could not run, \
+        if webhook_config['pipeline'] == 'test':
+            pipeline = Pipeline.test(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'deploy':
+            pipeline = Pipeline.deploy_compose(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'full':
+            pipeline = Pipeline.full_compose(webhook_config, webhook, webhook_output)
+        elif webhook_config['pipeline'] == 'pull':
+            pipeline = Utils.success(webhook_output, webhook)
+        elif not webhook_config['pipeline']:
+            final_output = webhook_output + '\nError: Harvey could not run, \
                 there was no pipeline specified.'
             Utils.kill(final_output, webhook)
 

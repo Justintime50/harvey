@@ -1,10 +1,12 @@
 from datetime import datetime
 import subprocess
 import os
-from .globals import Global
-from .container import Container
-from .image import Image
-from .utils import Utils
+import json
+import time
+from harvey.globals import Global
+from harvey.container import Container
+from harvey.image import Image
+from harvey.utils import Utils
 
 
 class Stage():
@@ -13,12 +15,13 @@ class Stage():
         """Test Stage
         """
         start_time = datetime.now()
+        test_project_name = f'test-{Global.docker_project_name(webhook)}'
         context = 'test'
 
         # Build the image
         try:
             image = Image.build(config, webhook, context)
-            image_output = f'Test image created.\n{image[1]}'
+            image_output = f'Test image created.\n{image}'
             print(image_output)
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out building the Test image.'
@@ -31,18 +34,18 @@ class Stage():
             Utils.kill(final_output, webhook)
 
         # Create a container
-        container = Container.create(image[0])
+        container = Container.create_container(test_project_name)
         if container is not False:
             container_output = 'Test container created.'
             print(container_output)
         else:
             final_output = output + image_output + \
                 '\nError: Harvey could not create the Test container.'
-            Image.remove(image[0])
+            Image.remove(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Start the container
-        start = Container.start(container['Id'])
+        start = Container.start_container(test_project_name)
         if start is not False:
             start_output = 'Test container started.'
             print(start_output)
@@ -50,11 +53,11 @@ class Stage():
             final_output = output + image_output + container_output + \
                 '\nError: Harvey could not start the container.'
             Image.remove(image[0])
-            Container.remove(container)
+            Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Wait for container to exit
-        wait = Container.wait(container['Id'])
+        wait = Container.wait_container(test_project_name)
         if wait is not False:
             wait_output = 'Waiting for Test container to exit.'
             print(wait_output)
@@ -62,11 +65,11 @@ class Stage():
             final_output = output + image_output + container_output + start_output + \
                 '\nError: Harvey could not wait for the container.'
             Image.remove(image[0])
-            Container.remove(container)
+            Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Return logs
-        logs = Container.logs(container['Id'])
+        logs = Container.inspect_container_logs(test_project_name)
         if logs is not False:
             logs_output = '\nTest logs:\n' + \
                 '============================================================\n' \
@@ -76,11 +79,11 @@ class Stage():
             final_output = output + image_output + container_output + start_output + wait_output + \
                 '\nError: Harvey could not create the container logs.'
             Image.remove(image[0])
-            Container.remove(container)
+            Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Remove container and image after it's done
-        remove = Container.remove(container['Id'])
+        remove = Container.remove_container(test_project_name)
         if remove is not False:
             Image.remove(image[0])
             remove_output = 'Test container and image removed.'
@@ -90,7 +93,7 @@ class Stage():
                 wait_output + logs_output + \
                 '\nError: Harvey could not remove the container and/or image.'
             Image.remove(image[0])
-            Container.remove(container)
+            Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
         execution_time = f'\nTest stage execution time: {datetime.now() - start_time}'
@@ -108,10 +111,9 @@ class Stage():
 
         # Build the image
         try:
-            Image.remove(
-                f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+            Image.remove(Global.docker_project_name(webhook))
             image = Image.build(config, webhook)
-            image_output = f'Project image created\n{image[1]}'
+            image_output = f'Project image created\n{image}'
             print(image_output)
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out during the build stage.'
@@ -134,23 +136,26 @@ class Stage():
         start_time = datetime.now()
 
         # Tear down the old container if one exists
-        # TODO: Add logic that checks if a container exists and skips these if not
-        Container.stop(
-            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
-        stop_output = 'Attempting to stop old project container.'
-        print(stop_output)
-        Container.wait(
-            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
-        wait_output = 'Attempting to wait on old project container to exit.'
-        print(wait_output)
-        Container.remove(
-            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
-        remove_output = 'Attempting to remove old project container.'
-        print(remove_output)
+        # TODO: Check if tearing down the old container is necessary, should we instead
+        # TODO: simply be swapping them out for each other?
+        container_list = Container.list_containers()
+        if Global.docker_project_name(webhook) not in json.dumps(container_list):
+            stop_output = ''
+            wait_output = ''
+            remove_output = ''
+        else:
+            Container.stop_container(Global.docker_project_name(webhook))
+            stop_output = 'Attempting to stop old project container.'
+            print(stop_output)
+            Container.wait_container(Global.docker_project_name(webhook))
+            wait_output = 'Attempting to wait on old project container to exit.'
+            print(wait_output)
+            Container.remove_container(Global.docker_project_name(webhook))
+            remove_output = 'Attempting to remove old project container.'
+            print(remove_output)
 
         # Create a container
-        container = Container.create(
-            f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}')
+        container = Container.create_container(Global.docker_project_name(webhook))
         if container is not False:
             create_output = 'Project container created.'
             print(create_output)
@@ -160,7 +165,7 @@ class Stage():
             Utils.kill(final_output, webhook)
 
         # Start the container
-        start = Container.start(container['Id'])
+        start = Container.start_container(Global.docker_project_name(webhook))
         if start is not False:
             start_output = 'Project container started.'
             print(start_output)
@@ -208,3 +213,25 @@ class Stage():
         print(execution_time)
 
         return final_output
+
+    @classmethod
+    def run_container_healthcheck(cls, webhook):
+        """Run a healthcheck to ensure the container is running and not in a transitory state.
+        Not to be confused with the Docker Healthcheck functionality which is different
+        """
+        time.sleep(3)
+        container = Container.inspect_container(Global.docker_project_name(webhook))
+        state = container['State']
+        if (
+            state['Restarting']
+            and state['Dead']
+            and state['Paused']
+        ) is False and state['Running'] is True:
+            healthcheck = True
+            output = 'Project healthcheck succeeded!'
+            print(output)
+        else:
+            healthcheck = False
+            output = 'Project healthcheck failed.'
+            print(output)
+        return healthcheck, output
