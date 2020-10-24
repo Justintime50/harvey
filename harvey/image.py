@@ -1,13 +1,8 @@
 import json
-import uuid
 import os
 import subprocess
 import requests
-import requests_unixsocket
-from .globals import Global
-
-# allows us to use requests_unixsocker via requests
-requests_unixsocket.monkeypatch()
+from harvey.globals import Global
 
 
 class Image():
@@ -32,14 +27,12 @@ class Image():
         if context == 'test':
             project = f'--build-arg PROJECT={Global.repo_full_name(webhook)}'
             path = Global.PROJECTS_PATH
-            tag = uuid.uuid4().hex
         else:
             project = ''
             path = os.path.join(Global.PROJECTS_PATH,
                                 Global.repo_full_name(webhook))
-            tag = f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}'
 
-        tag_arg = f'-t {tag}'
+        tag_arg = f'-t {Global.docker_project_name(webhook)}'
 
         # For testing only:
         if "language" in config and context == 'test':
@@ -56,7 +49,7 @@ class Image():
             f'cd {path} && docker build {dockerfile} {tag_arg} {language} {version} {project} .',
             stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
 
-        return tag, image.decode('UTF-8')
+        return image.decode('UTF-8')
 
     @classmethod
     def retrieve(cls, image_id):

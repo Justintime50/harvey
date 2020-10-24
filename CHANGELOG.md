@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## v0.5.0 (2020-10-24)
+
+* Fixed a bug where container names were not being created properly which led to other issues down the pipeline flow
+* Added a `healthcheck` feature - pipelines now run a healthcheck and ensure the container is running (and didn't exit) before declaring the pipeline a success
+* Various bug fixes and under-the-hood improvements throughout the entire experience
+* Removed ngrok executable and all info about ngrok from README
+
 ## v0.4.0 (2020-10-23)
 
 * Added a preamble Slack message when a pipeline starts. Now you'll get notified when a pipeline starts in addition to when it finishes (closes #39)

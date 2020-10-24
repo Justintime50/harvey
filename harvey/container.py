@@ -1,114 +1,109 @@
-import json
 import requests
-import requests_unixsocket
-from .globals import Global
-
-# allows us to use requests_unixsocker via requests
-requests_unixsocket.monkeypatch()
+from harvey.globals import Global
 
 
 class Container():
     @classmethod
-    def create(cls, tag):
+    def create_container(cls, tag):
         """Create a Docker container
         """
-        data = requests.post(
+        response = requests.post(
             Global.BASE_URL + 'containers/create',
-            params=json.dumps({'name': tag}),
-            data=json.dumps({'Image': tag}),
+            params={'name': tag},
+            json={'Image': tag},
             headers=Global.JSON_HEADERS
         )
         if (
-            data.status_code == 200
-            or data.status_code == 201
-            or data.status_code == 204
+            response.status_code == 200
+            or response.status_code == 201
+            or response.status_code == 204
         ):
-            response = data.json()
+            data = response.json()
         else:
-            response = False
-        return response
-
-    @classmethod
-    def start(cls, container_id):
-        """Start a Docker container
-        """
-        data = requests.post(
-            Global.BASE_URL + f'containers/{container_id}/start')
-        if (
-            data.status_code == 200
-            or data.status_code == 201
-            or data.status_code == 204
-        ):
-            response = data
-        else:
-            response = False
-        return response
-
-    @classmethod
-    def stop(cls, container_id):
-        """Stop a Docker container
-        """
-        data = requests.post(
-            Global.BASE_URL + f'containers/{container_id}/stop')
+            data = False
         return data
 
     @classmethod
-    def retrieve(cls, container_id):
-        """Retrieve a Docker container
+    def start_container(cls, container_id):
+        """Start a Docker container
         """
-        data = requests.get(
-            Global.BASE_URL + f'containers/{container_id}/json')
-        return data.json()
+        response = requests.post(
+            Global.BASE_URL + f'containers/{container_id}/start')
+        if (
+            response.status_code == 200
+            or response.status_code == 201
+            or response.status_code == 204
+        ):
+            data = response
+        else:
+            data = False
+        return data
 
     @classmethod
-    def all(cls):
+    def stop_container(cls, container_id):
+        """Stop a Docker container
+        """
+        response = requests.post(
+            Global.BASE_URL + f'containers/{container_id}/stop')
+        return response
+
+    @classmethod
+    def inspect_container(cls, container_id):
+        """Inspect the details of a Docker container
+        """
+        response = requests.get(
+            Global.BASE_URL + f'containers/{container_id}/json')
+        return response.json()
+
+    @classmethod
+    def list_containers(cls):
         """List all Docker containers
         """
-        data = requests.get(Global.BASE_URL + 'containers/json')
-        return data.json()
+        response = requests.get(Global.BASE_URL + 'containers/json')
+        return response.json()
 
     @classmethod
-    def logs(cls, container_id):
+    def inspect_container_logs(cls, container_id):
         """Retrieve logs (and write to file) of a Docker container
         """
         # TODO: Use attach endpoint instead of live log reloading
-        # data = requests.post(Global.BASE_URL + f'containers/{id}/attach',
-        #   data=json.dumps({
+        # response = requests.post(Global.BASE_URL + f'containers/{id}/attach',
+        #   json={
         #     'logs': True,
         #     'stream': True,
         #     'stdin': True,
         #     'stdout': True,
         #     'stderr': True
-        # }), headers=Global.ATTACH_HEADERS)
-        data = requests.get(
+        # }, headers=Global.ATTACH_HEADERS)
+        response = requests.get(
             Global.BASE_URL + f'containers/{container_id}/logs',
             params={'stdout': True, 'stderr': True}
         )
-        return data.content.decode('latin1')
+        return response.content.decode('latin1')
 
     @classmethod
-    def wait(cls, container_id):
+    def wait_container(cls, container_id):
         """Wait for a Docker container to exit
         """
-        data = requests.post(
+        response = requests.post(
             Global.BASE_URL + f'containers/{container_id}/wait')
         if (
-            data.status_code == 200
-            or data.status_code == 201
-            or data.status_code == 204
+            response.status_code == 200
+            or response.status_code == 201
+            or response.status_code == 204
         ):
-            response = data.json()
+            data = response.json()
         else:
-            response = False
-        return response
+            data = False
+        return data
 
     @classmethod
-    def remove(cls, container_id):
+    def remove_container(cls, container_id):
         """Remove (delete) a Docker container
         """
-        data = requests.delete(
+        response = requests.delete(
             Global.BASE_URL + f'containers/{container_id}',
-            data=json.dumps({'force': True}),
+            json={'force': True},
             headers=Global.JSON_HEADERS
         )
-        return data
+        return response

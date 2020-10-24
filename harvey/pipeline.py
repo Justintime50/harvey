@@ -18,6 +18,7 @@ class Pipeline():
             )
         test = Stage.test(config, webhook, output)
         if 'Error: the above command exited with code' in test:
+            # TODO: Ensure this works, it may be broken
             execution_time = f'Test pipeline execution time: {datetime.now() - start_time}'
             failed = 'Test pipeline failed!'
             final_output = f'{output}\n{test}\n{execution_time}\n{failed}'
@@ -41,11 +42,17 @@ class Pipeline():
             )
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
-        execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
-        success = 'Deploy pipeline succeeded!'
-        final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{success}'
+        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
-        Utils.success(final_output, webhook)
+        execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
+        if healthcheck is True:
+            success = 'Deploy pipeline succeeded!'
+            final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+            Utils.success(final_output, webhook)
+        else:
+            fail = 'Deploy pipeline failed due to bad healthcheck.'
+            final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{fail}'
+            Utils.kill(final_output, webhook)
 
         return deploy
 
@@ -66,11 +73,17 @@ class Pipeline():
             Utils.kill(final_output, webhook)
         build = Stage.build(config, webhook, output)
         deploy = Stage.deploy(webhook, output)
-        execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
-        success = 'Full pipeline succeeded!'
-        final_output = f'{output}\n{test}\n{build}\n{deploy}\n{execution_time}\n{success}'
+        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
-        Utils.success(final_output, webhook)
+        execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
+        if healthcheck is True:
+            success = 'Deploy pipeline succeeded!'
+            final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+            Utils.success(final_output, webhook)
+        else:
+            fail = 'Deploy pipeline failed due to bad healthcheck.'
+            final_output = f'{output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{fail}'
+            Utils.kill(final_output, webhook)
 
         return deploy
 
@@ -84,11 +97,17 @@ class Pipeline():
                 f'Harvey has started a `{config["pipeline"]}` pipeline for `{Global.repo_full_name(webhook)}`.'
             )
         deploy = Stage.build_deploy_compose(config, webhook, output)
-        execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
-        success = 'Deploy pipeline succeeded!'
-        final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
+        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
-        Utils.success(final_output, webhook)
+        execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
+        if healthcheck is True:
+            success = 'Deploy pipeline succeeded!'
+            final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+            Utils.success(final_output, webhook)
+        else:
+            fail = 'Deploy pipeline failed due to bad healthcheck.'
+            final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{fail}'
+            Utils.kill(final_output, webhook)
 
         return deploy
 
@@ -108,10 +127,16 @@ class Pipeline():
             final_output = f'{output}\n{test}\n{execution_time}\n{failed}'
             Utils.kill(final_output, webhook)
         deploy = Stage.build_deploy_compose(config, webhook, output)
-        execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
-        success = 'Full pipeline succeeded!'
-        final_output = f'{output}\n{test}\n{deploy}\n{execution_time}\n{success}'
+        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
-        Utils.success(final_output, webhook)
+        execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
+        if healthcheck is True:
+            success = 'Deploy pipeline succeeded!'
+            final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+            Utils.success(final_output, webhook)
+        else:
+            fail = 'Deploy pipeline failed due to bad healthcheck.'
+            final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{fail}'
+            Utils.kill(final_output, webhook)
 
         return deploy
