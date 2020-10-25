@@ -50,7 +50,7 @@ make help
 1. Ensure you've added your ssh key to the ssh agent: `ssh-add` followed by your password
 1. Enable logging (see below)
 1. Setup enviornment variables in `.env`
-1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/harvey`, send the payload as JSON)
+1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/pipelines/start`, send the payload as JSON)
 
 **NOTE:** It is not recommended to use Harvey alongside other CI/CD or Docker orchestration platforms on the same machine.
 
@@ -72,7 +72,7 @@ The [following](https://docs.docker.com/config/containers/logging/json-file/#usa
 
 Find the full [docs here](docs/README.md). 
 
-Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/harvey`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret):
+Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/pipelines/start`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret):
 
 ```javascript
 {
@@ -137,6 +137,16 @@ Here are some common examples of testing environments you can use. Any Docker `i
 **Null Params**
 - If no language is provided, an `Alpine Linux` container with `Shellcheck` pre-installed will be used.
 - If no version is provided, the `latest` tag will be used.
+
+### Add a Harvey badge to your project
+
+[![Harvey CI](https://img.shields.io/badge/CI%2FCD-Harvey-blue)](https://github.com/Justintime50/harvey)
+
+Add the following to your project's README:
+
+```
+[![Harvey CI](https://img.shields.io/badge/CI%2FCD-Harvey-blue)](https://github.com/Justintime50/harvey)
+```
 
 ## Development
 

@@ -1,6 +1,10 @@
 import json
 import os
 from datetime import datetime
+import hmac
+import hashlib
+from flask import abort
+from threading import Thread
 from harvey.pipeline import Pipeline
 from harvey.git import Git
 from harvey.globals import Global
@@ -42,7 +46,33 @@ class Webhook():
         return config, output
 
     @classmethod
-    def receive(cls, webhook):
+    def parse_webhook(cls, request, target):
+        """Initiate details to receive a webhook
+        """
+        data = request.data
+        signature = request.headers.get('X-Hub-Signature')
+        parsed_data = json.loads(data)  # TODO: Is this necessary?
+        # TODO: Allow the user to configure whatever branch they'd like to pull from
+        if parsed_data['ref'] in ['refs/heads/master', 'refs/heads/main']:
+            if os.getenv('MODE') == 'test':
+                Thread(target=target, args=(parsed_data,)).start()
+                return "200"
+            if cls.decode_webhook(data, signature):
+                Thread(target=target, args=(parsed_data,)).start()
+                return "200"
+            return abort(403)
+        return abort(500, 'Harvey can only pull from the "master" or "main" branch.')
+
+    @classmethod
+    def decode_webhook(cls, data, signature):
+        """Decode a webhook's secret key
+        """
+        secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
+        mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
+        return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
+
+    @classmethod
+    def start_pipeline(cls, webhook):
         """Receive a webhook and spin up a pipeline based on the config
         """
         webhook_config, webhook_output = Webhook.init(webhook)
@@ -63,7 +93,7 @@ class Webhook():
         return pipeline
 
     @classmethod
-    def compose(cls, webhook):
+    def start_pipeline_compose(cls, webhook):
         """Receive a webhook and spin up a pipeline based on the config
         """
         webhook_config, webhook_output = Webhook.init(webhook)

@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.6.0 (2020-10-25)
+
+* Added unit tests for the `container` module and refactored various code there
+* Fixed a bug where the deploy stage of a pipeline would fail if a container already existed but was stopped
+* Added Harvey badge info to README
+* Moved all logic from `app.py` to the `webhook` module, updated endpoint urls to be more verbose and explicit
+* Various other bug fixes and code cleanup
+
 ## v0.5.0 (2020-10-24)
 
 * Fixed a bug where container names were not being created properly which led to other issues down the pipeline flow

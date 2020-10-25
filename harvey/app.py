@@ -1,14 +1,12 @@
 import json
 import os
 import time
-import hmac
-import hashlib
 import requests_unixsocket
-from threading import Thread
 from dotenv import load_dotenv
 from flask import Flask, request, abort
 from harvey.webhook import Webhook
 from harvey.globals import Global
+
 
 API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
@@ -20,51 +18,38 @@ DEBUG = os.getenv('DEBUG', 'True')
 # This file should only route requests to the proper functions
 
 
-@API.route('/harvey', methods=['POST'])
-def receive_webhook():
-    """Receive a Webhook - this is the entrypoint for Harvey"""
-    target = Webhook.receive
-    return webhook(target)
-
-
-@API.route('/harvey/compose', methods=['POST'])
-def receive_webhook_compose():
-    """Receive a Webhook, build from compose file.
-    This is the entrypoint for Harvey
+@API.route('/pipelines/start', methods=['POST'])
+def start_pipeline():
+    """Start a pipeline based on webhook data
     """
-    target = Webhook.compose
-    return webhook(target)
+    return Webhook.parse_webhook(request=request, target=Webhook.start_pipeline)
 
 
-def webhook(target):
-    """Initiate details to receive a webhook
+# @API.route('/pipelines/stop', methods=['POST'])
+# def stop_pipeline():
+#     # TODO: Add this endpoint
+
+
+@API.route('/pipelines/start/compose', methods=['POST'])
+def start_pipeline_compose():
+    """Start a pipeline based on webhook data
+    But build from compose file.
     """
-    data = request.data
-    signature = request.headers.get('X-Hub-Signature')
-    parsed_data = json.loads(data)
-    if parsed_data['ref'] == 'refs/heads/master':
-        if os.getenv('MODE') == 'test':
-            Thread(target=target, args=(parsed_data,)).start()
-            return "200"
-        if decode_webhook(data, signature):
-            Thread(target=target, args=(parsed_data,)).start()
-            return "200"
-        return abort(403)
-    return abort(500, 'Harvey can only pull from the master branch.')
+    return Webhook.parse_webhook(request=request, target=Webhook.start_pipeline_compose)
 
 
-def decode_webhook(data, signature):
-    """Decode a webhook's secret key
-    """
-    secret = bytes(os.getenv('WEBHOOK_SECRET'), 'UTF-8')
-    mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
-    return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
+# @API.route('/pipelines/stop/compose', methods=['POST'])
+# def stop_pipeline_compose():
+#     # TODO: Add this endpoint
 
 
 @API.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
     """Retrieve a pipeline's logs by ID
     """
+    # This is a hacky temporary solution until we can store
+    # this data in a database and is not meant to remain
+    # as a long-term solution
     file = f'{pipeline_id}.log'
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH):
         if file in files:
@@ -78,8 +63,9 @@ def retrieve_pipeline(pipeline_id):
 def retrieve_pipelines():
     """Retrieve a list of pipelines
     """
-    # TODO: 1) Do not expose log paths here
-    # TODO: 2) Replace this with retrieving from a DB instead
+    # This is a hacky temporary solution until we can store
+    # this data in a database and is not meant to remain
+    # as a long-term solution
     pipelines = {'pipelines': []}
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
         for file in files:
@@ -93,12 +79,14 @@ def retrieve_pipelines():
 # def container_healthcheck():
 #     # TODO: Add this endpoint
 
+
 # @API.route('/containers/create', methods=['POST'])
 # def create_container():
 #     """Create a Docker container"""
 #     tag = request.tag
 #     response = json.dumps(harvey.Container.create_container(tag))
 #     return response
+
 
 # @API.route('/containers/<container_id>/start', methods=['POST'])
 # def start_container(container_id):
@@ -107,6 +95,7 @@ def retrieve_pipelines():
 #     response = str(start)
 #     return response
 
+
 # @API.route('/containers/<container_id>/stop', methods=['POST'])
 # def stop_container(container_id):
 #     """Stop a Docker container"""
@@ -114,11 +103,13 @@ def retrieve_pipelines():
 #     response = str(stop)
 #     return response
 
+
 # @API.route('/containers/<container_id>', methods=['GET'])
 # def inspect_container(container_id):
 #     """Retrieve a Docker container"""
 #     response = json.dumps(harvey.Container.inspect_container(container_id))
 #     return response
+
 
 # @API.route('/containers', methods=['GET'])
 # def all_containers():
@@ -126,11 +117,13 @@ def retrieve_pipelines():
 #     response = json.dumps(harvey.Container.list_containers())
 #     return response
 
+
 # @API.route('/containers/<container_id>/logs', methods=['GET'])
 # def logs_container(container_id):
 #     """Retrieve logs from a Docker container"""
 #     response = str(harvey.Container.inspect_container_logs(container_id))
 #     return response
+
 
 # @API.route('/containers/<container_id>/wait', methods=['POST'])
 # def wait_container(container_id):
@@ -138,12 +131,14 @@ def retrieve_pipelines():
 #     response = json.dumps(harvey.Container.wait_container(container_id))
 #     return response
 
+
 # @API.route('/containers/<container_id>/remove', methods=['DELETE'])
 # def remove_container(container_id):
 #     """Remove (delete) a Docker container"""
 #     remove = harvey.Container.remove_container(container_id)
 #     response = str(remove)
 #     return response
+
 
 # @API.route('/build', methods=['POST'])
 # def build_image():
@@ -154,17 +149,20 @@ def retrieve_pipelines():
 #     build = harvey.Image.build(data, tag, context)
 #     return build
 
+
 # @API.route('/images/<image_id>', methods=['GET'])
 # def retrieve_image(image_id):
 #     """Retrieve a Docker image"""
 #     response = json.dumps(harvey.Image.retrieve(image_id))
 #     return response
 
+
 # @API.route('/images', methods=['GET'])
 # def all_images():
 #     """Retrieve all Docker images"""
 #     response = json.dumps(harvey.Image.all())
 #     return response
+
 
 # @API.route('/images/<image_id>/remove', methods=['DELETE'])
 # def remove_image(image_id):
@@ -173,6 +171,7 @@ def retrieve_pipelines():
 #     response = str(remove)
 #     return response
 
+
 # @API.route('/pull', methods=['POST'])
 # def pull_project():
 #     """Pull/clone GitHub project"""
@@ -180,6 +179,7 @@ def retrieve_pipelines():
 #     pull = harvey.Git.pull_repo(data)
 #     response = str(pull)
 #     return response
+
 
 def main():
     # allows us to use requests_unixsocker via requests
