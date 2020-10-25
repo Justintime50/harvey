@@ -91,11 +91,11 @@ import harvey
 """API Entrypoint (Webhook)"""
 with open('examples/git_webhook.json', 'r') as file:
     request = requests.post(
-        'http://127.0.0.1:5000/harvey',
+        'http://127.0.0.1:5000/pipelines/start',
         data=file,
         headers=harvey.Global.JSON_HEADERS
     )
-    print(request)
+    print(request.json())
 
 # """Retrieve a Pipeline by ID"""
 # request = requests.get(

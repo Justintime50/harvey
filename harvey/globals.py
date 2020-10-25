@@ -1,7 +1,6 @@
 class Global():
     """Contains global configuration for Harvey
     """
-    # Setup variables that can be customized
     DOCKER_VERSION = 'v1.40'  # Docker API version
     # TODO: Figure out how to sync this version number with the one in `setup.py`
     HARVEY_VERSION = '0.5.0'  # Harvey release
@@ -10,11 +9,9 @@ class Global():
     HARVEY_LOG_PATH = 'logs/harvey'
     BUILD_TIMEOUT = 1800  # 30 minutes
     GIT_TIMEOUT = 180
-    # Setup reusable variables
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}
-    ATTACH_HEADERS = {'Content-Type': 'application/vnd.docker.raw-stream'}
 
     @classmethod
     def repo_name(cls, webhook):

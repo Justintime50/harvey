@@ -1,7 +1,6 @@
 from datetime import datetime
 import subprocess
 import os
-import json
 import time
 from harvey.globals import Global
 from harvey.container import Container
@@ -15,7 +14,7 @@ class Stage():
         """Test Stage
         """
         start_time = datetime.now()
-        test_project_name = f'test-{Global.docker_project_name(webhook)}'
+        test_project_name = f'test-{Global.docker_project_name(webhook)}-{config["language"]}-{config["version"]}'
         context = 'test'
 
         # Build the image
@@ -135,43 +134,63 @@ class Stage():
         """
         start_time = datetime.now()
 
-        # Tear down the old container if one exists
-        # TODO: Check if tearing down the old container is necessary, should we instead
-        # TODO: simply be swapping them out for each other?
-        container_list = Container.list_containers()
-        if Global.docker_project_name(webhook) not in json.dumps(container_list):
-            stop_output = ''
-            wait_output = ''
-            remove_output = ''
-        else:
-            Container.stop_container(Global.docker_project_name(webhook))
-            stop_output = 'Attempting to stop old project container.'
+        # Tear down the old container if one exists, this ensures a fresh container
+        # is used for each deploy and is required to flush out stopped containers
+        # for example
+        #
+        # TODO: Determine what the best method for tearing down old containers is
+        # For instance, what if the user stopped a container explicitly and now it
+        # will be overriden? What about volume persistence?
+        stop_container = Container.stop_container(Global.docker_project_name(webhook))
+        if stop_container.status_code == 204:
+            stop_output = f'Stopping old {Global.docker_project_name(webhook)} container.'
             print(stop_output)
-            Container.wait_container(Global.docker_project_name(webhook))
-            wait_output = 'Attempting to wait on old project container to exit.'
+        elif stop_container.status_code == 304:
+            # TODO: Add missing logic here
+            stop_output = f'Error: {Global.docker_project_name(webhook)} is already stopped.'
+            print(stop_output)
+        else:
+            # TODO: Add missing logic here
+            stop_output = 'Error: Harvey could not stop the container.'
+            print(stop_output)
+        wait_container = Container.wait_container(Global.docker_project_name(webhook))
+        if wait_container.status_code == 200:
+            wait_output = f'Waiting for old {Global.docker_project_name(webhook)} container to exit...'
             print(wait_output)
-            Container.remove_container(Global.docker_project_name(webhook))
-            remove_output = 'Attempting to remove old project container.'
+        else:
+            # TODO: Add missing logic here
+            print(
+                f'Error: Harvey could not wait for the {Global.docker_project_name(webhook)} container: {wait_container.json()}'  # noqa
+            )
+        remove_container = Container.remove_container(Global.docker_project_name(webhook))
+        if remove_container.status_code == 204:
+            remove_output = f'Removing old {Global.docker_project_name(webhook)} container.'
             print(remove_output)
+        else:
+            # TODO: Add missing logic here
+            print(
+                f'Error: Harvey could not remove the {Global.docker_project_name(webhook)} container: {remove_container.json()}'  # noqa
+            )
 
         # Create a container
-        container = Container.create_container(Global.docker_project_name(webhook))
-        if container is not False:
-            create_output = 'Project container created.'
+        create_container = Container.create_container(Global.docker_project_name(webhook))
+        if create_container.status_code == 201:
+            create_output = f'{Global.docker_project_name(webhook)} container created.'
             print(create_output)
         else:
             final_output = output + stop_output + wait_output + remove_output + \
-                '\nError: Harvey could not create the container in the deploy stage.'
+                f'\nError: Harvey could not create the container in the deploy stage: {create_container.json()}'
             Utils.kill(final_output, webhook)
 
         # Start the container
-        start = Container.start_container(Global.docker_project_name(webhook))
-        if start is not False:
-            start_output = 'Project container started.'
+        start_container = Container.start_container(Global.docker_project_name(webhook))
+        if start_container.status_code == 204:
+            start_output = f'{Global.docker_project_name(webhook)} container started.'
             print(start_output)
         else:
             final_output = output + stop_output + wait_output + remove_output + \
-                create_output + '\nError: Harvey could not start the container in the deploy stage.'
+                create_output + \
+                f'\nError: Harvey could not start the container in the deploy stage: {start_container.json()}'
             Utils.kill(final_output, webhook)
 
         execution_time = f'\nDeploy stage execution time: {datetime.now() - start_time}'
@@ -219,9 +238,11 @@ class Stage():
         """Run a healthcheck to ensure the container is running and not in a transitory state.
         Not to be confused with the Docker Healthcheck functionality which is different
         """
-        time.sleep(3)
+        print('Running container healthcheck...')
+        time.sleep(5)
         container = Container.inspect_container(Global.docker_project_name(webhook))
-        state = container['State']
+        container_json = container.json()
+        state = container_json['State']
         if (
             state['Restarting']
             and state['Dead']
