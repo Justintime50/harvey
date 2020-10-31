@@ -4,8 +4,8 @@ from harvey.globals import Global
 
 
 def _mock_response(status=201):
-    response = mock.Mock()
-    response.json = mock.Mock(
+    response = mock.MagicMock()
+    response.json = mock.MagicMock(
         return_value={'mock': 'json'}
     )
     response.status_code = status

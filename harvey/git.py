@@ -9,6 +9,7 @@ class Git():
     def update_git_repo(cls, webhook):
         """Clone or pull repo using Git depending on if it exists or not
         """
+        # TODO: Fail fast if a repo doesn't exist
         project_path = os.path.join(
             Global.PROJECTS_PATH, Global.repo_full_name(webhook)
         )
