@@ -14,6 +14,7 @@ class Utils():
         if os.getenv('SLACK'):
             Message.send_slack_message(final_output)
         sys.exit()
+        return True
 
     @classmethod
     def success(cls, final_output, webhook):
@@ -22,6 +23,7 @@ class Utils():
         Logs.generate_logs(final_output, webhook)
         if os.getenv('SLACK'):
             Message.send_slack_message(final_output)
+        return True
 
 
 class Logs():

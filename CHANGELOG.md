@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.7.0 (2020-10-26)
+
+* Refactored the `webhook` module and added unit tests
+* Refactored webhook logic to return appropriate JSON messages and HTTP status codes
+* Fixed bugs where Harvey would blow up when no JSON, malformed JSON, or other webhook details weren't correct
+* Fixed a bug that would not catch when a bad pipeline name would be given
+* Various other bug fixes and improvements
+* Added basic tests to API routes
+
 ## v0.6.0 (2020-10-25)
 
 * Added unit tests for the `container` module and refactored various code there

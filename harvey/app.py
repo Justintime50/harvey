@@ -13,16 +13,14 @@ HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
 DEBUG = os.getenv('DEBUG', 'True')
 
-
-# TODO: Move all of the logic out of this file and into Harvey itself
-# This file should only route requests to the proper functions
+# TODO: Add authentication to each endpoint
 
 
 @API.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data
     """
-    return Webhook.parse_webhook(request=request, target=Webhook.start_pipeline)
+    return Webhook.parse_webhook(request=request, use_compose=False)
 
 
 # @API.route('/pipelines/stop', methods=['POST'])
@@ -35,7 +33,7 @@ def start_pipeline_compose():
     """Start a pipeline based on webhook data
     But build from compose file.
     """
-    return Webhook.parse_webhook(request=request, target=Webhook.start_pipeline_compose)
+    return Webhook.parse_webhook(request=request, use_compose=True)
 
 
 # @API.route('/pipelines/stop/compose', methods=['POST'])

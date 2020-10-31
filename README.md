@@ -19,14 +19,15 @@ Harvey was born because Rancher has too much overhead and GitLab is too RAM hung
 
 ## How it Works
 
-Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. When all is said and done - we'll even provide you a message to say "job's done".
+Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. If you have Slack enabled, Harvey will send you the pipeline summary.
 
-1. GitHub webhook fires to your self-hosted endpoint stating that a new commit hit an enabled repo
-    - Your server pulls in the new changes for that repo via Git
-1. Next we test your code based on the criteria provided
-1. Then we build your docker image locally
-1. Next we spin up the new docker container and tear down the old one once it's up and running, making downtime barely a blip
-1. Finally we shoot off a message to notify users the build was a success or not
+1. GitHub webhook fires and is received by Harvey stating that a new commit hit an enabled repo
+    * Harvey pulls in the new changes for that repo via Git
+1. Next Harvey tests your code based on the criteria provided
+1. Then Harvey builds your docker image locally
+1. Next Harvey spins up the new docker container and tears down the old one once it's up and running
+1. Then Harvey will run a container healthcheck to ensure your container is up and running and didn't exit on startup
+1. Finally, (if enabled) Harvey will shoot off a message to notify users the build was a success or not
 
 Harvey has lightweight testing functionality which is configurable via shell scripts. Harvey builds a unique self-isolated Docker container to test your code and returns the logs from your tests when finished.
 
@@ -48,11 +49,9 @@ make help
 
 1. Install Docker & login
 1. Ensure you've added your ssh key to the ssh agent: `ssh-add` followed by your password
-1. Enable logging (see below)
-1. Setup enviornment variables in `.env`
-1. Add webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/pipelines/start`, send the payload as JSON)
-
-**NOTE:** It is not recommended to use Harvey alongside other CI/CD or Docker orchestration platforms on the same machine.
+1. Enable logging (see `Logs` below)
+1. Setup enviornment variables as needed
+1. Enable GitHub webhooks for all your repositories you want to use Harvey with (point them to `http://example.com:5000/pipelines/start`, send the payload as JSON)
 
 ### Logs
 
@@ -70,9 +69,17 @@ The [following](https://docs.docker.com/config/containers/logging/json-file/#usa
 
 ## Usage
 
+```bash
+# Run locally
+make run
+
+# Run in production
+harvey-ci
+```
+
 Find the full [docs here](docs/README.md). 
 
-Harvey's entrypoint is a webhook (eg: `127.0.0.1:5000/pipelines/start`). Pass GitHub data to Harvey and let it do the rest. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret):
+Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret and GitHub headers):
 
 ```javascript
 {
@@ -99,12 +106,6 @@ Environment Variables:
     HOST            The host Harvey will run on. Default: 127.0.0.1
     PORT            The port Harvey will run on. Default: 5000
     DEBUG           Whether the Flask API will run in debug mode or not
-```
-
-### Start API Server (for Webhook)
-
-```bash
-make run
 ```
 
 ### Example Python Functions
