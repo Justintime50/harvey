@@ -4,19 +4,19 @@ import harvey
 
 
 # """Retrieve a single image"""
-# image = harvey.Image.retrieve('harvey/python-test')
+# image = harvey.Image.retrieve_image('harvey/python-test')
 # print(image)
 
 # """Retrieve a list of images"""
-# images = harvey.Image.all()
+# images = harvey.Image.retrieve_all_images()
 # print(json.dumps(images, indent=4))
 
 # """Remove an image"""
-# remove_image = harvey.Image.remove('c1d7538e38f74ea6ba43920eaabd27b8')
+# remove_image = harvey.Image.remove_image('c1d7538e38f74ea6ba43920eaabd27b8')
 # print(remove_image)
 
 # """Build an image"""
-# image = harvey.Image.build(
+# image = harvey.build_image(
 #     config={
 #         'language': 'python',
 #         'version': '3.7',

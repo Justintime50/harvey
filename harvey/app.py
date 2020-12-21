@@ -45,8 +45,8 @@ def start_pipeline_compose():
 def retrieve_pipeline(pipeline_id):
     """Retrieve a pipeline's logs by ID
     """
-    # This is a hacky temporary solution until we can store
-    # this data in a database and is not meant to remain
+    # TODO: This is a hacky temporary solution until we can
+    # store this data in a database and is not meant to remain
     # as a long-term solution
     file = f'{pipeline_id}.log'
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH):
@@ -61,8 +61,8 @@ def retrieve_pipeline(pipeline_id):
 def retrieve_pipelines():
     """Retrieve a list of pipelines
     """
-    # This is a hacky temporary solution until we can store
-    # this data in a database and is not meant to remain
+    # TODO: This is a hacky temporary solution until we can
+    # store this data in a database and is not meant to remain
     # as a long-term solution
     pipelines = {'pipelines': []}
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
@@ -144,28 +144,28 @@ def retrieve_pipelines():
 #     data = json.loads(request.data)
 #     tag = json.loads(request.tag)
 #     context = json.loads(request.context)
-#     build = harvey.Image.build(data, tag, context)
+#     build = harvey.build_image(data, tag, context)
 #     return build
 
 
 # @API.route('/images/<image_id>', methods=['GET'])
 # def retrieve_image(image_id):
 #     """Retrieve a Docker image"""
-#     response = json.dumps(harvey.Image.retrieve(image_id))
+#     response = json.dumps(harvey.Image.retrieve_image(image_id))
 #     return response
 
 
 # @API.route('/images', methods=['GET'])
 # def all_images():
 #     """Retrieve all Docker images"""
-#     response = json.dumps(harvey.Image.all())
+#     response = json.dumps(harvey.Image.retrieve_all_images())
 #     return response
 
 
 # @API.route('/images/<image_id>/remove', methods=['DELETE'])
 # def remove_image(image_id):
 #     """Remove (delete) a Docker image"""
-#     remove = harvey.Image.remove(image_id)
+#     remove = harvey.Image.remove_image(image_id)
 #     response = str(remove)
 #     return response
 

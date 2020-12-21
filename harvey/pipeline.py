@@ -9,7 +9,7 @@ from harvey.message import Message
 class Pipeline():
     @classmethod
     def test(cls, config, webhook, output):
-        """Pull changes and run tests (no deploy)
+        """Pull changes and run tests (will not deploy code)
         """
         start_time = datetime.now()
         if os.getenv('SLACK'):

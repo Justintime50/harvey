@@ -14,7 +14,9 @@
 - Each `harvey.json` config file will house information about your tests and build/deploy
 - This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 
-The following example will run a full pipeline (tests, build and deploy), tag it with a unique name based on the GitHub project. Provide the language and version for the test stage:
+The following example will run a full pipeline (tests, build and deploy), tag it with a unique name based on the GitHub project. Provide the language and version for the test stage.
+
+**Note:** All keys must be lowercase!
 
 ```javascript
 {
