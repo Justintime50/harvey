@@ -3,32 +3,6 @@ import pytest
 import harvey.app as app
 
 
-MOCK_WEBHOOK = {
-    "ref": 'refs/heads/master',
-    "repository": {
-        "name": "TEST-repo-name",
-        "full_name": "TEST_user/TEST-repo-name",
-        "ssh_url": "https://test-url.com",
-        "owner": {
-                "name": "TEST_owner"
-        }
-    },
-    "commits": [
-        {
-            "id": 123456,
-            "author": {
-                "name": "test_user"
-            }
-        }
-    ]
-}
-
-
-@pytest.fixture
-def client():
-    return app.API.test_client()
-
-
 @pytest.mark.parametrize(
     'route',
     [
@@ -37,8 +11,8 @@ def client():
 
     ]
 )
-def test_routes_are_reachable_get(client, route):
-    response = client.get(route)
+def test_routes_are_reachable_get(mock_client, route):
+    response = mock_client.get(route)
     assert response.status_code == 200
 
 

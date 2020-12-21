@@ -1,5 +1,14 @@
 # CHANGELOG
 
+## v0.8.0 (2020-12-20)
+
+* Refactored the `image` module and added unit tests
+* Added a fallback variable for `MODE` set to `production`
+* Created `conftest` file for test suite, started shifting fixtures around
+* Bumped Docker API version from `1.40` to `1.41`, there should be no change in behavior
+* Fixed a bug where if a container didn't exist yet, it would still try to wait, stop, and remove it on the deploy stage. The output would also blow up as it was impossible to do because it didn't exist. Now we check if a container exists prior to running those commands on the deploy stage and skip if no container exists
+* Various bug fixes and optimizations
+
 ## v0.7.0 (2020-10-26)
 
 * Refactored the `webhook` module and added unit tests

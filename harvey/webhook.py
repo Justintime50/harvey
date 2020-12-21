@@ -11,7 +11,6 @@ from harvey.utils import Utils
 
 
 WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
-APP_MODE = os.getenv('MODE')
 
 
 class Webhook():
@@ -35,10 +34,18 @@ class Webhook():
 
     @classmethod
     def open_project_config(cls, webhook):
-        """Open the project's config file to assign pipeline variables
+        """Open the project's config file to assign pipeline variables.
+
+        Project configs look like the following:
+        {
+            "pipeline": "full",
+            "language": "php",
+            "version": "7.4"
+        }
         """
         # TODO: Add the ability to configure projects on the Harvey side
-        # instead of only from within a JSON file in the repo
+        # (eg: save values to a database via a UI) instead of only from
+        # within a JSON file in the repo
         try:
             filename = os.path.join(
                 Global.PROJECTS_PATH, Global.repo_full_name(webhook), 'harvey.json'
@@ -54,8 +61,9 @@ class Webhook():
 
     @classmethod
     def parse_webhook(cls, request, use_compose):
-        """Initiate details to receive a webhook
+        """Parse a webhook's data. Return success or error status.
         """
+        # TODO: Restructure this function so it can be used for more than starting a pipeline
         success = False
         message = 'Server-side error.'
         status_code = 500
@@ -63,16 +71,17 @@ class Webhook():
         signature = request.headers.get('X-Hub-Signature')
 
         if request.data and data:
-            # TODO: Allow the user to configure whatever branch they'd like to pull from
-            if data['ref'] in ['refs/heads/master', 'refs/heads/main']:
-                if APP_MODE == 'test' or cls.decode_webhook(data, signature):
+            if Global.APP_MODE != 'test' and not cls.decode_webhook(data, signature):
+                message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
+                status_code = 403
+            # TODO: Allow the user to configure whatever branch they'd like to pull from or
+            # a list of branches that can be pulled from
+            elif data['ref'] in ['refs/heads/master', 'refs/heads/main']:
+                if Global.APP_MODE == 'test' or cls.decode_webhook(data, signature):
                     Thread(target=cls.start_pipeline, args=(data, use_compose,)).start()
                     message = f'Started pipeline for {data["repository"]["name"]}'
                     status_code = 200
                     success = True
-                if APP_MODE != 'test' and not cls.decode_webhook(data, signature):
-                    message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
-                    status_code = 403
             else:
                 message = 'Harvey can only pull from the "master" or "main" branch of a repo.'
                 status_code = 422

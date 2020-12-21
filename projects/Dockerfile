@@ -1,3 +1,5 @@
+# This Dockerfile is used for the Harvey test environment
+
 ARG LANGUAGE=koalaman/shellcheck-alpine
 ARG VERSION=latest
 FROM ${LANGUAGE}:${VERSION}

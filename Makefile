@@ -32,9 +32,13 @@ lint:
 	venv/bin/flake8 harvey/*.py
 	venv/bin/flake8 test/*.py
 
-## test - Test the project
+## test - Test the project (unit tests)
 test:
 	venv/bin/pytest
+
+## integration test - Test the project (integration tests)
+integration_test:
+	venv/bin/python test/integration/test_pipeline.py
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:

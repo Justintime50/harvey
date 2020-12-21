@@ -19,7 +19,7 @@ class Stage():
 
         # Build the image
         try:
-            image = Image.build(config, webhook, context)
+            image = Image.build_image(config, webhook, context)
             image_output = f'Test image created.\n{image}'
             print(image_output)
         except subprocess.TimeoutExpired:
@@ -40,7 +40,7 @@ class Stage():
         else:
             final_output = output + image_output + \
                 '\nError: Harvey could not create the Test container.'
-            Image.remove(test_project_name)
+            Image.remove_image(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Start the container
@@ -51,7 +51,7 @@ class Stage():
         else:
             final_output = output + image_output + container_output + \
                 '\nError: Harvey could not start the container.'
-            Image.remove(image[0])
+            Image.remove_image(image[0])
             Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
@@ -63,7 +63,7 @@ class Stage():
         else:
             final_output = output + image_output + container_output + start_output + \
                 '\nError: Harvey could not wait for the container.'
-            Image.remove(image[0])
+            Image.remove_image(image[0])
             Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
@@ -77,21 +77,21 @@ class Stage():
         else:
             final_output = output + image_output + container_output + start_output + wait_output + \
                 '\nError: Harvey could not create the container logs.'
-            Image.remove(image[0])
+            Image.remove_image(image[0])
             Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
         # Remove container and image after it's done
         remove = Container.remove_container(test_project_name)
         if remove is not False:
-            Image.remove(image[0])
+            Image.remove_image(image[0])
             remove_output = 'Test container and image removed.'
             print(remove_output)
         else:
             final_output = output + image_output + container_output + start_output + \
                 wait_output + logs_output + \
                 '\nError: Harvey could not remove the container and/or image.'
-            Image.remove(image[0])
+            Image.remove_image(image[0])
             Container.remove_container(test_project_name)
             Utils.kill(final_output, webhook)
 
@@ -110,8 +110,8 @@ class Stage():
 
         # Build the image
         try:
-            Image.remove(Global.docker_project_name(webhook))
-            image = Image.build(config, webhook)
+            Image.remove_image(Global.docker_project_name(webhook))
+            image = Image.build_image(config, webhook)
             image_output = f'Project image created\n{image}'
             print(image_output)
         except subprocess.TimeoutExpired:
@@ -146,9 +146,9 @@ class Stage():
             stop_output = f'Stopping old {Global.docker_project_name(webhook)} container.'
             print(stop_output)
         elif stop_container.status_code == 304:
-            # TODO: Add missing logic here
-            stop_output = f'Error: {Global.docker_project_name(webhook)} is already stopped.'
-            print(stop_output)
+            stop_output = ''
+        elif stop_container.status_code == 404:
+            stop_output = ''
         else:
             # TODO: Add missing logic here
             stop_output = 'Error: Harvey could not stop the container.'
@@ -157,6 +157,8 @@ class Stage():
         if wait_container.status_code == 200:
             wait_output = f'Waiting for old {Global.docker_project_name(webhook)} container to exit...'
             print(wait_output)
+        elif wait_container.status_code == 404:
+            wait_output = ''
         else:
             # TODO: Add missing logic here
             print(
@@ -166,6 +168,8 @@ class Stage():
         if remove_container.status_code == 204:
             remove_output = f'Removing old {Global.docker_project_name(webhook)} container.'
             print(remove_output)
+        elif remove_container.status_code == 404:
+            remove_output = ''
         else:
             # TODO: Add missing logic here
             print(
