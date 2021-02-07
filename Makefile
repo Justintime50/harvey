@@ -30,7 +30,8 @@ clean:
 ## lint - Lint the project
 lint:
 	venv/bin/flake8 harvey/*.py
-	venv/bin/flake8 test/*.py
+	venv/bin/flake8 test/unit/*.py
+	venv/bin/flake8 test/integration/*.py
 
 ## test - Test the project (unit tests)
 test:
@@ -42,6 +43,6 @@ integration_test:
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
-	venv/bin/pytest --cov=harvey --cov-branch --cov-report=html
+	venv/bin/pytest --cov=harvey --cov-branch --cov-report=html --cov-report=term-missing
 
 .PHONY: help install clean lint test coverage
