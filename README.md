@@ -4,8 +4,8 @@
 
 Your personal CI/CD and Docker orchestration platform.
 
-[![Build Status](https://travis-ci.com/Justintime50/harvey.svg?branch=master)](https://travis-ci.com/Justintime50/harvey)
-[![Coverage Status](https://coveralls.io/repos/github/Justintime50/harvey/badge.svg?branch=master)](https://coveralls.io/github/Justintime50/harvey?branch=master)
+[![Build Status](https://github.com/Justintime50/harvey/workflows/build/badge.svg)](https://github.com/Justintime50/harvey/actions)
+[![Coverage Status](https://coveralls.io/repos/github/Justintime50/harvey/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/harvey?branch=main)
 [![PyPi](https://img.shields.io/pypi/v/harvey-ci)](https://pypi.org/project/harvey-ci/)
 [![Licence](https://img.shields.io/github/license/justintime50/harvey)](LICENSE)
 
