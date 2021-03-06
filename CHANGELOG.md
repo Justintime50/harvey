@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.8.2 (2021-03-06)
+
+* Disabled container healthchecks temporarily for docker-compose workflows
+* Fixed healthcheck bug for key error
+
 ## v0.8.1 (2021-03-06)
 
 * Fixed a bug where webhook secrets couldn't be decoded properly
