@@ -1,5 +1,13 @@
 # CHANGELOG
 
+## v0.8.1 (2021-03-06)
+
+* Fixed a bug where webhook secrets couldn't be decoded properly
+* Fixed a bug where `.env` files wouldn't load variables properly
+* Container healthchecks may have previously failed with a key error if the container wasn't completely running yet. Corrected key error and added retry logic for checking if a container is running after deployments
+* Cleaned and refactored various code
+* Various additional bug fixes
+
 ## v0.8.0 (2020-12-20)
 
 * Refactored the `image` module and added unit tests
