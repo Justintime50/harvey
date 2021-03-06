@@ -67,19 +67,19 @@ class Webhook():
         success = False
         message = 'Server-side error.'
         status_code = 500
-        data = request.json if request.json else None
+        payload = request.data or None
         signature = request.headers.get('X-Hub-Signature')
 
-        if request.data and data:
-            if Global.APP_MODE != 'test' and not cls.decode_webhook(data, signature):
+        if payload:
+            if Global.APP_MODE != 'test' and not cls.decode_webhook(payload, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
             # TODO: Allow the user to configure whatever branch they'd like to pull from or
             # a list of branches that can be pulled from
-            elif data['ref'] in ['refs/heads/master', 'refs/heads/main']:
-                if Global.APP_MODE == 'test' or cls.decode_webhook(data, signature):
-                    Thread(target=cls.start_pipeline, args=(data, use_compose,)).start()
-                    message = f'Started pipeline for {data["repository"]["name"]}'
+            elif payload['ref'] in ['refs/heads/master', 'refs/heads/main']:
+                if Global.APP_MODE == 'test' or cls.decode_webhook(payload, signature):
+                    Thread(target=cls.start_pipeline, args=(payload, use_compose,)).start()
+                    message = f'Started pipeline for {payload["repository"]["name"]}'
                     status_code = 200
                     success = True
             else:
@@ -101,7 +101,8 @@ class Webhook():
         if signature:
             secret = bytes(WEBHOOK_SECRET, 'UTF-8')
             mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
-            return hmac.compare_digest('sha1=' + mac.hexdigest(), signature)
+            digest = 'sha1=' + mac.hexdigest()
+            return hmac.compare_digest(digest, signature)
         else:
             return False
 
