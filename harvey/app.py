@@ -9,6 +9,7 @@ from flask import Flask, abort, request
 from harvey.globals import Global
 from harvey.webhook import Webhook
 
+load_dotenv()
 API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
@@ -183,7 +184,6 @@ def retrieve_pipelines():
 def main():
     # allows us to use requests_unixsocker via requests
     requests_unixsocket.monkeypatch()
-    load_dotenv()
     API.run(host=HOST, port=PORT, debug=DEBUG)
 
 
