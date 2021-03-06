@@ -244,17 +244,17 @@ class Stage():
         """Run a healthcheck to ensure the container is running and not in a transitory state.
         Not to be confused with the Docker Healthcheck functionality which is different
         """
-        print('Running container healthcheck...')  # TODO: Attach project name to this line
+        print(f'Running healthcheck for {Global.docker_project_name(webhook)}...')
 
         # If we cannot inspect a container, it may not be up and running yet, retry
         container = Container.inspect_container(Global.docker_project_name(webhook))
         container_json = container.json()
         state = container_json.get('State')
-        if not state and retry_attempt <= 5:
+        if not state and retry_attempt <= 4:
             retry_attempt += 1
             time.sleep(5)
             cls.run_container_healthcheck(webhook, retry_attempt)
-        elif state['Running'] is True:
+        elif state.get('Running') is True:
             healthcheck = True
             output = 'Project healthcheck succeeded!'
         else:
