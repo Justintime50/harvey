@@ -26,7 +26,8 @@ class Git():
         """
         try:
             final_output = subprocess.check_output(
-                f'git -C {project_path} pull --rebase origin master',
+                # TODO: Rebase without the need to specify the branch
+                f'git -C {project_path} pull --rebase origin main',
                 stdin=None,
                 stderr=None,
                 shell=True,
@@ -49,7 +50,7 @@ class Git():
         """
         try:
             final_output = subprocess.check_output(
-                f'git clone --depth=10 --branch=master {Global.repo_url(webhook)} {project_path}',
+                f'git clone --depth=10 {Global.repo_url(webhook)} {project_path}',
                 stdin=None,
                 stderr=None,
                 shell=True,

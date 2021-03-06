@@ -9,7 +9,7 @@ def mock_client():
 
 
 @pytest.fixture
-def mock_webhook(branch='refs/heads/master'):
+def mock_webhook(branch='refs/heads/main'):
     return {
         "ref": branch,
         "repository": {
@@ -32,7 +32,7 @@ def mock_webhook(branch='refs/heads/master'):
 
 
 @pytest.fixture
-def mock_webhook_object(branch='refs/heads/master'):
+def mock_webhook_object(branch='refs/heads/main'):
     webhook = mock.MagicMock()
     webhook.json = {
         "ref": branch,

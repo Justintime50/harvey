@@ -67,11 +67,11 @@ class Webhook():
         success = False
         message = 'Server-side error.'
         status_code = 500
-        payload_data = request.data or None
-        payload_json = request.json or None
+        payload_data = request.data
+        payload_json = request.json
         signature = request.headers.get('X-Hub-Signature')
 
-        if payload_data:
+        if payload_data and payload_json:
             if Global.APP_MODE != 'test' and not cls.decode_webhook(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
