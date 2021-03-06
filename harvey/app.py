@@ -9,7 +9,7 @@ from flask import Flask, abort, request
 from harvey.globals import Global
 from harvey.webhook import Webhook
 
-load_dotenv()
+load_dotenv()  # must remain at the top of this file
 API = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
