@@ -109,7 +109,7 @@ class Pipeline():
             )
 
         deploy = Stage.build_deploy_compose(config, webhook, output)
-        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
+        # healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
         execution_time = f'Deploy pipeline execution time: {datetime.now() - start_time}'
 
@@ -126,7 +126,7 @@ class Pipeline():
 
         # TODO: Remove the following three lines once healthchecks are fixed
         success = 'Deploy pipeline succeeded!'
-        final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+        final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
         Utils.success(final_output, webhook)
 
         return deploy
@@ -150,7 +150,7 @@ class Pipeline():
             Utils.kill(final_output, webhook)
 
         deploy = Stage.build_deploy_compose(config, webhook, output)
-        healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
+        # healthcheck, healthcheck_message = Stage.run_container_healthcheck(webhook)
 
         execution_time = f'Full pipeline execution time: {datetime.now() - start_time}'
         # if healthcheck is True:
@@ -164,7 +164,7 @@ class Pipeline():
 
         # TODO: Remove the following three lines once healthchecks are fixed
         success = 'Deploy pipeline succeeded!'
-        final_output = f'{output}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{success}'
+        final_output = f'{output}\n{deploy}\n{execution_time}\n{success}'
         Utils.success(final_output, webhook)
 
         return deploy
