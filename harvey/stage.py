@@ -254,7 +254,7 @@ class Stage():
             retry_attempt += 1
             time.sleep(5)
             cls.run_container_healthcheck(webhook, retry_attempt)
-        elif state.get('Running') is True:
+        elif state and state['Running'] is True:
             healthcheck = True
             output = 'Project healthcheck succeeded!'
         else:
