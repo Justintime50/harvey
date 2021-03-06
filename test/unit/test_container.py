@@ -1,7 +1,8 @@
+from test.unit.conftest import mock_response  # Remove once fixtures are fixed
+
 import mock
 from harvey.container import Container
 from harvey.globals import Global
-from test.unit.conftest import mock_response  # Remove once fixtures are fixed
 
 
 @mock.patch('requests.post', return_value=mock_response(status=201))

@@ -1,7 +1,7 @@
-import requests  # noqa
 import json  # noqa
-import harvey
 
+import harvey
+import requests  # noqa
 
 # """Retrieve a single image"""
 # image = harvey.Image.retrieve_image('harvey/python-test')

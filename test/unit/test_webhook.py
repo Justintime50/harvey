@@ -1,10 +1,10 @@
-import mock
-import pytest
 import hashlib
-from harvey.globals import Global
-from harvey.webhook import Webhook
 from test.unit.conftest import mock_config  # Remove once fixtures are fixed
 
+import mock
+import pytest
+from harvey.globals import Global
+from harvey.webhook import Webhook
 
 MOCK_OUTPUT = 'mock output'
 

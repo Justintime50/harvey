@@ -1,13 +1,15 @@
-from datetime import datetime
-import subprocess
 import os
+import subprocess
 import time
-from harvey.globals import Global
+from datetime import datetime
+
 from harvey.container import Container
+from harvey.globals import Global
 from harvey.image import Image
 from harvey.utils import Utils
 
 
+# TODO: Break up each Stage into a separate class, practice DRY
 class Stage():
     @classmethod
     def test(cls, config, webhook, output):
@@ -34,7 +36,7 @@ class Stage():
 
         # Create a container
         container = Container.create_container(test_project_name)
-        if container is not False:
+        if container:
             container_output = 'Test container created.'
             print(container_output)
         else:
@@ -45,7 +47,7 @@ class Stage():
 
         # Start the container
         start = Container.start_container(test_project_name)
-        if start is not False:
+        if start:
             start_output = 'Test container started.'
             print(start_output)
         else:
@@ -57,7 +59,7 @@ class Stage():
 
         # Wait for container to exit
         wait = Container.wait_container(test_project_name)
-        if wait is not False:
+        if wait:
             wait_output = 'Waiting for Test container to exit.'
             print(wait_output)
         else:
@@ -69,7 +71,7 @@ class Stage():
 
         # Return logs
         logs = Container.inspect_container_logs(test_project_name)
-        if logs is not False:
+        if logs:
             logs_output = '\nTest logs:\n' + \
                 '============================================================\n' \
                 + logs + '============================================================\n'
@@ -83,7 +85,7 @@ class Stage():
 
         # Remove container and image after it's done
         remove = Container.remove_container(test_project_name)
-        if remove is not False:
+        if remove:
             Image.remove_image(image[0])
             remove_output = 'Test container and image removed.'
             print(remove_output)

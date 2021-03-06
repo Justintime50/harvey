@@ -1,7 +1,9 @@
+from test.unit.conftest import \
+    mock_response_container  # Remove once fixtures are fixed
+
 import mock
-from harvey.stage import Stage
 from harvey.globals import Global
-from test.unit.conftest import mock_response_container  # Remove once fixtures are fixed
+from harvey.stage import Stage
 
 
 @mock.patch('time.sleep', return_value=None)

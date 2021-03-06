@@ -1,7 +1,7 @@
 import os
 import sys
-import slack
 
+import slack
 
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = os.getenv('SLACK_CHANNEL')

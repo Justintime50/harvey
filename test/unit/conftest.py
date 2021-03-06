@@ -1,6 +1,6 @@
-import pytest
-import mock
 import harvey.app as app
+import mock
+import pytest
 
 
 @pytest.fixture
