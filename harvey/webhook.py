@@ -67,19 +67,20 @@ class Webhook():
         success = False
         message = 'Server-side error.'
         status_code = 500
-        payload = request.data or None
+        payload_data = request.data or None
+        payload_json = request.json or None
         signature = request.headers.get('X-Hub-Signature')
 
-        if payload:
-            if Global.APP_MODE != 'test' and not cls.decode_webhook(payload, signature):
+        if payload_data:
+            if Global.APP_MODE != 'test' and not cls.decode_webhook(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
             # TODO: Allow the user to configure whatever branch they'd like to pull from or
             # a list of branches that can be pulled from
-            elif payload['ref'] in ['refs/heads/master', 'refs/heads/main']:
-                if Global.APP_MODE == 'test' or cls.decode_webhook(payload, signature):
-                    Thread(target=cls.start_pipeline, args=(payload, use_compose,)).start()
-                    message = f'Started pipeline for {payload["repository"]["name"]}'
+            elif payload_json['ref'] in ['refs/heads/master', 'refs/heads/main']:
+                if Global.APP_MODE == 'test' or cls.decode_webhook(payload_data, signature):
+                    Thread(target=cls.start_pipeline, args=(payload_json, use_compose,)).start()
+                    message = f'Started pipeline for {payload_json["repository"]["name"]}'
                     status_code = 200
                     success = True
             else:
