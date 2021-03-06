@@ -1,14 +1,14 @@
+import hashlib
+import hmac
 import json
 import os
 from datetime import datetime
-import hmac
-import hashlib
 from threading import Thread
-from harvey.pipeline import Pipeline
+
 from harvey.git import Git
 from harvey.globals import Global
+from harvey.pipeline import Pipeline
 from harvey.utils import Utils
-
 
 WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
 

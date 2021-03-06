@@ -1,6 +1,6 @@
+import harvey.app as app
 import mock
 import pytest
-import harvey.app as app
 
 
 @pytest.mark.parametrize(

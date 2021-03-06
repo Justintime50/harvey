@@ -1,5 +1,6 @@
-import mock
 import subprocess
+
+import mock
 from harvey.git import Git
 
 

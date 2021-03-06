@@ -26,7 +26,7 @@ The following example will run a full pipeline (tests, build and deploy), tag it
 }
 ```
 
-* Optional: `compose` value can be passed to specify the `docker-compose` file to use **if** building from a docker-compose file and hitting the `/pipelines/start/compose` endpoint.
+* Optional: `compose` value can be passed to specify the `docker-compose` file to use **if** building from a docker-compose file and hitting the `/pipelines/start/compose` endpoint (eg: `-f docker-compose.yml -f docker-compose-prod.yml`).
 * Optional: `dockerfile` value can be passed to specify the name of the Dockerfile to build from (including path if not in root directory).
 
 **Possible Pipeline Values**
