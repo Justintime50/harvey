@@ -1,11 +1,11 @@
 import mock
 import pytest
 import slack
-from harvey.message import Message
+from harvey.messages import Message
 
 
-@mock.patch('harvey.message.SLACK_CHANNEL', 'mock-channel')
-@mock.patch('harvey.message.SLACK_BOT_TOKEN', '123')
+@mock.patch('harvey.messages.SLACK_CHANNEL', 'mock-channel')
+@mock.patch('harvey.messages.SLACK_BOT_TOKEN', '123')
 @mock.patch('slack.WebClient.chat_postMessage')
 def test_send_slack_message_success(mock_slack):
     message = 'mock message'

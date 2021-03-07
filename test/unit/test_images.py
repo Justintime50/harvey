@@ -3,7 +3,7 @@ from test.unit.conftest import mock_response  # Remove once fixtures are fixed
 import mock
 import pytest
 from harvey.globals import Global
-from harvey.image import Image
+from harvey.images import Image
 
 
 @pytest.mark.parametrize('context', [('test'), (None)])

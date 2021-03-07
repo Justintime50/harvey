@@ -6,7 +6,7 @@ class Global():
     """
     DOCKER_VERSION = 'v1.41'  # Docker API version
     # TODO: Figure out how to sync this version number with the one in `setup.py`
-    HARVEY_VERSION = '0.8.2'  # Harvey release
+    HARVEY_VERSION = '0.9.0'  # Harvey release
     PROJECTS_PATH = 'projects'
     PROJECTS_LOG_PATH = 'logs/projects'
     HARVEY_LOG_PATH = 'logs/harvey'
@@ -16,6 +16,12 @@ class Global():
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}
     APP_MODE = os.getenv('MODE', 'production').lower()
+    SUPPORTED_PIPELINES = [
+        'pull',
+        'test',
+        'deploy',
+        'full'
+    ]
 
     @classmethod
     def repo_name(cls, webhook):

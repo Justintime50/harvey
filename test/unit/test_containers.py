@@ -1,7 +1,7 @@
 from test.unit.conftest import mock_response  # Remove once fixtures are fixed
 
 import mock
-from harvey.container import Container
+from harvey.containers import Container
 from harvey.globals import Global
 
 

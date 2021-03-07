@@ -1,5 +1,11 @@
 # CHANGELOG
 
+## v0.9.0 (2021-03-07)
+
+* Overhauled the Pipeline/Webhook modules and removed lots of duplicate code
+* Fixed a bug where the pipeline timer wouldn't account for startup time (closes #35)
+* Various other bug fixes
+
 ## v0.8.2 (2021-03-06)
 
 * Disabled container healthchecks temporarily for docker-compose workflows
