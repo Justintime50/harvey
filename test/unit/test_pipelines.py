@@ -117,3 +117,37 @@ def test_test_pipeline_error(mock_test_stage, mock_utils_kill, mock_webhook):
 
     mock_test_stage.assert_called_once_with(mock_config('test'), mock_webhook, MOCK_OUTPUT)
     mock_utils_kill.assert_called_once()
+
+
+@mock.patch('harvey.stages.Stage.build_deploy_compose')
+def test_deploy_pipeline_compose_success(mock_deploy_stage, mock_webhook):
+    _, _, _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, True)
+
+    mock_deploy_stage.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+
+
+@mock.patch('harvey.stages.Stage.run_container_healthcheck')
+@mock.patch('harvey.stages.Stage.build')
+@mock.patch('harvey.stages.Stage.deploy')
+def test_deploy_pipeline_no_compose_success(mock_deploy_stage, mock_build_stage,
+                                            mock_run_container_healthcheck, mock_webhook):
+    _, _, _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, False)
+
+    mock_build_stage.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+    mock_deploy_stage.assert_called_once_with(mock_webhook, MOCK_OUTPUT)
+    mock_run_container_healthcheck.assert_called_once_with(mock_webhook)
+
+
+@mock.patch('harvey.utils.Utils.kill')
+@mock.patch('harvey.stages.Stage.run_container_healthcheck', return_value=False)
+@mock.patch('harvey.stages.Stage.build')
+@mock.patch('harvey.stages.Stage.deploy')
+def test_deploy_pipeline_no_compose_failed_healthcheck(mock_deploy_stage, mock_build_stage,
+                                                       mock_run_container_healthcheck, mock_utils_kill, mock_webhook):
+    _, _, healthcheck = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, False)
+
+    assert healthcheck is False
+    mock_build_stage.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+    mock_deploy_stage.assert_called_once_with(mock_webhook, MOCK_OUTPUT)
+    mock_run_container_healthcheck.assert_called_once_with(mock_webhook)
+    mock_utils_kill.assert_called_once()
