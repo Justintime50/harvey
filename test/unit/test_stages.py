@@ -12,6 +12,7 @@ from harvey.stages import Stage
                                                  restarting=False, running=True))
 def test_run_container_healthcheck_success(mock_container_json, mock_sleep, mock_webhook):
     healthcheck = Stage.run_container_healthcheck(mock_webhook)
+
     mock_container_json.assert_called_once_with(Global.docker_project_name(mock_webhook))
     assert healthcheck is True
 
@@ -22,5 +23,6 @@ def test_run_container_healthcheck_success(mock_container_json, mock_sleep, mock
                                                  restarting=False, running=False))
 def test_run_container_healthcheck_failed(mock_container_json, mock_sleep, mock_webhook):
     healthcheck = Stage.run_container_healthcheck(mock_webhook)
+
     mock_container_json.assert_called_once_with(Global.docker_project_name(mock_webhook))
     assert healthcheck is False

@@ -50,28 +50,30 @@ class Pipeline():
 
         if pipeline in Global.SUPPORTED_PIPELINES:
             if pipeline == 'pull':
-                Utils.success(webhook_output, webhook)
+                final_output = f'{webhook_output}\nHarvey pulled the project successfully.'
             if pipeline in ['test', 'full']:
                 test = cls.test(webhook_config, webhook, webhook_output, start_time)
+
+                end_time = datetime.now()
+                execution_time = f'Pipeline execution time: {end_time - start_time}'
+                pipeline_status = 'Pipeline succeeded!'
+
+                final_output = f'{webhook_output}\n{test}\n{execution_time}\n{pipeline_status}'
             if pipeline in ['deploy', 'full']:
                 build, deploy, healthcheck = cls.deploy(webhook_config, webhook, webhook_output, start_time, use_compose)  # noqa
+
+                stage_output = build + '\n' + deploy
+                healthcheck_message = f'Project passed healthcheck: {healthcheck}'
+                end_time = datetime.now()
+                execution_time = f'Pipeline execution time: {end_time - start_time}'
+                pipeline_status = 'Pipeline succeeded!'
+
+                final_output = f'{webhook_output}\n{stage_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'  # noqa
+
+            Utils.success(final_output, webhook)
         else:
             final_output = webhook_output + '\nError: Harvey could not run, there was no acceptable pipeline specified.'
             pipeline = Utils.kill(final_output, webhook)
-
-        end_time = datetime.now()
-        execution_time = f'Pipeline execution time: {end_time - start_time}'
-        pipeline_status = 'Pipeline succeeded!'
-        healthcheck_message = f'Project passed healthcheck: {healthcheck}'
-
-        output_options = {
-            'test': f'{webhook_output}\n{test}\n{execution_time}\n{pipeline_status}',
-            'deploy': f'{webhook_output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}',  # noqa
-            'full': f'{webhook_output}\n{build}\n{deploy}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}',
-        }
-        final_output = output_options[pipeline]
-
-        Utils.success(final_output, webhook)
 
         return final_output
 
@@ -124,8 +126,8 @@ class Pipeline():
         if use_compose:
             build = ''  # When using compose, there is no build step
             deploy = Stage.build_deploy_compose(config, webhook, output)
-            healthcheck = True
             # healthcheck = Stage.run_container_healthcheck(webhook)  # TODO: Correct healthchecks for compose
+            healthcheck = True
         else:
             build = Stage.build(config, webhook, output)
             deploy = Stage.deploy(webhook, output)
