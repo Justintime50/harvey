@@ -2,7 +2,7 @@ import os
 import sys
 
 from harvey.globals import Global
-from harvey.message import Message
+from harvey.messages import Message
 
 
 class Utils():

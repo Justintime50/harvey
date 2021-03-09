@@ -3,9 +3,9 @@ import subprocess
 import time
 from datetime import datetime
 
-from harvey.container import Container
+from harvey.containers import Container
 from harvey.globals import Global
-from harvey.image import Image
+from harvey.images import Image
 from harvey.utils import Utils
 
 
@@ -221,7 +221,11 @@ class Stage():
             compose = subprocess.check_output(
                 f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
                 && docker-compose {compose} up -d --build',
-                stdin=None, stderr=None, shell=True, timeout=Global.BUILD_TIMEOUT)
+                stdin=None,
+                stderr=None,
+                shell=True,
+                timeout=Global.BUILD_TIMEOUT
+            )
             compose_output = compose.decode('UTF-8')
             print(compose_output)
         except subprocess.TimeoutExpired:
@@ -229,8 +233,7 @@ class Stage():
             print(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = output + '\nError: Harvey could not finish the' + \
-                'build/deploy compose stage.'
+            final_output = output + '\nError: Harvey could not finish the build/deploy compose stage.'
             Utils.kill(final_output, webhook)
 
         execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'
@@ -256,10 +259,7 @@ class Stage():
             cls.run_container_healthcheck(webhook, retry_attempt)
         elif state and state['Running'] is True:
             healthcheck = True
-            output = 'Project healthcheck succeeded!'
         else:
             healthcheck = False
-            output = 'Project healthcheck failed.'
 
-        print(output)
-        return healthcheck, output
+        return healthcheck

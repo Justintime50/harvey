@@ -7,7 +7,7 @@ from dotenv import load_dotenv
 from flask import Flask, abort, request
 
 from harvey.globals import Global
-from harvey.webhook import Webhook
+from harvey.webhooks import Webhook
 
 load_dotenv()  # must remain at the top of this file
 API = Flask(__name__)
