@@ -13,7 +13,7 @@ REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.9.0',
+    version='0.10.0',
     description='Your personal CI/CD and Docker orchestration platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",

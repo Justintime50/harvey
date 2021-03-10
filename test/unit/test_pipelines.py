@@ -103,7 +103,7 @@ def test_start_pipeline_bad_pipeline_name(mock_initialize_pipeline, mock_utils_k
     )
 
 
-@mock.patch('harvey.stages.Stage.test')
+@mock.patch('harvey.stages.TestStage.run')
 def test_test_pipeline_success(mock_test_stage, mock_webhook):
     _ = Pipeline.test(mock_config('test'), mock_webhook, MOCK_OUTPUT, MOCK_TIME)
 
@@ -111,7 +111,7 @@ def test_test_pipeline_success(mock_test_stage, mock_webhook):
 
 
 @mock.patch('harvey.utils.Utils.kill')
-@mock.patch('harvey.stages.Stage.test', return_value='Error: the above command exited with code')
+@mock.patch('harvey.stages.TestStage.run', return_value='Error: the above command exited with code')
 def test_test_pipeline_error(mock_test_stage, mock_utils_kill, mock_webhook):
     _ = Pipeline.test(mock_config('test'), mock_webhook, MOCK_OUTPUT, MOCK_TIME)
 
@@ -119,16 +119,16 @@ def test_test_pipeline_error(mock_test_stage, mock_utils_kill, mock_webhook):
     mock_utils_kill.assert_called_once()
 
 
-@mock.patch('harvey.stages.Stage.build_deploy_compose')
+@mock.patch('harvey.stages.DeployComposeStage.run')
 def test_deploy_pipeline_compose_success(mock_deploy_stage, mock_webhook):
     _, _, _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, True)
 
     mock_deploy_stage.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 
 
-@mock.patch('harvey.stages.Stage.run_container_healthcheck')
-@mock.patch('harvey.stages.Stage.build')
-@mock.patch('harvey.stages.Stage.deploy')
+@mock.patch('harvey.stages.DeployStage.run_container_healthcheck')
+@mock.patch('harvey.stages.BuildStage.run')
+@mock.patch('harvey.stages.DeployStage.run')
 def test_deploy_pipeline_no_compose_success(mock_deploy_stage, mock_build_stage,
                                             mock_run_container_healthcheck, mock_webhook):
     _, _, _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, False)
@@ -139,9 +139,9 @@ def test_deploy_pipeline_no_compose_success(mock_deploy_stage, mock_build_stage,
 
 
 @mock.patch('harvey.utils.Utils.kill')
-@mock.patch('harvey.stages.Stage.run_container_healthcheck', return_value=False)
-@mock.patch('harvey.stages.Stage.build')
-@mock.patch('harvey.stages.Stage.deploy')
+@mock.patch('harvey.stages.DeployStage.run_container_healthcheck', return_value=False)
+@mock.patch('harvey.stages.BuildStage.run')
+@mock.patch('harvey.stages.DeployStage.run')
 def test_deploy_pipeline_no_compose_failed_healthcheck(mock_deploy_stage, mock_build_stage,
                                                        mock_run_container_healthcheck, mock_utils_kill, mock_webhook):
     _, _, healthcheck = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, False)

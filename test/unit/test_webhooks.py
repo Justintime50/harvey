@@ -43,6 +43,19 @@ def test_parse_webhook_no_json(mock_start_pipeline):
     assert webhook[1] == 422
 
 
+@mock.patch('harvey.webhooks.Webhook.decode_webhook', return_value=False)
+@mock.patch('harvey.globals.Global.APP_MODE', 'prod')
+@mock.patch('harvey.webhooks.Pipeline.start_pipeline')
+def test_parse_webhook_bad_webhook_secret(mock_start_pipeline, mock_webhook_object):
+    webhook = Webhook.parse_webhook(mock_webhook_object, False)
+
+    assert webhook[0] == {
+        'message': 'The X-Hub-Signature did not match the WEBHOOK_SECRET.',
+        'success': False
+    }
+    assert webhook[1] == 403
+
+
 @mock.patch('harvey.webhooks.WEBHOOK_SECRET', '123')
 @mock.patch('harvey.webhooks.APP_MODE', 'prod')
 @pytest.mark.skip('Security is hard, revisit later - but this logic does work')

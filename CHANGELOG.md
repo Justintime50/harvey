@@ -1,10 +1,16 @@
 # CHANGELOG
 
+## v0.10.0 (2021-03-10)
+
+* Overhaul the `stages` modules, improved code readability and documentation
+* Added unit tests for the `stages` module
+* Various bug fixes
+
 ## v0.9.0 (2021-03-09)
 
 * Overhauled the Pipeline/Webhook modules and removed lots of duplicate code
 * Fixed a bug where the pipeline timer wouldn't account for startup time (closes #35)
-* Added unit tests for the `pipelines` modules
+* Added unit tests for the `pipelines` module
 * Various other bug fixes
 
 ## v0.8.2 (2021-03-06)
