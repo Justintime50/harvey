@@ -22,7 +22,7 @@ Harvey was born because Rancher has too much overhead and GitLab is too RAM hung
 Harvey receives a webhook from GitHub, pulls in the changes, tests them, builds them, then deploys them. If you have Slack enabled, Harvey will send you the pipeline summary.
 
 1. GitHub webhook fires and is received by Harvey stating that a new commit hit an enabled repo
-    * Harvey pulls in the new changes for that repo via Git
+    * Harvey pulls in the new changes for that repo via Git (currently, only commits made to `master` or `main` will prompt a new pipeline to start)
 1. Next Harvey tests your code based on the criteria provided
 1. Then Harvey builds your docker image locally
 1. Next Harvey spins up the new docker container and tears down the old one once it's up and running
