@@ -19,6 +19,8 @@ class Pipeline():
         and setting up standard logging info
         """
         start_time = datetime.now()
+        # Run git operation first to ensure the config is present and up-to-date
+        git = Git.update_git_repo(webhook)
         config = cls.open_project_config(webhook)
 
         if SLACK:
@@ -36,8 +38,6 @@ class Pipeline():
             f'New commit by: {Global.repo_commit_author(webhook)}.'
             f'\nCommit made on repo: {Global.repo_full_name(webhook)}.'
         )
-
-        git = Git.update_git_repo(webhook)
 
         execution_time = f'Startup execution time: {datetime.now() - start_time}\n'
         output = (

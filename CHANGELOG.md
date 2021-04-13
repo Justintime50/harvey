@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.10.1 (2021-04-12)
+
+* Fixes a bug for brand new repos that weren't yet cloned not being able to read the harvey configuration due to bad ordering of operations
+
 ## v0.10.0 (2021-03-10)
 
 * Overhaul the `stages` modules, improved code readability and documentation
