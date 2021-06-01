@@ -1,19 +1,27 @@
 import setuptools
 
-with open("README.md", "r") as fh:
+with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
-    'flask >= 1.1.2',
-    'requests >= 2.24.0',
-    'requests_unixsocket >= 0.2.0',
-    'slackclient >= 2.7.2',
-    'python-dotenv >= 0.10.0'
+    'flask == 1.*',  # TODO: bump to v2 after thorough testing
+    'requests == 2.*',
+    'requests_unixsocket == 0.2.*',
+    'slackclient == 2.*',
+    'python-dotenv == 0.17.*'
+]
+
+DEV_REQUIREMENTS = [
+    'coveralls == 3.*',
+    'flake8',
+    'mock == 4.*',
+    'pytest == 6.*',
+    'pytest-cov == 2.*',
 ]
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.10.1',
+    version='0.10.2',
     description='Your personal CI/CD and Docker orchestration platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -28,13 +36,7 @@ setuptools.setup(
     ],
     install_requires=REQUIREMENTS,
     extras_require={
-        'dev': [
-            'pytest >= 6.0.0',
-            'pytest-cov >= 2.10.0',
-            'coveralls >= 2.1.2',
-            'flake8 >= 3.8.0',
-            'mock >= 4.0.0',
-        ]
+        'dev': DEV_REQUIREMENTS
     },
     entry_points={
         'console_scripts': [
