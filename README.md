@@ -9,7 +9,7 @@ Your personal CI/CD and Docker orchestration platform.
 [![PyPi](https://img.shields.io/pypi/v/harvey-ci)](https://pypi.org/project/harvey-ci/)
 [![Licence](https://img.shields.io/github/license/justintime50/harvey)](LICENSE)
 
-<img src="assets/showcase.png">
+<img src="assets/showcase.png" alt="Showcase">
 
 </div>
 
@@ -165,4 +165,5 @@ make coverage
 
 ## Resources
 
-- [Use docker-compose in production](https://docs.docker.com/compose/production/)
+* [Use docker-compose in production](https://docs.docker.com/compose/production/)
+* Icons made by <a href="https://www.freepik.com" title="Freepik">Freepik</a> from <a href="https://www.flaticon.com/" title="Flaticon">www.flaticon.com</a>
