@@ -102,6 +102,7 @@ Environment Variables:
     SLACK_CHANNEL   The Slack channel to send messages to
     SLACK_BOT_TOKEN The Slackbot token to use to authenticate each request to Slack
     WEBHOOK_SECRET  The Webhook secret required by GitHub (if enabled) to secure your webhooks
+    FILTER_WEBHOOKS Setting this to `true` will filter webhooks and only accept those from GitHub's list of webhook IP ranges. Default: False
     MODE            Set to "test" to bypass the header and auth data from GitHub to test. Default: production
     HOST            The host Harvey will run on. Default: 127.0.0.1
     PORT            The port Harvey will run on. Default: 5000
