@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.11.0 (2021-07-19)
+
+* Adds the ability to filter webhooks based on origin, this is great if you want to deny all requests that don't come from GitHub. This can be achieved via the `FILTER_WEBHOOKS` environment variable (closes #41)
+
 ## v0.10.2 (2021-05-31)
 
 * Pins dependencies
