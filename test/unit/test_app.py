@@ -6,10 +6,10 @@ import pytest
 @pytest.mark.parametrize(
     'route',
     [
+        'health',
         'pipelines',
         # 'pipelines/<pipeline_id>',  # TODO: Figure out how to test endpoints with parameters
-
-    ]
+    ],
 )
 def test_routes_are_reachable_get(mock_client, route):
     response = mock_client.get(route)

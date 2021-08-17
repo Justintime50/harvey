@@ -8,7 +8,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
-    'python-dotenv == 0.17.*'
+    'python-dotenv == 0.17.*',
 ]
 
 DEV_REQUIREMENTS = [
@@ -21,7 +21,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.11.0',
+    version='0.12.0',
     description='Your personal CI/CD and Docker orchestration platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -36,12 +36,10 @@ setuptools.setup(
     ],
     install_requires=REQUIREMENTS,
     extras_require={
-        'dev': DEV_REQUIREMENTS
+        'dev': DEV_REQUIREMENTS,
     },
     entry_points={
-        'console_scripts': [
-            'harvey-ci=harvey.app:main'
-        ]
+        'console_scripts': ['harvey-ci=harvey.app:main'],
     },
     python_requires='>=3.6',
 )

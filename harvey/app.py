@@ -18,10 +18,21 @@ DEBUG = os.getenv('DEBUG', 'True')
 # TODO: Add authentication to each endpoint
 
 
+@API.route('/health', methods=['GET'])
+def healthcheck():
+    """Return a 200 if Harvey is running."""
+    status_code = 200
+    response = {
+        'success': True,
+        'message': 'Ok',
+    }, status_code
+
+    return response
+
+
 @API.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
-    """Start a pipeline based on webhook data
-    """
+    """Start a pipeline based on webhook data."""
     return Webhook.parse_webhook(request=request, use_compose=False)
 
 
@@ -45,8 +56,7 @@ def start_pipeline_compose():
 
 @API.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
-    """Retrieve a pipeline's logs by ID
-    """
+    """Retrieve a pipeline's logs by ID."""
     # TODO: This is a hacky temporary solution until we can
     # store this data in a database and is not meant to remain
     # as a long-term solution
@@ -61,8 +71,7 @@ def retrieve_pipeline(pipeline_id):
 
 @API.route('/pipelines', methods=['GET'])
 def retrieve_pipelines():
-    """Retrieve a list of pipelines
-    """
+    """Retrieve a list of pipelines."""
     # TODO: This is a hacky temporary solution until we can
     # store this data in a database and is not meant to remain
     # as a long-term solution
@@ -70,8 +79,7 @@ def retrieve_pipelines():
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
         for file in files:
             timestamp = time.ctime(os.path.getmtime(os.path.join(root, file)))
-            pipelines['pipelines'].append(
-                f'{timestamp}: {os.path.join(root, file)}')
+            pipelines['pipelines'].append(f'{timestamp}: {os.path.join(root, file)}')
     return json.dumps(pipelines, indent=4)
 
 
