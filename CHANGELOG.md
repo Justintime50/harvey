@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.12.0 (2021-08-17)
+
+* Adds a `/health` endpoint that returns a 200 if Harvey is up and running
+
 ## v0.11.0 (2021-07-19)
 
 * Adds the ability to filter webhooks based on origin, this is great if you want to deny all requests that don't come from GitHub. This can be achieved via the `FILTER_WEBHOOKS` environment variable (closes #41)
