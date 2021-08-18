@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+* Corrects encoding of test logs, binary data should no longer show in the output (closes #4)
+* Various code refactors
+
 ## v0.12.0 (2021-08-17)
 
 * Adds a `/health` endpoint that returns a 200 if Harvey is up and running

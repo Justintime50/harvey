@@ -190,7 +190,7 @@ def retrieve_pipelines():
 
 
 def main():
-    # allows us to use requests_unixsocker via requests
+    # allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
     API.run(host=HOST, port=PORT, debug=DEBUG)
 
