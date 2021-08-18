@@ -5,25 +5,21 @@ from harvey.globals import Global
 from harvey.utils import Utils
 
 
-class Git():
-    @classmethod
-    def update_git_repo(cls, webhook):
-        """Clone or pull repo using Git depending on if it exists or not
-        """
+class Git:
+    @staticmethod
+    def update_git_repo(webhook):
+        """Clone or pull repo using Git depending on if it exists or not."""
         # TODO: Fail fast if a repo doesn't exist
-        project_path = os.path.join(
-            Global.PROJECTS_PATH, Global.repo_full_name(webhook)
-        )
+        project_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
         if os.path.exists(project_path):
-            output = cls.pull_repo(project_path, webhook)
+            output = Git.pull_repo(project_path, webhook)
         else:
-            output = cls.clone_repo(project_path, webhook)
+            output = Git.clone_repo(project_path, webhook)
         return output.decode('UTF-8')
 
-    @classmethod
-    def pull_repo(cls, project_path, webhook):
-        """Pull updates for a repo in the Harvey projects folder
-        """
+    @staticmethod
+    def pull_repo(project_path, webhook):
+        """Pull updates for a repo in the Harvey projects folder."""
         try:
             final_output = subprocess.check_output(
                 # TODO: Rebase without the need to specify the branch
@@ -31,7 +27,7 @@ class Git():
                 stdin=None,
                 stderr=None,
                 shell=True,
-                timeout=Global.GIT_TIMEOUT
+                timeout=Global.GIT_TIMEOUT,
             )
             print(final_output)
             return final_output
@@ -44,17 +40,16 @@ class Git():
             print(final_output)
             Utils.kill(final_output, webhook)
 
-    @classmethod
-    def clone_repo(cls, project_path, webhook):
-        """Clone a repo into the Harvey projects folder
-        """
+    @staticmethod
+    def clone_repo(project_path, webhook):
+        """Clone a repo into the Harvey projects folder."""
         try:
             final_output = subprocess.check_output(
                 f'git clone --depth=10 {Global.repo_url(webhook)} {project_path}',
                 stdin=None,
                 stderr=None,
                 shell=True,
-                timeout=Global.GIT_TIMEOUT
+                timeout=Global.GIT_TIMEOUT,
             )
             print(final_output)
             return final_output
