@@ -57,7 +57,7 @@ make help
 
 The [following](https://docs.docker.com/config/containers/logging/json-file/#usage) is required in your Docker daemon file to be able to view logs:
 
-```js
+```json
 {
     "log-driver": "json-file",
     "log-opts": {

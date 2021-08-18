@@ -50,10 +50,8 @@ import requests  # noqa
 # print(container.name, "stopped")
 
 # """List logs for a container"""
-# logs = harvey.Container.inspect_container_logs(
-#     '089cb9dda0da7c3e0289b6a2cea26837591599ebd531c5a493c4d30548acb38d'
-# )
-# print(logs)
+# request = requests.get('http://127.0.0.1:5000/logs/149d8cc9a92d', headers=harvey.Global.JSON_HEADERS)
+# print(request.text)
 
 # """Complete Test"""
 # stage_test = harvey.Stage.test(
@@ -91,11 +89,7 @@ import requests  # noqa
 """API Entrypoint (Webhook)"""
 with open('examples/git_webhook.json', 'r') as file:
     data = json.load(file)
-    request = requests.post(
-        'http://127.0.0.1:5000/pipelines/start',
-        json=data,
-        headers=harvey.Global.JSON_HEADERS
-    )
+    request = requests.post('http://127.0.0.1:5000/pipelines/start', json=data, headers=harvey.Global.JSON_HEADERS)
     print(request.json())
 
 # """Retrieve a Pipeline by ID"""

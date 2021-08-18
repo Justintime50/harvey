@@ -42,16 +42,16 @@ class Container:
     @staticmethod
     def inspect_container_logs(container_id):
         """Retrieve logs (and write to file) of a Docker container."""
+        params = {
+            'stdout': True,
+            'stderr': True,
+        }
         response = requests.get(
             f'{Global.BASE_URL}containers/{container_id}/logs',
-            params={
-                'stdout': True,
-                'stderr': True,
-            },
+            params=params,
         )
-        # TODO: Fix encoding here (test output for instance)
-        # TODO: Returning the content like this doesn't allow us to use a status_code
-        return response.content.decode('latin1')
+
+        return response.content.decode()
 
     @staticmethod
     def wait_container(container_id):
