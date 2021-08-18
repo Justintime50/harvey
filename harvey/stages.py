@@ -9,10 +9,10 @@ from harvey.images import Image
 from harvey.utils import Utils
 
 
-class TestStage():
-    @classmethod
-    def run(cls, config, webhook, output):
-        """Test Stage, used in "test" and "full" pipelines
+class TestStage:
+    @staticmethod
+    def run(config, webhook, output):
+        """Test Stage, used in "test" and "full" pipelines.
 
         1. Build an image
         2. Create a container
@@ -37,11 +37,7 @@ class TestStage():
             print(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError as error:
-            final_output = (
-                f'{output}'
-                '\nError: Harvey could not build the Test image.'
-                f'\n{error.output}'
-            )
+            final_output = f'{output}\nError: Harvey could not build the Test image.\n{error.output}'
             print(final_output)
             Utils.kill(final_output, webhook)
 
@@ -51,11 +47,7 @@ class TestStage():
             container_output = 'Test container created.'
             print(container_output)
         else:
-            final_output = (
-                f'{output}'
-                f'\n{image_output}'
-                f'\nError: Harvey could not create the Test container.'
-            )
+            final_output = f'{output}\n{image_output}\nError: Harvey could not create the Test container.'
             # Cleanup items as a result of failure so we don't leave orphaned images/containers
             Image.remove_image(test_project_name)
             Utils.kill(final_output, webhook)
@@ -66,12 +58,7 @@ class TestStage():
             start_output = 'Test container started.'
             print(start_output)
         else:
-            final_output = (
-                f'{output}'
-                f'\n{image_output}'
-                f'\n{container_output}'
-                '\nError: Harvey could not start the container.'
-            )
+            final_output = f'{output}\n{image_output}\n{container_output}\nError: Harvey could not start the container.'
             # Cleanup items as a result of failure so we don't leave orphaned images/containers
             Image.remove_image(image[0])
             Container.remove_container(test_project_name)
@@ -112,7 +99,7 @@ class TestStage():
                 f'\n{container_output}'
                 f'\n{start_output}'
                 f'\n{wait_output}'
-                f'\nError: Harvey could not create the container logs.'
+                '\nError: Harvey could not create the container logs.'
             )
             # Cleanup items as a result of failure so we don't leave orphaned images/containers
             Image.remove_image(image[0])
@@ -155,10 +142,10 @@ class TestStage():
         return final_output
 
 
-class BuildStage():
-    @classmethod
-    def run(cls, config, webhook, output):
-        """Build Stage, used in "deploy" and "full" pipelines
+class BuildStage:
+    @staticmethod
+    def run(config, webhook, output):
+        """Build Stage, used in "deploy" and "full" pipelines.
 
         1. Remove the image if it already exists to ensure a clean start
         1. Build the image
@@ -184,10 +171,10 @@ class BuildStage():
         return final_output
 
 
-class DeployStage():
-    @classmethod
-    def run(cls, webhook, output):
-        """Deploy Stage, used in "deploy" and "full" pipelines
+class DeployStage:
+    @staticmethod
+    def run(webhook, output):
+        """Deploy Stage, used in "deploy" and "full" pipelines.
 
         1. Stop a container by the same name as the one we want to deploy
         2. Wait for the container to stop
@@ -275,19 +262,14 @@ class DeployStage():
 
         execution_time = f'\nDeploy stage execution time: {datetime.now() - start_time}'
         final_output = (
-            f'{stop_output}'
-            f'\n{wait_output}'
-            f'\n{remove_output}'
-            f'\n{create_output}'
-            f'\n{start_output}'
-            f'\n{execution_time}'
+            f'{stop_output}\n{wait_output}\n{remove_output}\n{create_output}\n{start_output}\n{execution_time}'
         )
         print(execution_time)
 
         return final_output
 
-    @classmethod
-    def run_container_healthcheck(cls, webhook, retry_attempt=0):
+    @staticmethod
+    def run_container_healthcheck(webhook, retry_attempt=0):
         """Run a healthcheck to ensure the container is running and not in a transitory state.
         Not to be confused with the Docker Healthcheck functionality which is different.
 
@@ -305,15 +287,15 @@ class DeployStage():
         elif retry_attempt <= 4:
             retry_attempt += 1
             time.sleep(5)
-            cls.run_container_healthcheck(webhook, retry_attempt)
+            DeployStage.run_container_healthcheck(webhook, retry_attempt)
 
         return healthcheck
 
 
-class DeployComposeStage():
-    @classmethod
-    def run(cls, config, webhook, output):
-        """Build Stage, used for `deploy` pipelines that hit the `compose` endpoint
+class DeployComposeStage:
+    @staticmethod
+    def run(config, webhook, output):
+        """Build Stage, used for `deploy` pipelines that hit the `compose` endpoint.
 
         This flow doesn't use the standard Docker API and instead shells out to run
         `docker-compose` commands, perfect for projects with docker-compose.yml files.
@@ -324,8 +306,8 @@ class DeployComposeStage():
         # Build the image and container from the docker-compose file
         try:
             compose_command = subprocess.check_output(
-                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))} \
-                && docker-compose {compose} up -d --build',
+                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}                 &&'
+                f' docker-compose {compose} up -d --build',
                 stdin=None,
                 stderr=None,
                 shell=True,
@@ -333,10 +315,7 @@ class DeployComposeStage():
             )
             compose_output = compose_command.decode('UTF-8')
             execution_time = f'Build/Deploy stage execution time: {datetime.now() - start_time}'
-            final_output = (
-                f'{compose_output}'
-                f'\n{execution_time}'
-            )
+            final_output = f'{compose_output}\n{execution_time}'
             print(final_output)
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out during the docker compose build/deploy stage.'

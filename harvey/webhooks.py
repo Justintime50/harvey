@@ -9,9 +9,9 @@ from harvey.pipelines import Pipeline
 WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
 
 
-class Webhook():
-    @classmethod
-    def parse_webhook(cls, request, use_compose):
+class Webhook:
+    @staticmethod
+    def parse_webhook(request, use_compose):
         """Parse a webhook's data. Return success or error status.
 
         1. Check if the request came from a GitHub webhook (optional)
@@ -32,7 +32,7 @@ class Webhook():
             message = 'Webhook did not originate from GitHub.'
             status_code = 422
         elif payload_data and payload_json:
-            if Global.APP_MODE != 'test' and not cls.decode_webhook(payload_data, signature):
+            if Global.APP_MODE != 'test' and not Webhook.decode_webhook(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
             # TODO: Allow the user to configure whatever branch they'd like to pull from or
@@ -40,8 +40,14 @@ class Webhook():
             elif payload_json['ref'] in Global.ALLOWED_BRANCHES:
                 # TODO: It appears that you must provide a secret, add an option for those that
                 # don't want to use a secret
-                if Global.APP_MODE == 'test' or cls.decode_webhook(payload_data, signature):
-                    Thread(target=Pipeline.start_pipeline, args=(payload_json, use_compose,)).start()
+                if Global.APP_MODE == 'test' or Webhook.decode_webhook(payload_data, signature):
+                    Thread(
+                        target=Pipeline.start_pipeline,
+                        args=(
+                            payload_json,
+                            use_compose,
+                        ),
+                    ).start()
                     message = f'Started pipeline for {payload_json["repository"]["name"]}'
                     status_code = 200
                     success = True
@@ -59,10 +65,9 @@ class Webhook():
 
         return response
 
-    @classmethod
-    def decode_webhook(cls, data, signature):
-        """Decode a webhook's secret key
-        """
+    @staticmethod
+    def decode_webhook(data, signature):
+        """Decode a webhook's secret key"""
         if signature:
             secret = bytes(WEBHOOK_SECRET, 'UTF-8')
             mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)

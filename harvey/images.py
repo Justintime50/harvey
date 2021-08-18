@@ -6,11 +6,10 @@ import requests
 from harvey.globals import Global
 
 
-class Image():
-    @classmethod
-    def build_image(cls, config, webhook, context=''):
-        """Build a Docker image by shelling out and running Docker commands.
-        """
+class Image:
+    @staticmethod
+    def build_image(config, webhook, context=''):
+        """Build a Docker image by shelling out and running Docker commands."""
         # TODO: Use the Docker API for building instead of a shell \
         # command (haven't because I can't get it working)
         # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
@@ -39,32 +38,31 @@ class Image():
             stdin=None,
             stderr=None,
             shell=True,
-            timeout=Global.BUILD_TIMEOUT
+            timeout=Global.BUILD_TIMEOUT,
         )
 
         return image.decode('UTF-8')
 
-    @classmethod
-    def retrieve_image(cls, image_id):
-        """Retrieve a Docker image
-        """
+    @staticmethod
+    def retrieve_image(image_id):
+        """Retrieve a Docker image."""
         response = requests.get(Global.BASE_URL + f'images/{image_id}/json')
         return response
 
-    @classmethod
-    def retrieve_all_images(cls):
-        """Retrieve all Docker images
-        """
+    @staticmethod
+    def retrieve_all_images():
+        """Retrieve all Docker images"""
         response = requests.get(Global.BASE_URL + 'images/json')
         return response
 
-    @classmethod
-    def remove_image(cls, image_id):
-        """Remove (delete) a Docker image
-        """
+    @staticmethod
+    def remove_image(image_id):
+        """Remove (delete) a Docker image."""
         response = requests.delete(
             Global.BASE_URL + f'images/{image_id}',
-            json={'force': True},
-            headers=Global.JSON_HEADERS
+            json={
+                'force': True,
+            },
+            headers=Global.JSON_HEADERS,
         )
         return response
