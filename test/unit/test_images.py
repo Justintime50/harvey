@@ -4,11 +4,11 @@ import mock
 import pytest
 from harvey.globals import Global
 from harvey.images import Image
-
+from docker.models.images import ImageCollection
 
 @pytest.mark.parametrize('context', [('test'), (None)])
-@mock.patch('subprocess.check_output')
-def test_build_image(mock_subprocess, context, mock_webhook):
+@mock.patch.object(ImageCollection, 'build')
+def test_build_image(mock_build, context, mock_webhook):
     # TODO: Mock the subprocess better to ensure it does what it's supposed to
     Image.build_image(
         {
@@ -20,7 +20,7 @@ def test_build_image(mock_subprocess, context, mock_webhook):
         context
     )
 
-    mock_subprocess.assert_called_once()
+    mock_build.assert_called_once()
 
 
 @mock.patch('requests.get', return_value=mock_response(201))
