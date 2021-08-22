@@ -6,10 +6,10 @@ from harvey.globals import Global
 from harvey.images import Image
 from docker.models.images import ImageCollection
 
+
 @pytest.mark.parametrize('context', [('test'), (None)])
 @mock.patch.object(ImageCollection, 'build')
 def test_build_image(mock_build, context, mock_webhook):
-    # TODO: Mock the subprocess better to ensure it does what it's supposed to
     Image.build_image(
         {
             'pipeline': 'full',

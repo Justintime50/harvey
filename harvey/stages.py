@@ -7,7 +7,7 @@ from harvey.containers import Container
 from harvey.globals import Global
 from harvey.images import Image
 from harvey.utils import Utils
-
+import multiprocessing
 
 class TestStage:
     @staticmethod
@@ -29,15 +29,16 @@ class TestStage:
 
         # Build the image
         try:
-            image = Image.build_image(config, webhook, context)
+            image = multiprocessing.Process(target=Image.build_image, args=(config, webhook, context,))
+            image.start()
+            image.join(Global.BUILD_TIMEOUT)
+            if image.is_alive():
+                p.terminate()
+                raise multiprocessing.TimeoutError
             image_output = f'Test image created.\n{image}'
             print(image_output)
-        except subprocess.TimeoutExpired:
+        except multiprocessing.TimeoutError:
             final_output = 'Error: Harvey timed out building the Test image.'
-            print(final_output)
-            Utils.kill(final_output, webhook)
-        except subprocess.CalledProcessError as error:
-            final_output = f'{output}\nError: Harvey could not build the Test image.\n{error.output}'
             print(final_output)
             Utils.kill(final_output, webhook)
 
@@ -155,12 +156,17 @@ class BuildStage:
         # Build the image
         try:
             Image.remove_image(Global.docker_project_name(webhook))
-            image = Image.build_image(config, webhook)
+            image = multiprocessing.Process(target=Image.build_image, args=(config, webhook,))
+            image.start()
+            image.join(Global.BUILD_TIMEOUT)
+            if image.is_alive():
+                image.terminate()
+                raise multiprocessing.TimeoutError
             image_output = f'Project image created\n{image}'
             execution_time = f'Build stage execution time: {datetime.now() - start_time}'
             final_output = f'{image_output}\n{execution_time}\n'
             print(final_output)
-        except subprocess.TimeoutExpired:
+        except multiprocessing.TimeoutError:
             final_output = 'Error: Harvey timed out during the build stage.'
             print(final_output)
             Utils.kill(final_output, webhook)

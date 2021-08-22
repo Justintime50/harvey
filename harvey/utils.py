@@ -34,7 +34,7 @@ class Logs:
             os.makedirs(os.path.join(Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook)))
         try:
             filename = os.path.join(
-                Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook), Global.repo_commit_id(webhook) + '.log'
+                Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook), str(Global.repo_commit_id(webhook)) + '.log'
             )
             with open(filename, 'w') as log:
                 log.write(final_output)

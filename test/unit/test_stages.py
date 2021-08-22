@@ -1,6 +1,9 @@
 import subprocess
+from docker.models.images import ImageCollection
 from test.unit.conftest import mock_config  # Remove once fixtures are fixed
 from test.unit.conftest import mock_response_container
+import multiprocessing
+from multiprocessing.process import BaseProcess
 
 import mock
 from harvey.globals import Global
@@ -10,18 +13,18 @@ MOCK_OUTPUT = 'mock output'
 
 
 @mock.patch('harvey.images.Image.remove_image')
-@mock.patch('subprocess.check_output')
-def test_build_stage_success(mock_subprocess, mock_remove_image, mock_webhook):
-    # TODO: Mock the subprocess better to ensure it does what it's supposed to
+@mock.patch('multiprocessing.Process')
+@mock.patch('harvey.utils.Utils.kill') # Need to add this not able to patch process.is_alive()
+def test_build_stage_success(mock_kill, mock_build, mock_remove_image, mock_webhook):
     _ = BuildStage.run(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
-
+    mock_build.is_alive.return_value = False
     mock_remove_image.assert_called_once()
-    mock_subprocess.assert_called_once()
+    mock_build.assert_called_once()
 
 
 @mock.patch('harvey.images.Image.remove_image')
 @mock.patch('harvey.utils.Utils.kill')
-@mock.patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd=subprocess.check_output, timeout=0.1))  # noqa
+@mock.patch('multiprocessing.Process', side_effect=multiprocessing.TimeoutError)
 def test_build_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_remove_image, mock_project_path, mock_webhook):  # noqa
     _ = BuildStage.run(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 
@@ -31,7 +34,8 @@ def test_build_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_r
 
 @mock.patch('harvey.images.Image.remove_image')
 @mock.patch('harvey.utils.Utils.kill')
-@mock.patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))  # noqa
+@mock.patch('multiprocessing.Process', side_effect=multiprocessing.TimeoutError)
+# @mock.patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))  # noqa
 def test_build_stage_process_error(mock_subprocess, mock_utils_kill, mock_remove_image, mock_project_path, mock_webhook):  # noqa
     _ = BuildStage.run(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 

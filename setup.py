@@ -9,6 +9,7 @@ REQUIREMENTS = [
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
     'python-dotenv == 0.17.*',
+    'docker'
 ]
 
 DEV_REQUIREMENTS = [
@@ -17,6 +18,7 @@ DEV_REQUIREMENTS = [
     'mock == 4.*',
     'pytest == 6.*',
     'pytest-cov == 2.*',
+    'docker'
 ]
 
 setuptools.setup(
