@@ -9,6 +9,7 @@ from harvey.images import Image
 from harvey.utils import Utils
 import multiprocessing
 
+
 class TestStage:
     @staticmethod
     def run(config, webhook, output):
@@ -33,7 +34,7 @@ class TestStage:
             image.start()
             image.join(Global.BUILD_TIMEOUT)
             if image.is_alive():
-                p.terminate()
+                image.terminate()
                 raise multiprocessing.TimeoutError
             image_output = f'Test image created.\n{image}'
             print(image_output)
