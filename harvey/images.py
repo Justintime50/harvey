@@ -37,7 +37,7 @@ class Image:
             timeout=Global.BUILD_TIMEOUT
         )
 
-        return image.tags[0]
+        return image[0].id
 
     @staticmethod
     def retrieve_image(image_id):
