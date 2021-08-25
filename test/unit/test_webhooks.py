@@ -1,12 +1,12 @@
 import hashlib
+from unittest.mock import MagicMock, patch
 
-import mock
 import pytest
 from harvey.webhooks import Webhook
 
 
-@mock.patch('harvey.globals.Global.APP_MODE', 'test')
-@mock.patch('harvey.webhooks.Pipeline.start_pipeline')
+@patch('harvey.globals.Global.APP_MODE', 'test')
+@patch('harvey.webhooks.Pipeline.start_pipeline')
 def test_parse_webhook(mock_start_pipeline, mock_webhook_object):
     webhook = Webhook.parse_webhook(mock_webhook_object, False)
 
@@ -17,8 +17,8 @@ def test_parse_webhook(mock_start_pipeline, mock_webhook_object):
     assert webhook[1] == 200
 
 
-@mock.patch('harvey.globals.Global.APP_MODE', 'test')
-@mock.patch('harvey.webhooks.Pipeline.start_pipeline')
+@patch('harvey.globals.Global.APP_MODE', 'test')
+@patch('harvey.webhooks.Pipeline.start_pipeline')
 def test_parse_webhook_bad_branch(mock_start_pipeline, mock_webhook_object):
     webhook = Webhook.parse_webhook(mock_webhook_object(branch='ref/heads/bad_branch'), False)
 
@@ -29,10 +29,10 @@ def test_parse_webhook_bad_branch(mock_start_pipeline, mock_webhook_object):
     assert webhook[1] == 422
 
 
-@mock.patch('harvey.globals.Global.APP_MODE', 'test')
-@mock.patch('harvey.webhooks.Pipeline.start_pipeline')
+@patch('harvey.globals.Global.APP_MODE', 'test')
+@patch('harvey.webhooks.Pipeline.start_pipeline')
 def test_parse_webhook_no_json(mock_start_pipeline):
-    mock_webhook = mock.MagicMock()
+    mock_webhook = MagicMock()
     mock_webhook.json = None
     webhook = Webhook.parse_webhook(mock_webhook, False)
 

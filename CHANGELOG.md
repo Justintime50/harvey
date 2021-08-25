@@ -8,6 +8,7 @@
     * Previously a webhook secret was required; now, Harvey will run Pipelines without a webhook secret (bypassing decoding and validation of the previously non-existent secret) if there is no `WEBHOOK_SECRET` variable set
     * Additional refactor surrounding how we validate webhook secrets
 * Fixed the container healthcheck when using the compose workflow - this was accomplished by making the compose and non-compose container names uniform
+* Bumps dependencies (Flask 1 to Flask 2) and now required Python 3.7. Also removes the `mock` library in favor of the builtin `unittest.mock` library
 * Various code refactors and bug fixes
 
 ## v0.12.0 (2021-08-17)
