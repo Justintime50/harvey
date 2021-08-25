@@ -271,25 +271,27 @@ class DeployStage:
     @staticmethod
     def run_container_healthcheck(webhook, retry_attempt=0):
         """Run a healthcheck to ensure the container is running and not in a transitory state.
-        Not to be confused with the Docker Healthcheck functionality which is different.
+        Not to be confused with the "Docker Healthcheck" functionality which is different.
 
         If we cannot inspect a container, it may not be up and running yet, we'll retry
         a few times before abandoning the healthcheck.
         """
-        healthcheck = False
+        container_healthy = False
+        max_retries = 5
         container = Container.inspect_container(Global.docker_project_name(webhook))
         container_json = container.json()
-        state = container_json.get('State')
+        container_state = container_json.get('State')
 
-        if state and state['Running'] is True:
-            healthcheck = True
-            return healthcheck
-        elif retry_attempt <= 4:
+        # We need to explicitly check for a state and a running key here
+        if container_state and container_state['Running'] is True:
+            container_healthy = True
+            return container_healthy
+        elif retry_attempt < max_retries:
             retry_attempt += 1
             time.sleep(5)
             DeployStage.run_container_healthcheck(webhook, retry_attempt)
 
-        return healthcheck
+        return container_healthy
 
 
 class DeployComposeStage:
