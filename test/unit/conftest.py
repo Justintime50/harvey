@@ -9,36 +9,37 @@ def mock_client():
 
 
 @pytest.fixture
-def mock_webhook(branch='refs/heads/main'):
+def mock_webhook(branch='main'):
     return {
-        "ref": branch,
+        "ref": f'refs/heads/{branch}',
         "repository": {
             "name": "TEST-repo-name",
             "full_name": "TEST_user/TEST-repo-name",
             "ssh_url": "https://test-url.com",
             "owner": {
-                    "name": "TEST_owner"
-            }
+                "name": "TEST_owner",
+            },
         },
         "commits": [
             {
                 "id": 123456,
                 "author": {
-                    "name": "test_user"
-                }
+                    "name": "test_user",
+                },
             }
-        ]
+        ],
     }
 
 
 @pytest.fixture
-def mock_webhook_object(branch='refs/heads/main'):
+def mock_webhook_object(branch='main'):
     webhook = mock.MagicMock()
+    webhook.remote_addr = '192.30.252.0'  # A real GitHub IP address
     webhook.json = {
-        "ref": branch,
+        "ref": f'refs/heads/{branch}',
         "repository": {
             "name": "TEST-repo-name",
-        }
+        },
     }
     return webhook
 
@@ -62,7 +63,7 @@ def mock_project_path():
 def mock_response(status=201, json_data={'mock': 'json'}):
     response = mock.MagicMock()
     response.json = mock.MagicMock(
-        return_value=json_data
+        return_value=json_data,
     )
     response.status_code = status
     return response
@@ -87,7 +88,7 @@ def mock_response_container(status=200, dead=False, paused=False, restarting=Fal
                 'Dead': dead,
                 'Paused': paused,
                 'Restarting': restarting,
-                'Running': running
+                'Running': running,
             }
         }
     )
