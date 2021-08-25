@@ -43,10 +43,10 @@ def test_parse_webhook_no_json(mock_start_pipeline):
     assert webhook[1] == 422
 
 
-@mock.patch('harvey.webhooks.WEBHOOK_SECRET', '123')
-@mock.patch('harvey.webhooks.Webhook.validate_webhook_secret', return_value=False)
-@mock.patch('harvey.globals.Global.APP_MODE', 'prod')
-@mock.patch('harvey.webhooks.Pipeline.start_pipeline')
+@patch('harvey.webhooks.WEBHOOK_SECRET', '123')
+@patch('harvey.webhooks.Webhook.validate_webhook_secret', return_value=False)
+@patch('harvey.globals.Global.APP_MODE', 'prod')
+@patch('harvey.webhooks.Pipeline.start_pipeline')
 def test_parse_webhook_bad_webhook_secret(mock_start_pipeline, mock_webhook_object):
     webhook = Webhook.parse_webhook(mock_webhook_object, False)
 
@@ -57,8 +57,8 @@ def test_parse_webhook_bad_webhook_secret(mock_start_pipeline, mock_webhook_obje
     assert webhook[1] == 403
 
 
-@mock.patch('harvey.webhooks.WEBHOOK_SECRET', '123')
-@mock.patch('harvey.webhooks.APP_MODE', 'prod')
+@patch('harvey.webhooks.WEBHOOK_SECRET', '123')
+@patch('harvey.webhooks.APP_MODE', 'prod')
 @pytest.mark.skip('Security is hard, revisit later - this logic has been proven in prod')
 def test_validate_webhook_secret(mock_webhook):
     mock_webhook_secret = bytes('123', 'UTF-8')
@@ -68,14 +68,14 @@ def test_validate_webhook_secret(mock_webhook):
     assert validated_webhook_secret is True
 
 
-@mock.patch('harvey.webhooks.WEBHOOK_SECRET', '123')
+@patch('harvey.webhooks.WEBHOOK_SECRET', '123')
 def test_validate_webhook_secret_no_signature(mock_webhook):
     validated_webhook_secret = Webhook.validate_webhook_secret(mock_webhook, None)
 
     assert validated_webhook_secret is False
 
 
-@mock.patch('harvey.globals.Global.FILTER_WEBHOOKS', True)
+@patch('harvey.globals.Global.FILTER_WEBHOOKS', True)
 def test_webhook_originated_outside_github(mock_webhook_object):
     mock_webhook_object.remote_addr = '1.2.3.4'
     webhook = Webhook.parse_webhook(mock_webhook_object, False)
