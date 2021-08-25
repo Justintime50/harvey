@@ -32,27 +32,27 @@ class Webhook:
             message = 'Webhook did not originate from GitHub.'
             status_code = 422
         elif payload_data and payload_json:
-            if Global.APP_MODE != 'test' and not Webhook.decode_webhook(payload_data, signature):
+            # Exit fast when we shouldn't continue
+            if Global.APP_MODE != 'test' and (
+                WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature)
+            ):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
-            # TODO: Allow the user to configure whatever branch they'd like to pull from or
-            # a list of branches that can be pulled from
-            elif payload_json['ref'] in Global.ALLOWED_BRANCHES:
-                # TODO: It appears that you must provide a secret, add an option for those that
-                # don't want to use a secret
-                if Global.APP_MODE == 'test' or Webhook.decode_webhook(payload_data, signature):
-                    Thread(
-                        target=Pipeline.start_pipeline,
-                        args=(
-                            payload_json,
-                            use_compose,
-                        ),
-                    ).start()
-                    message = f'Started pipeline for {payload_json["repository"]["name"]}'
-                    status_code = 200
-                    success = True
+            # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
+            # slash to get the branch name and check against the user-allowed list of branches.
+            elif payload_json['ref'].rsplit('/', 1)[-1] in Global.ALLOWED_BRANCHES:
+                Thread(
+                    target=Pipeline.start_pipeline,
+                    args=(
+                        payload_json,
+                        use_compose,
+                    ),
+                ).start()
+                message = f'Started pipeline for {payload_json["repository"]["name"]}'
+                status_code = 200
+                success = True
             else:
-                message = 'Harvey can only pull from the "master" or "main" branch of a repo.'
+                message = 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.'
                 status_code = 422
         else:
             message = 'Malformed or missing JSON data in webhook.'
@@ -66,12 +66,16 @@ class Webhook:
         return response
 
     @staticmethod
-    def decode_webhook(data, signature):
-        """Decode a webhook's secret key"""
+    def validate_webhook_secret(data, signature):
+        """Decode and validate a webhook's secret key."""
+        secret_validated = False
+
         if signature:
-            secret = bytes(WEBHOOK_SECRET, 'UTF-8')
-            mac = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
-            digest = 'sha1=' + mac.hexdigest()
-            return hmac.compare_digest(digest, signature)
-        else:
-            return False
+            secret = bytes(WEBHOOK_SECRET, 'utf-8')
+            expected_signature = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
+            digest = 'sha1=' + expected_signature.hexdigest()
+
+            if hmac.compare_digest(digest, signature):
+                secret_validated = True
+
+        return secret_validated
