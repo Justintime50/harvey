@@ -16,10 +16,7 @@ class Global:
     TAR_HEADERS = {'Content-Type': 'application/tar'}
     APP_MODE = os.getenv('MODE', 'production').lower()
     FILTER_WEBHOOKS = os.getenv('FILTER_WEBHOOKS', False)
-    ALLOWED_BRANCHES = [
-        'refs/heads/master',
-        'refs/heads/main',
-    ]
+    ALLOWED_BRANCHES = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
     SUPPORTED_PIPELINES = [
         'pull',
         'test',

@@ -3,6 +3,11 @@
 ## NEXT RELEASE
 
 * Corrects encoding of test logs, binary data should no longer show in the output (closes #4)
+* Overhauls the webhook flow
+    * Users can now configure their own comma separated list of `ALLOWED_BRANCHES`
+    * Previously a webhook secret was required; now, Harvey will run Pipelines without a webhook secret (bypassing decoding and validation of the previously non-existent secret) if there is no `WEBHOOK_SECRET` variable set
+    * Additional refactor surrounding how we validate webhook secrets
+
 * Various code refactors
 
 ## v0.12.0 (2021-08-17)
