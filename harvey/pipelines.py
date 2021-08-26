@@ -136,8 +136,7 @@ class Pipeline:
         if use_compose:
             build = ''  # When using compose, there is no build step
             deploy = DeployComposeStage.run(config, webhook, output)
-            # healthcheck = Stage.run_container_healthcheck(webhook)  # TODO: Correct healthchecks for compose
-            healthcheck = True
+            healthcheck = DeployStage.run_container_healthcheck(webhook)
         else:
             build = BuildStage.run(config, webhook, output)
             deploy = DeployStage.run(webhook, output)

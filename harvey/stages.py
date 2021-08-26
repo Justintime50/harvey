@@ -285,7 +285,6 @@ class DeployStage:
         # We need to explicitly check for a state and a running key here
         if container_state and container_state['Running'] is True:
             container_healthy = True
-            return container_healthy
         elif retry_attempt < max_retries:
             retry_attempt += 1
             time.sleep(5)
@@ -304,12 +303,13 @@ class DeployComposeStage:
         """
         start_time = datetime.now()
         compose = f'-f {config["compose"]}' if config.get('compose') else None
+        project_name = f'harvey_{Global.repo_owner_name(webhook)}'
 
         # Build the image and container from the docker-compose file
         try:
             compose_command = subprocess.check_output(
-                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}                 &&'
-                f' docker-compose {compose} up -d --build',
+                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}'
+                f' && docker-compose {compose} --project-name {project_name} up -d --build',
                 stdin=None,
                 stderr=None,
                 shell=True,
