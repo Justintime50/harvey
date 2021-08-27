@@ -4,17 +4,16 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
-    'flask == 1.*',  # TODO: bump to v2 after thorough testing
+    'flask == 2.*',
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
-    'python-dotenv == 0.17.*',
+    'python-dotenv == 0.19.*',
 ]
 
 DEV_REQUIREMENTS = [
     'coveralls == 3.*',
     'flake8',
-    'mock == 4.*',
     'pytest == 6.*',
     'pytest-cov == 2.*',
 ]
@@ -41,5 +40,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['harvey-ci=harvey.app:main'],
     },
-    python_requires='>=3.6',
+    python_requires='>=3.7',
 )

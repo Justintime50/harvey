@@ -107,8 +107,8 @@ class Pipeline:
         # within a JSON file in the repo
         try:
             filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), 'harvey.json')
-            with open(filename, 'r') as file:
-                config = json.loads(file.read())
+            with open(filename, 'r') as config_file:
+                config = json.loads(config_file.read())
                 print(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
