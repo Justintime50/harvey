@@ -271,25 +271,27 @@ class DeployStage:
     @staticmethod
     def run_container_healthcheck(webhook, retry_attempt=0):
         """Run a healthcheck to ensure the container is running and not in a transitory state.
-        Not to be confused with the Docker Healthcheck functionality which is different.
+        Not to be confused with the "Docker Healthcheck" functionality which is different.
 
         If we cannot inspect a container, it may not be up and running yet, we'll retry
         a few times before abandoning the healthcheck.
         """
-        healthcheck = False
+        container_healthy = False
+        max_retries = 5
         container = Container.inspect_container(Global.docker_project_name(webhook))
         container_json = container.json()
-        state = container_json.get('State')
+        container_state = container_json.get('State')
 
-        if state and state['Running'] is True:
-            healthcheck = True
-            return healthcheck
-        elif retry_attempt <= 4:
+        # We need to explicitly check for a state and a running key here
+        if container_state and container_state['Running'] is True:
+            container_healthy = True
+        elif retry_attempt < max_retries:
+            # TODO: This is a great spot for logging what container is failing and what attempt it is
             retry_attempt += 1
             time.sleep(5)
             DeployStage.run_container_healthcheck(webhook, retry_attempt)
 
-        return healthcheck
+        return container_healthy
 
 
 class DeployComposeStage:
@@ -302,12 +304,15 @@ class DeployComposeStage:
         """
         start_time = datetime.now()
         compose = f'-f {config["compose"]}' if config.get('compose') else None
+        # Docker will complete the project name by appending the container_name field and a 1
+        # A full example is something like `harvey_ownername_reponame_1`
+        project_name = f'harvey_{Global.repo_owner_name(webhook)}'
 
         # Build the image and container from the docker-compose file
         try:
             compose_command = subprocess.check_output(
-                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}                 &&'
-                f' docker-compose {compose} up -d --build',
+                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}'
+                f' && docker-compose {compose} --project-name {project_name} up -d --build',
                 stdin=None,
                 stderr=None,
                 shell=True,
