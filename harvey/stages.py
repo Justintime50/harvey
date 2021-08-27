@@ -286,6 +286,7 @@ class DeployStage:
         if container_state and container_state['Running'] is True:
             container_healthy = True
         elif retry_attempt < max_retries:
+            # TODO: This is a great spot for logging what container is failing and what attempt it is
             retry_attempt += 1
             time.sleep(5)
             DeployStage.run_container_healthcheck(webhook, retry_attempt)
@@ -303,6 +304,8 @@ class DeployComposeStage:
         """
         start_time = datetime.now()
         compose = f'-f {config["compose"]}' if config.get('compose') else None
+        # Docker will complete the project name by appending the container_name field and a 1
+        # A full example is something like `harvey_ownername_reponame_1`
         project_name = f'harvey_{Global.repo_owner_name(webhook)}'
 
         # Build the image and container from the docker-compose file
