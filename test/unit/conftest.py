@@ -1,5 +1,6 @@
+from unittest.mock import MagicMock, Mock
+
 import harvey.app as app
-import mock
 import pytest
 
 
@@ -33,7 +34,7 @@ def mock_webhook(branch='main'):
 
 @pytest.fixture
 def mock_webhook_object(branch='main'):
-    webhook = mock.MagicMock()
+    webhook = MagicMock()
     webhook.remote_addr = '192.30.252.0'  # A real GitHub IP address
     webhook.json = {
         "ref": f'refs/heads/{branch}',
@@ -61,8 +62,8 @@ def mock_project_path():
 
 # TODO: Move this to a fixture
 def mock_response(status=201, json_data={'mock': 'json'}):
-    response = mock.MagicMock()
-    response.json = mock.MagicMock(
+    response = MagicMock()
+    response.json = MagicMock(
         return_value=json_data,
     )
     response.status_code = status
@@ -81,8 +82,8 @@ def mock_config(pipeline='deploy', language='python', version='3.9', compose=Non
 
 # TODO: Move this to a fixture
 def mock_response_container(status=200, dead=False, paused=False, restarting=False, running=True):
-    response = mock.Mock()
-    response.json = mock.Mock(
+    response = Mock()
+    response.json = Mock(
         return_value={
             'State': {
                 'Dead': dead,

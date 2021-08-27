@@ -1,5 +1,5 @@
 import harvey.app as app
-import mock
+from unittest.mock import patch
 import pytest
 
 
@@ -17,7 +17,7 @@ def test_routes_are_reachable_get(mock_client, route):
     assert response.status_code == 200
 
 
-@mock.patch('harvey.webhooks.Webhook.parse_webhook')
+@patch('harvey.webhooks.Webhook.parse_webhook')
 def test_start_pipeline(mock_parse_webhook):
     # TODO: Long-term, test the status_code and logic
     app.start_pipeline()
@@ -25,7 +25,7 @@ def test_start_pipeline(mock_parse_webhook):
     mock_parse_webhook.assert_called_once()
 
 
-@mock.patch('harvey.webhooks.Webhook.parse_webhook')
+@patch('harvey.webhooks.Webhook.parse_webhook')
 def test_start_pipeline_compose(mock_parse_webhook):
     # TODO: Long-term, test the status_code and logic
     app.start_pipeline_compose()

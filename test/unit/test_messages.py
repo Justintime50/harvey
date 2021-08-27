@@ -1,12 +1,13 @@
-import mock
+from unittest.mock import patch
+
 import pytest
 import slack
 from harvey.messages import Message
 
 
-@mock.patch('harvey.messages.SLACK_CHANNEL', 'mock-channel')
-@mock.patch('harvey.messages.SLACK_BOT_TOKEN', '123')
-@mock.patch('slack.WebClient.chat_postMessage')
+@patch('harvey.messages.SLACK_CHANNEL', 'mock-channel')
+@patch('harvey.messages.SLACK_BOT_TOKEN', '123')
+@patch('slack.WebClient.chat_postMessage')
 def test_send_slack_message_success(mock_slack):
     message = 'mock message'
     Message.send_slack_message(message)
@@ -14,12 +15,17 @@ def test_send_slack_message_success(mock_slack):
     mock_slack.assert_called_once_with(channel='mock-channel', text=message)
 
 
-@mock.patch('sys.exit')
-@mock.patch('slack.WebClient.chat_postMessage',
-            side_effect=slack.errors.SlackApiError(
-                message='The request to the Slack API failed.',
-                response={'ok': False, 'error': 'not_authed'}
-            ))
+@patch('sys.exit')
+@patch(
+    'slack.WebClient.chat_postMessage',
+    side_effect=slack.errors.SlackApiError(
+        message='The request to the Slack API failed.',
+        response={
+            'ok': False,
+            'error': 'not_authed',
+        },
+    ),
+)
 def test_send_slack_message_exception(mock_slack, mock_sys_exit):
     message = 'mock message'
     Message.send_slack_message(message)
