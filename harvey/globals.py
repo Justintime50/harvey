@@ -6,7 +6,7 @@ import re
 class Global:
     DOCKER_VERSION = 'v1.41'  # Docker API version
     # TODO: Figure out how to sync this version number with the one in `setup.py`
-    HARVEY_VERSION = '0.12.0'  # Harvey release
+    HARVEY_VERSION = '0.13.0'  # Harvey release
     PROJECTS_PATH = 'projects'
     PROJECTS_LOG_PATH = 'logs/projects'
     HARVEY_LOG_PATH = 'logs/harvey'
