@@ -132,15 +132,16 @@ def test_test_pipeline_error(mock_test_stage, mock_utils_kill, mock_webhook):
     mock_utils_kill.assert_called_once()
 
 
+@patch('harvey.stages.DeployStage.run_container_healthcheck', return_value=True)
 @patch('harvey.stages.DeployComposeStage.run')
-def test_deploy_pipeline_compose_success(mock_deploy_stage, mock_webhook):
+def test_deploy_pipeline_compose_success(mock_deploy_stage, mock_run_container_healthcheck, mock_webhook):
     _, _, healthcheck = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT, MOCK_TIME, True)
 
     assert healthcheck is True
     mock_deploy_stage.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 
 
-@patch('harvey.stages.DeployStage.run_container_healthcheck')
+@patch('harvey.stages.DeployStage.run_container_healthcheck', return_value=True)
 @patch('harvey.stages.BuildStage.run')
 @patch('harvey.stages.DeployStage.run')
 def test_deploy_pipeline_no_compose_success(
