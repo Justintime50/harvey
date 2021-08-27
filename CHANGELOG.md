@@ -7,8 +7,8 @@
     * Users can now configure their own comma separated list of `ALLOWED_BRANCHES`
     * Previously a webhook secret was required; now, Harvey will run Pipelines without a webhook secret (bypassing decoding and validation of the previously non-existent secret) if there is no `WEBHOOK_SECRET` variable set
     * Additional refactor surrounding how we validate webhook secrets
-
-* Various code refactors
+* Fixed the container healthcheck when using the compose workflow - this was accomplished by making the compose and non-compose container names uniform
+* Various code refactors and bug fixes
 
 ## v0.12.0 (2021-08-17)
 

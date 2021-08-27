@@ -1,5 +1,6 @@
 import ipaddress
 import os
+import re
 
 
 class Global:
@@ -63,8 +64,21 @@ class Global:
 
     @staticmethod
     def docker_project_name(webhook):
-        """Return the project name to be used for containers and images."""
-        return f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}'
+        """Return the project name to be used for containers and images.
+
+        This name is the same format for compose and non-compose containers but assumes
+        that the `container_name` or `service_name` fields match the repo name found on GitHub.
+
+        NOTE: (From the Docker API docs) - Because Docker container names must be unique, you cannot scale a
+        service beyond 1 container if you have specified a custom name. Attempting to do so results in an error.
+        """
+        project_name = f'harvey_{Global.repo_owner_name(webhook)}_{Global.repo_name(webhook)}_1'
+
+        # We strip non-alphanumeric characters in the name because Docker does the same
+        strip_non_alphanumeric = re.compile('[^a-zA-Z0-9_-]')
+        docker_formatted_project_name = strip_non_alphanumeric.sub('', project_name)
+
+        return docker_formatted_project_name
 
     @staticmethod
     def github_webhook_ip_ranges():
@@ -73,7 +87,7 @@ class Global:
         TODO: Refactor this so it's not a static list but a list pulled from GitHub
         and stored in redis or a database:
 
-        https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/about-githubs-ip-addresses  # noqa
+        https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/about-githubs-ip-addresses
         """
         ip_address_list = [
             str(ip_address)
