@@ -1,6 +1,5 @@
 from unittest.mock import patch
 
-import pytest
 import slack
 from harvey.messages import Message
 
@@ -31,10 +30,3 @@ def test_send_slack_message_exception(mock_slack, mock_sys_exit):
     Message.send_slack_message(message)
 
     mock_sys_exit.assert_called_once_with('Harvey could not send the Slack message.')
-
-
-def test_send_email():
-    message = 'mock message'
-
-    with pytest.raises(NotImplementedError):
-        Message.send_email(message)

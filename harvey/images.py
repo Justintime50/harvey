@@ -10,12 +10,7 @@ class Image:
     @staticmethod
     def build_image(config, webhook, context=''):
         """Build a Docker image by shelling out and running Docker commands."""
-        # TODO: Use the Docker API for building instead of a shell \
-        # command (haven't because I can't get it working)
-        # tar = open('./docker/pullbug.tar.gz', encoding="latin-1").read()
-        # json = open('./harvey/build.json', 'rb').read()
-        # data = requests.post(Global.BASE_URL + 'build', \
-        # params=json, data=tar, headers=Global.TAR_HEADERS)
+        # TODO: Use the Docker API for building instead of a shell command
 
         # Set variables based on the context (test vs deploy vs full)
         if context == 'test':
