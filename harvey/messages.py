@@ -22,9 +22,3 @@ class Message:
             final_output = 'Harvey could not send the Slack message.'
             print(final_output)
             sys.exit(final_output)
-
-    @staticmethod
-    def send_email(message):
-        """Send an email message."""
-        # TODO: Add email functionality
-        raise NotImplementedError()
