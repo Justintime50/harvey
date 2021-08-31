@@ -14,6 +14,8 @@ class Utils:
         Utils.generate_pipeline_logs(final_output, webhook)
         if os.getenv('SLACK'):
             Message.send_slack_message(final_output)
+
+        # Close the thread safely
         sys.exit()
 
     @staticmethod
@@ -22,6 +24,9 @@ class Utils:
         Utils.generate_pipeline_logs(final_output, webhook)
         if os.getenv('SLACK'):
             Message.send_slack_message(final_output)
+
+        # Close the thread safely
+        sys.exit()
 
     @staticmethod
     def generate_pipeline_logs(final_output, webhook):

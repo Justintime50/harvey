@@ -11,7 +11,7 @@ class Global:
     PROJECTS_LOG_PATH = 'logs/projects'
     HARVEY_LOG_PATH = 'logs/harvey'
     BUILD_TIMEOUT = 1800  # 30 minutes
-    GIT_TIMEOUT = 180
+    GIT_TIMEOUT = 300
     BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'
     JSON_HEADERS = {'Content-Type': 'application/json'}
     TAR_HEADERS = {'Content-Type': 'application/tar'}

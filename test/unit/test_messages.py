@@ -29,4 +29,4 @@ def test_send_slack_message_exception(mock_slack, mock_sys_exit):
     message = 'mock message'
     Message.send_slack_message(message)
 
-    mock_sys_exit.assert_called_once_with('Harvey could not send the Slack message.')
+    mock_sys_exit.assert_called_once()
