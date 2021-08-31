@@ -21,4 +21,4 @@ class Message:
         except slack.errors.SlackApiError:
             final_output = 'Harvey could not send the Slack message.'
             print(final_output)
-            sys.exit(final_output)
+            sys.exit()
