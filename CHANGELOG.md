@@ -1,5 +1,10 @@
 # CHANGELOG
 
+## v0.13.1 (2021-08-30)
+
+* Corrected a container naming bug that could make compose containers fail their healthchecks due to mismatched container names
+* Small enhancements and cleanup throughout the project
+
 ## v0.13.0 (2021-08-26)
 
 * Corrects encoding of test logs, binary data should no longer show in the output (closes #4)
