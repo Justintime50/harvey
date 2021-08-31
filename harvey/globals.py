@@ -6,7 +6,7 @@ import re
 class Global:
     DOCKER_VERSION = 'v1.41'  # Docker API version
     # TODO: Figure out how to sync this version number with the one in `setup.py`
-    HARVEY_VERSION = '0.13.0'  # Harvey release
+    HARVEY_VERSION = '0.13.1'  # Harvey release
     PROJECTS_PATH = 'projects'
     PROJECTS_LOG_PATH = 'logs/projects'
     HARVEY_LOG_PATH = 'logs/harvey'
@@ -71,8 +71,10 @@ class Global:
 
         NOTE: (From the Docker API docs) - Because Docker container names must be unique, you cannot scale a
         service beyond 1 container if you have specified a custom name. Attempting to do so results in an error.
+
+        TODO: Investigate why some container names have a `_1` appended and others don't (Docker's default behavior?)
         """
-        project_name = f'harvey_{Global.repo_owner_name(webhook)}_{Global.repo_name(webhook)}_1'
+        project_name = f'harvey_{Global.repo_owner_name(webhook)}_{Global.repo_name(webhook)}'
 
         # We strip non-alphanumeric characters in the name because Docker does the same
         strip_non_alphanumeric = re.compile('[^a-zA-Z0-9_-]')

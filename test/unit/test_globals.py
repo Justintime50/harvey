@@ -40,7 +40,7 @@ def test_repo_commit_id(mock_webhook):
 def test_docker_project_name(mock_webhook):
     result = Global.docker_project_name(mock_webhook)
 
-    assert result == 'harvey_test_owner_test-repo-name_1'
+    assert result == 'harvey_test_owner_test-repo-name'
 
 
 def test_github_webhook_ip_ranges():

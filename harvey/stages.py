@@ -286,9 +286,10 @@ class DeployStage:
         if container_state and container_state['Running'] is True:
             container_healthy = True
         elif retry_attempt < max_retries:
-            # TODO: This is a great spot for logging what container is failing and what attempt it is
+            # TODO: This is a great spot for logging what container is failing, what attempt it's on,
+            # and why it's failing with some helpful data
             retry_attempt += 1
-            time.sleep(5)
+            time.sleep(3)
             DeployStage.run_container_healthcheck(webhook, retry_attempt)
 
         return container_healthy
