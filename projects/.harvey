@@ -1,6 +1,0 @@
-harvey_fail() {
-    exit=$?
-    sleep 0.5
-    echo "Error: the above command exited with code $exit"
-    sleep 0.5
-}

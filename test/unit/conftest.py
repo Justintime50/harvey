@@ -71,11 +71,9 @@ def mock_response(status=201, json_data={'mock': 'json'}):
 
 
 # TODO: Make this fixture work and put it in the `test_build_image` test
-def mock_config(pipeline='deploy', language='python', version='3.9', compose=None):
+def mock_config(pipeline='deploy', compose=None):
     return {
         'pipeline': pipeline,
-        'language': language,
-        'version': version,
         'compose': compose if compose else None,
     }
 
