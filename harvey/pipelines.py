@@ -8,6 +8,8 @@ from harvey.messages import Message
 from harvey.stages import Deploy
 from harvey.utils import Utils
 
+# TODO: We may now be able to consolidate the `pipeline` and `stage` namespaces and verbage
+
 
 class Pipeline:
     @staticmethod
@@ -97,9 +99,8 @@ class Pipeline:
 
         Project configs look like the following:
         {
-            "pipeline": "full",
-            "language": "php",
-            "version": "7.4"
+            "pipeline": "deploy",
+            "compose": "some-name-compose.yml"
         }
         """
         # TODO: Add the ability to configure projects on the Harvey side
