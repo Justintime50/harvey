@@ -1,5 +1,18 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+### Breaking Changes
+
+* Strips away all non-compose logic - Harvey is now exclusively a `Docker Compose` deployment platform (closes #9, closes #15, closes #19, closes #20, closes #22, closes #24, closes #28, closes #44)
+* Strips away the non-functioning testing framework so that we can focus on deployments instead of the full CI/CD landscape
+* Removes the poorly integrated `APP_MODE` env variable now that `FILTER_WEBHOOKS` can be toggled
+
+### Other Changes
+
+* Rebasing repositories now doesn't assume the branch to rebase against is titled `main`
+* Cleaned up all documentation to reflect the breaking changes
+
 ## v0.13.1 (2021-08-30)
 
 * Corrected a container naming bug that could make compose containers fail their healthchecks due to mismatched container names

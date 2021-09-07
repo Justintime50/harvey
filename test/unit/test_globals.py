@@ -37,12 +37,6 @@ def test_repo_commit_id(mock_webhook):
     assert result == 123456
 
 
-def test_docker_project_name(mock_webhook):
-    result = Global.docker_project_name(mock_webhook)
-
-    assert result == 'harvey_test_owner_test-repo-name'
-
-
 def test_github_webhook_ip_ranges():
     """Assert that localhost and the first and last IP address
     of each CIDR range is in the result. These may need to be updated

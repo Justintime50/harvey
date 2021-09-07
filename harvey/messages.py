@@ -12,6 +12,7 @@ class Message:
     def send_slack_message(message):
         """Send a Slack message via a Slackbot."""
         slack_client = slack.WebClient(SLACK_BOT_TOKEN)
+
         try:
             slack_client.chat_postMessage(
                 channel=SLACK_CHANNEL,

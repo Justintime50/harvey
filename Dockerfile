@@ -1,3 +1,4 @@
+# NOTE: This is non-working and remains when we decide to revisit. See https://github.com/Justintime50/harvey/issues/10
 FROM python:3.7
 
 COPY harvey /var/www/html/harvey

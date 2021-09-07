@@ -19,7 +19,7 @@ DEBUG = os.getenv('DEBUG', 'True')
 
 
 @API.route('/health', methods=['GET'])
-def healthcheck():
+def harvey_healthcheck():
     """Return a 200 if Harvey is running."""
     status_code = 200
     response = {
@@ -30,18 +30,11 @@ def healthcheck():
     return response
 
 
+@API.route('/pipelines/start/compose', methods=['POST'])  # TODO: This is deprecated, remove at a future release
 @API.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
-    """Start a pipeline based on webhook data."""
-    return Webhook.parse_webhook(request=request, use_compose=False)
-
-
-@API.route('/pipelines/start/compose', methods=['POST'])
-def start_pipeline_compose():
-    """Start a pipeline based on webhook data
-    But build from compose file.
-    """
-    return Webhook.parse_webhook(request=request, use_compose=True)
+    """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
+    return Webhook.parse_webhook(request=request)
 
 
 @API.route('/pipelines/<pipeline_id>', methods=['GET'])
