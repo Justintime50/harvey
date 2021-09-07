@@ -6,7 +6,7 @@ import pytest
 
 @pytest.fixture
 def mock_client():
-    return app.API.test_client()
+    return app.APP.test_client()
 
 
 @pytest.fixture

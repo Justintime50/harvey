@@ -76,7 +76,7 @@ def test_webhook_originated_outside_github(mock_webhook_object):
     webhook = Webhook.parse_webhook(mock_webhook_object)
 
     assert webhook[0] == {
-        'message': 'Webhook did not originate from GitHub.',
+        'message': 'Request did not originate from GitHub.',
         'success': False,
     }
     assert webhook[1] == 422
