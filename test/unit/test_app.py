@@ -18,6 +18,12 @@ def test_routes_are_reachable_get(mock_client, route):
     assert response.status_code == 200
 
 
+def test_routes_not_found(mock_client):
+    response = mock_client.get('bad_route')
+
+    assert response.status_code == 404
+
+
 @patch('harvey.webhooks.Webhook.parse_webhook')
 def test_start_pipeline(mock_parse_webhook):
     # TODO: Long-term, test the status_code and logic
