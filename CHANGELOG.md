@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v0.14.0 (2021-09-06)
 
 ### Breaking Changes
 
@@ -10,6 +10,7 @@
 
 ### Other Changes
 
+* Added a `404` error handler to the API
 * Rebasing repositories now doesn't assume the branch to rebase against is titled `main`
 * Cleaned up all documentation to reflect the breaking changes
 

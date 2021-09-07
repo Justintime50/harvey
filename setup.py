@@ -20,8 +20,8 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.13.1',
-    description='Your personal CI/CD and Docker orchestration platform.',
+    version='0.14.0',
+    description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/harvey',

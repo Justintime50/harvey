@@ -10,15 +10,25 @@ from harvey.globals import Global
 from harvey.webhooks import Webhook
 
 load_dotenv()  # must remain at the top of this file
-API = Flask(__name__)
+APP = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
 DEBUG = os.getenv('DEBUG', 'True')
 
-# TODO: Add authentication to each endpoint
+
+@APP.errorhandler(404)
+def not_found(e):
+    """Return a 404 if the route is not found."""
+    status_code = 404
+    response = {
+        'success': False,
+        'message': 'Not a valid endpoint.',
+    }, status_code
+
+    return response
 
 
-@API.route('/health', methods=['GET'])
+@APP.route('/health', methods=['GET'])
 def harvey_healthcheck():
     """Return a 200 if Harvey is running."""
     status_code = 200
@@ -30,16 +40,18 @@ def harvey_healthcheck():
     return response
 
 
-@API.route('/pipelines/start/compose', methods=['POST'])  # TODO: This is deprecated, remove at a future release
-@API.route('/pipelines/start', methods=['POST'])
+@APP.route('/pipelines/start/compose', methods=['POST'])  # TODO: This is deprecated, remove in a future release
+@APP.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
     return Webhook.parse_webhook(request=request)
 
 
-@API.route('/pipelines/<pipeline_id>', methods=['GET'])
+@APP.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id):
     """Retrieve a pipeline's logs by ID."""
+    # TODO: Add authentication to this endpoint
+
     # TODO: This is a hacky temporary solution until we can
     # store this data in a database and is not meant to remain
     # as a long-term solution
@@ -52,9 +64,11 @@ def retrieve_pipeline(pipeline_id):
     return abort(404)
 
 
-@API.route('/pipelines', methods=['GET'])
+@APP.route('/pipelines', methods=['GET'])
 def retrieve_pipelines():
     """Retrieve a list of pipelines."""
+    # TODO: Add authentication to this endpoint
+
     # TODO: This is a hacky temporary solution until we can
     # store this data in a database and is not meant to remain
     # as a long-term solution
@@ -69,9 +83,9 @@ def retrieve_pipelines():
 
 
 def main():
-    # allows us to use requests_unixsocket via requests
+    # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
-    API.run(host=HOST, port=PORT, debug=DEBUG)
+    APP.run(host=HOST, port=PORT, debug=DEBUG)
 
 
 if __name__ == '__main__':
