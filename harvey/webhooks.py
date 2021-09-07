@@ -29,7 +29,7 @@ class Webhook:
         signature = request.headers.get('X-Hub-Signature')
 
         if Global.FILTER_WEBHOOKS and payload_ip_address not in Global.github_webhook_ip_ranges():
-            message = 'Webhook did not originate from GitHub.'
+            message = 'Request did not originate from GitHub.'
             status_code = 422
         elif payload_data and payload_json:
             # Exit fast when we shouldn't continue
