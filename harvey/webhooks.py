@@ -11,7 +11,7 @@ WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
 
 class Webhook:
     @staticmethod
-    def parse_webhook(request, use_compose):
+    def parse_webhook(request):
         """Parse a webhook's data. Return success or error status.
 
         1. Check if the request came from a GitHub webhook (optional)
@@ -33,20 +33,15 @@ class Webhook:
             status_code = 422
         elif payload_data and payload_json:
             # Exit fast when we shouldn't continue
-            if Global.APP_MODE != 'test' and (
-                WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature)
-            ):
+            if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
             # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
             # slash to get the branch name and check against the user-allowed list of branches.
             elif payload_json['ref'].rsplit('/', 1)[-1] in Global.ALLOWED_BRANCHES:
                 Thread(
-                    target=Pipeline.start_pipeline,
-                    args=(
-                        payload_json,
-                        use_compose,
-                    ),
+                    target=Pipeline.run_pipeline,
+                    args=(payload_json,),
                 ).start()
                 message = f'Started pipeline for {payload_json["repository"]["name"]}'
                 status_code = 200
