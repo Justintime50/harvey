@@ -60,7 +60,44 @@ make run
 harvey-ci
 ```
 
-Find the full [docs here](docs/README.md). 
+## Things to Know
+
+* Harvey will timeout git clone/pull after 300 seconds
+* Harvey will timeout deploys after 30 minutes
+* Harvey will shallow clone your project with the latest 10 commits
+* Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
+
+## Harvey Configuration
+
+**Configuration Criteria**
+* Each repo either needs a `harvey.json` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `harvey.json` file if there is no `data` key present)
+* You can specify one of `deploy` or `pull` as the pipeline type to run
+* This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
+* Optional: `compose` value can be passed to specify the `docker-compose` file to be used. This key can also be used to specify a base file with additional compose files as overrides (eg: `docker-compose.yml -f docker-compose-prod.yml`).
+
+**harvey.json Example**
+```javascript
+{
+    "pipeline": "deploy",
+    "compose": "my-docker-compose-prod.yml"
+}
+```
+
+**GitHub Action Example**
+```yml
+deploy:
+    needs: ["test", "lint"]
+    runs-on: ubuntu-latest
+    steps:
+        - name: Deploy to Harvey
+        if: github.ref == 'refs/heads/main'
+        uses: distributhor/workflow-webhook@v2
+        env:
+            webhook_type: "json-extended"
+            webhook_url: ${{ secrets.WEBHOOK_URL }}
+            webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+            data: '{ "pipeline": "deploy", "compose" : "my-docker-compose-prod.yml" }'
+```
 
 Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret and GitHub headers):
 
@@ -77,7 +114,7 @@ Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook fro
 }
 ```
 
-### Configuration
+### App Configuration
 
 ```
 Environment Variables:
@@ -108,16 +145,6 @@ curl -X GET http://127.0.0.1:5000/pipelines
 
 # Retrieve the pipeline output from Harvey using a commit ID.
 curl -X GET http://127.0.0.1:5000/pipeline/f599cde2f2a0ad562bb7982328fe0aeee9d22b1c
-```
-
-### Add a Harvey badge to your project
-
-[![Harvey CI](https://img.shields.io/badge/CI%2FCD-Harvey-blue)](https://github.com/Justintime50/harvey)
-
-Add the following to your project's README:
-
-```
-[![Harvey CI](https://img.shields.io/badge/CI%2FCD-Harvey-blue)](https://github.com/Justintime50/harvey)
 ```
 
 ## Development
