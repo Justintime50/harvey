@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+* Adds the ability to pass Harvey configuration data in a `data` field in the webhook instead of the default `harvey.json` configuration file kept in the repo (either are now options)
+* Configuration data now properly gets validated (pipeline key and existence)
+* Added emojis to the healthcheck messages via Slack
+* The `pipelines` and `stages` modules were consolidated into `pipelines` now that the testing functionality has been removed
+
 ## v0.14.0 (2021-09-06)
 
 ### Breaking Changes

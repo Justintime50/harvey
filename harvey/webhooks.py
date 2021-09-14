@@ -19,7 +19,6 @@ class Webhook:
         3. Check if the branch is in the allowed set of branches to runa pipeline from
         4. Check if the webhook secret matches (optional)
         """
-        # TODO: Restructure this function so it can be used for more than starting a pipeline
         success = False
         message = 'Server-side error.'
         status_code = 500
@@ -38,7 +37,10 @@ class Webhook:
                 status_code = 403
             # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
             # slash to get the branch name and check against the user-allowed list of branches.
-            elif payload_json['ref'].rsplit('/', 1)[-1] in Global.ALLOWED_BRANCHES:
+            # TODO: We need to allow the user to specify if they want to deploy on allowed branchs or tags
+            elif (
+                payload_json['ref'].rsplit('/', 1)[-1] in Global.ALLOWED_BRANCHES or 'refs/tags' in payload_json['ref']
+            ):
                 Thread(
                     target=Pipeline.run_pipeline,
                     args=(payload_json,),

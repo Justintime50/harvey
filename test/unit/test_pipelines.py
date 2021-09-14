@@ -1,3 +1,4 @@
+import subprocess
 from datetime import datetime
 from test.unit.conftest import mock_config  # Remove once fixtures are fixed
 from unittest.mock import mock_open, patch
@@ -66,12 +67,15 @@ def test_run_pipeline_pull(mock_initialize_pipeline, mock_utils_success, mock_we
 
 
 @patch('harvey.utils.Utils.success')
-@patch('harvey.pipelines.Pipeline.deploy', return_value=['mock-deploy', 'mock-healthcheck'])
+@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.pipelines.Pipeline.deploy', return_value='mock-output')
 @patch(
     'harvey.pipelines.Pipeline.initialize_pipeline',
     return_value=[mock_config(pipeline='deploy'), MOCK_OUTPUT, MOCK_TIME],
 )
-def test_run_pipeline_deploy(mock_initialize_pipeline, mock_deploy_pipeline, mock_utils_success, mock_webhook):
+def test_run_pipeline_deploy(
+    mock_initialize_pipeline, mock_deploy_pipeline, mock_healthcheck, mock_utils_success, mock_webhook
+):
     _ = Pipeline.run_pipeline(mock_webhook)
 
     mock_initialize_pipeline.assert_called_once_with(mock_webhook)
@@ -91,3 +95,41 @@ def test_run_pipeline_bad_pipeline_name(mock_initialize_pipeline, mock_utils_kil
     mock_utils_kill.assert_called_once_with(
         f'{MOCK_OUTPUT}\nError: Harvey could not run, there was no acceptable pipeline specified.', mock_webhook
     )
+
+
+@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
+@patch('subprocess.check_output')
+def test_deploy_compose_stage_success(mock_subprocess, mock_healthcheck, mock_webhook):
+    # TODO: Mock the subprocess better to ensure it does what it's supposed to
+    _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+
+    mock_subprocess.assert_called_once()
+
+
+@patch('harvey.utils.Utils.kill')
+@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd=subprocess.check_output, timeout=0.1))
+def test_deploy_compose_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
+    _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+
+    mock_utils_kill.assert_called_once()
+
+
+@patch('harvey.utils.Utils.kill')
+@patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))
+def test_deploy_compose_stage_process_error(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):  # noqa
+    _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+
+    mock_utils_kill.assert_called_once()
+
+
+@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
+@patch('subprocess.check_output')
+def test_deploy_compose_stage_custom_compose_success(mock_subprocess, mock_healthcheck, mock_webhook):
+    """This test simulates having a custom compose command set in the Harvey config
+    file - using two docker-compose files for instance
+    """
+    # TODO: Mock the subprocess better to ensure it does what it's supposed to
+    config = mock_config('deploy', compose='docker-compose.yml -f docker-compose-prod.yml')
+    _ = Pipeline.deploy(config, mock_webhook, MOCK_OUTPUT)
+
+    mock_subprocess.assert_called_once()

@@ -1,11 +1,12 @@
 import json
 import os
+import subprocess
 from datetime import datetime
 
+from harvey.containers import Container
 from harvey.git import Git
 from harvey.globals import Global
 from harvey.messages import Message
-from harvey.stages import Deploy
 from harvey.utils import Utils
 
 # TODO: We may now be able to consolidate the `pipeline` and `stage` namespaces and verbage
@@ -20,13 +21,30 @@ class Pipeline:
         start_time = datetime.now()
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)
-        config = Pipeline.open_project_config(webhook)
+
+        webhook_data_key = webhook.get('data')
+        if webhook_data_key:
+            config = webhook_data_key
+            pipeline = webhook_data_key.get('pipeline')
+        else:
+            config = Pipeline.open_project_config(webhook)
+            pipeline = config.get('pipeline')
+
+        # TODO: We may want to setup a default pipeline of `deploy` or `pull` if none is specified
+        if pipeline not in Global.SUPPORTED_PIPELINES:
+            final_output = (
+                f'Error: Harvey could not run for `{Global.repo_full_name(webhook)}`, there was no acceptable pipeline'
+                ' specified.'
+            )
+            pipeline = Utils.kill(final_output, webhook)
 
         if Global.SLACK:
             Message.send_slack_message(
-                f'Harvey has started a `{config["pipeline"]}` pipeline for `{Global.repo_full_name(webhook)}`.'
+                f':hammer_and_wrench: Harvey has started a `{config["pipeline"]}` pipeline for'
+                f' `{Global.repo_full_name(webhook)}`.'
             )
 
+        # TODO: Rework the logs of a pipeline to be more informative and clean
         preamble = (
             f'Running Harvey v{Global.HARVEY_VERSION}\n{config["pipeline"].title()} Pipeline Started: {start_time}'
         )
@@ -56,42 +74,38 @@ class Pipeline:
         If a Pipeline fails, it fails early in the individual functions being called.
         """
         webhook_config, webhook_output, start_time = Pipeline.initialize_pipeline(webhook)
-        pipeline = webhook_config.get('pipeline').lower()
+        pipeline = webhook_config['pipeline'].lower()
 
-        if pipeline in Global.SUPPORTED_PIPELINES:
-            if pipeline == 'pull':
-                # We simply assign the final message because if we got this far, the repo has already been pulled
-                final_output = f'{webhook_output}\nHarvey pulled the project successfully.'
-            elif pipeline in ['deploy']:
-                deploy_output, healthcheck = Pipeline.deploy(webhook_config, webhook, webhook_output)
+        if pipeline == 'pull':
+            # We simply assign the final message because if we got this far, the repo has already been pulled
+            final_output = f'{webhook_output}\nHarvey pulled the project successfully.'
+        elif pipeline == 'deploy':
+            healthcheck = Container.run_container_healthcheck(webhook)
+            deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)
 
-                # TODO: Can this be cleaned up a bit (DRY)
-                if healthcheck is False:
-                    end_time = datetime.now()
-                    pipeline_status = 'Pipeline failed due to a bad healthcheck.'
-                    execution_time = f'Pipeline execution time: {end_time - start_time}'
-                    healthcheck_message = f'Project passed healthcheck: {healthcheck}'
+            # TODO: Can this be cleaned up a bit (DRY)
+            if healthcheck is False:
+                end_time = datetime.now()
+                pipeline_status = 'Project Healthcheck: :skull_and_crossbones:'
+                execution_time = f'Pipeline execution time: {end_time - start_time}'
+                healthcheck_message = 'Pipeline failed!'
 
-                    final_output = (
-                        f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
-                    )
+                final_output = (
+                    f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
+                )
 
-                    Utils.kill(final_output, webhook)
-                else:
-                    healthcheck_message = f'Project passed healthcheck: {healthcheck}'
-                    end_time = datetime.now()
-                    execution_time = f'Pipeline execution time: {end_time - start_time}'
-                    pipeline_status = 'Pipeline succeeded!'
+                Utils.kill(final_output, webhook)
+            else:
+                healthcheck_message = 'Project Healthcheck: :white_check_mark:'
+                end_time = datetime.now()
+                execution_time = f'Pipeline execution time: {end_time - start_time}'
+                pipeline_status = 'Pipeline succeeded!'
 
-                    final_output = (
-                        f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
-                    )
+                final_output = (
+                    f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
+                )
 
             Utils.success(final_output, webhook)
-        else:
-            # TODO: We may want to setup a default pipeline of `deploy` or `pull` if none is specified
-            final_output = webhook_output + '\nError: Harvey could not run, there was no acceptable pipeline specified.'
-            pipeline = Utils.kill(final_output, webhook)
 
     @staticmethod
     def open_project_config(webhook):
@@ -103,10 +117,8 @@ class Pipeline:
             "compose": "some-name-compose.yml"
         }
         """
-        # TODO: Add the ability to configure projects on the Harvey side
-        # (eg: save values to a database via a UI) instead of only from
-        # within a JSON file in the repo
         try:
+            # TODO: Long-term, turn `harvey.json` into a hidden file and make it yml: `.harvey.yml`
             filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), 'harvey.json')
             with open(filename, 'r') as config_file:
                 config = json.loads(config_file.read())
@@ -117,10 +129,34 @@ class Pipeline:
             print(final_output)
             Utils.kill(final_output, webhook)
 
-    @staticmethod
     def deploy(config, webhook, output):
-        """Deploy a docker container via its `docker-compose.yml` file."""
-        deploy = Deploy.run(config, webhook, output)
-        healthcheck = Deploy.run_container_healthcheck(webhook)
+        """Build Stage, used for `deploy` pipelines that hit the `compose` endpoint.
 
-        return deploy, healthcheck
+        This flow doesn't use the standard Docker API and instead shells out to run
+        `docker-compose` commands, perfect for projects with docker-compose.yml files.
+        """
+        start_time = datetime.now()
+        compose_file_flag = f'-f {config["compose"]}' if config.get('compose') else None
+
+        try:
+            compose_command = subprocess.check_output(
+                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}'
+                f' && docker-compose {compose_file_flag} up -d --build',
+                stdin=None,
+                stderr=None,
+                shell=True,
+                timeout=Global.DEPLOY_TIMEOUT,
+            )
+            compose_output = compose_command.decode('UTF-8')
+            execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
+            final_output = f'{compose_output}\n{execution_time}'
+            print(final_output)  # TODO: Replace with logging
+        except subprocess.TimeoutExpired:
+            final_output = 'Error: Harvey timed out deploying.'
+            print(final_output)  # TODO: Replace with logging
+            Utils.kill(final_output, webhook)
+        except subprocess.CalledProcessError:
+            final_output = f'{output}\nError: Harvey could not finish the deploy.'
+            Utils.kill(final_output, webhook)
+
+        return final_output
