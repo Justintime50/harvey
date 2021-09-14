@@ -105,7 +105,7 @@ class Pipeline:
                     f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
                 )
 
-            Utils.success(final_output, webhook)
+        Utils.success(final_output, webhook)
 
     @staticmethod
     def open_project_config(webhook):

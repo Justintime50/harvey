@@ -83,20 +83,6 @@ def test_run_pipeline_deploy(
     mock_utils_success.assert_called_once()
 
 
-@patch('harvey.utils.Utils.kill')
-@patch(
-    'harvey.pipelines.Pipeline.initialize_pipeline',
-    return_value=[mock_config(pipeline='bad_name'), MOCK_OUTPUT, MOCK_TIME],
-)
-def test_run_pipeline_bad_pipeline_name(mock_initialize_pipeline, mock_utils_kill, mock_webhook):
-    _ = Pipeline.run_pipeline(mock_webhook)
-
-    mock_initialize_pipeline.assert_called_once_with(mock_webhook)
-    mock_utils_kill.assert_called_once_with(
-        f'{MOCK_OUTPUT}\nError: Harvey could not run, there was no acceptable pipeline specified.', mock_webhook
-    )
-
-
 @patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
 @patch('subprocess.check_output')
 def test_deploy_compose_stage_success(mock_subprocess, mock_healthcheck, mock_webhook):
