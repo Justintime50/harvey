@@ -15,10 +15,26 @@
 * This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 * Optional: `compose` value can be passed to specify the `docker-compose` file to be used. This key can also be used to specify a base file with additional compose files as overrides (eg: `docker-compose.yml -f docker-compose-prod.yml`).
 
-**Example**
+**harvey.json Example**
 ```javascript
 {
     "pipeline": "deploy",
     "compose": "my-docker-compose-prod.yml"
 }
+```
+
+**GitHub Action Example**
+```yml
+deploy:
+    needs: ["test", "lint"]
+    runs-on: ubuntu-latest
+    steps:
+        - name: Deploy to Harvey
+        if: github.ref == 'refs/heads/main'
+        uses: distributhor/workflow-webhook@v2
+        env:
+            webhook_type: "json-extended"
+            webhook_url: ${{ secrets.WEBHOOK_URL }}
+            webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
+            data: '{ "pipeline": "deploy", "compose" : "my-docker-compose-prod.yml" }'
 ```
