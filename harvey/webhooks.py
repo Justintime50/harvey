@@ -30,7 +30,7 @@ class Webhook:
         payload_ip_address = request.remote_addr
         signature = request.headers.get('X-Hub-Signature')
 
-        if Global.FILTER_WEBHOOKS and payload_ip_address not in Webhook.get_github_ip_address():
+        if Global.FILTER_WEBHOOKS and payload_ip_address not in Webhook.get_github_ip_addresses():
             message = 'Request did not originate from GitHub.'
             status_code = 422
         elif payload_data and payload_json:
@@ -81,7 +81,7 @@ class Webhook:
         return secret_validated
 
     @staticmethod
-    def get_github_ip_address():
+    def get_github_ip_addresses():
         """Returns a list of public IP addresses GitHub uses for webhooks and actions.
 
         Docs: https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/about-githubs-ip-addresses  # noqa

@@ -82,11 +82,11 @@ def test_webhook_originated_outside_github(mock_webhook_object):
     assert webhook[1] == 422
 
 
-def test_get_github_ip_address():
+def test_get_github_ip_addresses():
     """Assert that localhost is in the results and that the length
     exceeds some arbitrarily large number as GitHub has MANY ip addresses.
     """
-    result = Webhook.get_github_ip_address()
+    result = Webhook.get_github_ip_addresses()
 
     assert '127.0.0.1' in result
     assert len(result) > 1000  # Actual number is close to 1900
