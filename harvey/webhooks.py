@@ -1,7 +1,10 @@
 import hashlib
 import hmac
+import ipaddress
 import os
 from threading import Thread
+
+import requests
 
 from harvey.globals import Global
 from harvey.pipelines import Pipeline
@@ -27,7 +30,7 @@ class Webhook:
         payload_ip_address = request.remote_addr
         signature = request.headers.get('X-Hub-Signature')
 
-        if Global.FILTER_WEBHOOKS and payload_ip_address not in Global.github_webhook_ip_ranges():
+        if Global.FILTER_WEBHOOKS and payload_ip_address not in Webhook.get_github_ip_address():
             message = 'Request did not originate from GitHub.'
             status_code = 422
         elif payload_data and payload_json:
@@ -76,3 +79,41 @@ class Webhook:
                 secret_validated = True
 
         return secret_validated
+
+    @staticmethod
+    def get_github_ip_address():
+        """Returns a list of public IP addresses GitHub uses for webhooks and actions.
+
+        Docs: https://docs.github.com/en/github/authenticating-to-github/keeping-your-account-and-data-secure/about-githubs-ip-addresses  # noqa
+        """
+        # TODO: We should be storing these in redis or a database to optimize for speed
+        response = requests.get('https://api.github.com/meta')
+        response_json = response.json()
+
+        webhook_ip_ranges = response_json.get('hooks', [])
+        actions_ip_ranges = response_json.get('actions', [])
+
+        webhook_ip_list = []
+        for ip_range in webhook_ip_ranges:
+            if ':' in ip_range:
+                webhook_ip_list.append(ipaddress.IPv6Network(ip_range))
+            elif '.' in ip_range:
+                webhook_ip_list.append(ipaddress.IPv4Network(ip_range))
+            else:
+                pass
+
+        actions_ip_list = []
+        for ip_range in actions_ip_ranges:
+            if ':' in ip_range:
+                actions_ip_list.append(ipaddress.IPv6Network(ip_range))
+            elif '.' in ip_range:
+                actions_ip_list.append(ipaddress.IPv4Network(ip_range))
+            else:
+                pass
+
+        ip_address_list = webhook_ip_list + actions_ip_list
+
+        # Keep localhost included for testing
+        ip_address_list.append('127.0.0.1')
+
+        return ip_address_list

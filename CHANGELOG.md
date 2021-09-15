@@ -6,6 +6,7 @@
 * Configuration data now properly gets validated (pipeline key and existence)
 * Added emojis to the healthcheck messages via Slack
 * The `pipelines` and `stages` modules were consolidated into `pipelines` now that the testing functionality has been removed
+* When filtering webhook IP addresses, we now get the IP ranges directly from GitHub's API and include the `actions` IP addresses for when you are deploying via a GitHub Action
 
 ## v0.14.0 (2021-09-06)
 
