@@ -9,7 +9,7 @@ The lightweight Docker Compose deployment platform.
 [![PyPi](https://img.shields.io/pypi/v/harvey-ci)](https://pypi.org/project/harvey-ci/)
 [![Licence](https://img.shields.io/github/license/justintime50/harvey)](LICENSE)
 
-<img src="assets/showcase.png" alt="Showcase">
+<img src="https://raw.githubusercontent.com/justintime50/assets/main/src/harvey/showcase.png" alt="Showcase">
 
 </div>
 
