@@ -18,7 +18,7 @@ def test_parse_webhook(mock_run_pipeline, mock_webhook_object):
 
 @patch('harvey.webhooks.Pipeline.run_pipeline')
 def test_parse_webhook_bad_branch(mock_run_pipeline, mock_webhook_object):
-    webhook = Webhook.parse_webhook(mock_webhook_object(branch='ref/heads/bad_branch'))
+    webhook = Webhook.parse_webhook(mock_webhook_object(branch='bad_branch_name'))
 
     assert webhook[0] == {
         'message': 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.',
@@ -68,25 +68,3 @@ def test_validate_webhook_secret_no_signature(mock_webhook):
     validated_webhook_secret = Webhook.validate_webhook_secret(mock_webhook, None)
 
     assert validated_webhook_secret is False
-
-
-@patch('harvey.globals.Global.FILTER_WEBHOOKS', True)
-def test_webhook_originated_outside_github(mock_webhook_object):
-    mock_webhook_object.remote_addr = '1.2.3.4'
-    webhook = Webhook.parse_webhook(mock_webhook_object)
-
-    assert webhook[0] == {
-        'message': 'Request did not originate from GitHub.',
-        'success': False,
-    }
-    assert webhook[1] == 422
-
-
-def test_get_github_ip_addresses():
-    """Assert that localhost is in the results and that the length
-    exceeds some arbitrarily large number as GitHub has MANY ip addresses.
-    """
-    result = Webhook.get_github_ip_addresses()
-
-    assert '127.0.0.1' in result
-    assert len(result) > 1000  # Actual number is close to 1900

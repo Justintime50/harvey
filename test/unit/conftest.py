@@ -35,13 +35,15 @@ def mock_webhook(branch='main'):
 @pytest.fixture
 def mock_webhook_object(branch='main'):
     webhook = MagicMock()
-    webhook.remote_addr = '192.30.252.0'  # A real GitHub IP address
-    webhook.json = {
-        "ref": f'refs/heads/{branch}',
-        "repository": {
-            "name": "TEST-repo-name",
-        },
-    }
+    webhook.json = Mock(
+        return_value={
+            "ref": f'refs/heads/{branch}',
+            "repository": {
+                "name": "TEST-repo-name",
+            },
+        }
+    )
+
     return webhook
 
 
@@ -67,6 +69,7 @@ def mock_response(status=201, json_data={'mock': 'json'}):
         return_value=json_data,
     )
     response.status_code = status
+
     return response
 
 
@@ -92,4 +95,5 @@ def mock_response_container(status=200, dead=False, paused=False, restarting=Fal
         }
     )
     response.status_code = status
+
     return response

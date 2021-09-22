@@ -136,7 +136,7 @@ class Pipeline:
         `docker-compose` commands, perfect for projects with docker-compose.yml files.
         """
         start_time = datetime.now()
-        compose_file_flag = f'-f {config["compose"]}' if config.get('compose') else None
+        compose_file_flag = f'-f {config["compose"]}' if config.get('compose') else ''
 
         try:
             compose_command = subprocess.check_output(

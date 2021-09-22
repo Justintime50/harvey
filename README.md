@@ -101,17 +101,31 @@ deploy:
 
 Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret and GitHub headers):
 
-```javascript
+```json
 {
-    "repository": {
-        "name": "justinpaulhammond",
-        "full_name": "Justintime50/justinpaulhammond",
-        "url": "https://github.com/Justintime50/justinpaulhammond",
-    },
-    "owner": {
-        "name": "Justintime50",
+  "ref": "refs/heads/main",
+  "repository": {
+    "name": "justinpaulhammond",
+    "full_name": "Justintime50/justinpaulhammond",
+    "url": "https://github.com/Justintime50/justinpaulhammond",
+    "ssh_url": "git@github.com:Justintime50/justinpaulhammond.git"
+  },
+  "owner": {
+    "name": "Justintime50"
+  },
+  "commits": [
+    {
+      "id": "1",
+      "author": {
+        "name": "Justintime50"
+      }
     }
+  ],
+  "data": {
+    "pipeline": "deploy"
+  }
 }
+
 ```
 
 ### App Configuration
