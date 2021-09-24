@@ -8,7 +8,7 @@
 * The `pipelines` and `stages` modules were consolidated into `pipelines` now that the testing functionality has been removed
 * Removed the `filter webhook` functionality as it was prohibitively expensive to do correctly due to the vast number of IPs to guard against
 * Fixed a bug that would pass `None` instead of an empty string to the `docker-compose` command when no `compose` key was used in the config
-* Changed from using a combo of `.json` and `.data` on the request payloads and instead use Flask's builtin `.get_json()` function to better handle incoming payload data
+* Reworked how we pulled json data from webhooks to be more straightforward
 
 ## v0.14.0 (2021-09-06)
 
