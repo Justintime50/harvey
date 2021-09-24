@@ -21,12 +21,10 @@ class Webhook:
         success = False
         message = 'Server-side error.'
         status_code = 500
-        payload_json = request.get_json()
+        payload_json = request.json
         signature = request.headers.get('X-Hub-Signature')
-        breakpoint()
 
         if payload_json:
-            # Exit fast when we shouldn't continue
             if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_json, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
@@ -40,6 +38,7 @@ class Webhook:
                     target=Pipeline.run_pipeline,
                     args=(payload_json,),
                 ).start()
+
                 message = f'Started pipeline for {payload_json["repository"]["name"]}'
                 status_code = 200
                 success = True
