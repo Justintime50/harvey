@@ -1,7 +1,8 @@
 from unittest.mock import MagicMock, Mock
 
-import harvey.app as app
 import pytest
+
+import harvey.app as app
 
 
 @pytest.fixture

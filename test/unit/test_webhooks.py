@@ -2,6 +2,7 @@ import hashlib
 from unittest.mock import MagicMock, patch
 
 import pytest
+
 from harvey.webhooks import Webhook
 
 

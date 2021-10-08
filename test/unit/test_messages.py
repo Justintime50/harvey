@@ -1,6 +1,7 @@
 from unittest.mock import patch
 
 import slack
+
 from harvey.messages import Message
 
 

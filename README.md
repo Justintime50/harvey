@@ -164,12 +164,6 @@ curl -X GET http://127.0.0.1:5000/pipeline/f599cde2f2a0ad562bb7982328fe0aeee9d22
 ## Development
 
 ```bash
-# Lint the project
-make lint
-
-# Run tests
-make test
-
-# Run test coverage
-make coverage
+# Get a comprehensive list of development tools
+make help
 ```

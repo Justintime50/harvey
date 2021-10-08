@@ -1,7 +1,8 @@
 from unittest.mock import patch
 
-import harvey.app as app
 import pytest
+
+import harvey.app as app
 
 
 @pytest.mark.parametrize(
