@@ -22,10 +22,11 @@ class Webhook:
         message = 'Server-side error.'
         status_code = 500
         payload_json = request.json
+        payload_data = request.data  # We need this to properly decode the webhook secret
         signature = request.headers.get('X-Hub-Signature')
 
         if payload_json:
-            if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_json, signature):
+            if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
             # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
