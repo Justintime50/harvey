@@ -42,6 +42,10 @@ install:
 	ln -snf ~/.venv/$(PROJECT_NAME)/ venv
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
 
+## integration_test - Test the project end-to-end
+integration_test:
+	venv/bin/python test/integration/test_pipeline.py
+
 ## isort - Sorts imports throughout the project
 isort:
 	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ test/
@@ -54,8 +58,12 @@ isort-check:
 lint:
 	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ test/
 
+## run - Run the service locally
+run:
+	venv/bin/python harvey/app.py
+
 ## test - Test the project
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build coverage clean black black-check format format-check install isort isort-check lint test
+.PHONY: help build coverage clean black black-check format format-check install integration_test isort isort-check lint run test
