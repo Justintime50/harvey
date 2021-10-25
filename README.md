@@ -36,12 +36,6 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 git clone https://github.com/Justintime50/harvey.git
 make install
 cp .env.example .env
-
-# Install Harvey via Pip (untested, may have odd path issues)
-pip3 install harvey-ci
-
-# Get Makefile help
-make help
 ```
 
 1. Install Docker & login
@@ -53,11 +47,11 @@ make help
 ## Usage
 
 ```bash
-# Run locally
+# Run locally for development (runs via Flask)
 make run
 
-# Run in production
-harvey-ci
+# Run in production (runs via Gunicorn)
+make prod
 ```
 
 ## Things to Know

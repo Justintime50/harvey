@@ -6,10 +6,11 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'docker == 5.0.*',
     'flask == 2.*',
+    'gunicorn == 20.1.*',
+    'python-dotenv == 0.19.*',
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
-    'python-dotenv == 0.19.*',
 ]
 
 DEV_REQUIREMENTS = [

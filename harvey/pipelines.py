@@ -9,8 +9,6 @@ from harvey.globals import Global
 from harvey.messages import Message
 from harvey.utils import Utils
 
-# TODO: We may now be able to consolidate the `pipeline` and `stage` namespaces and verbage
-
 
 class Pipeline:
     @staticmethod
@@ -78,7 +76,7 @@ class Pipeline:
 
         if pipeline == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
-            final_output = f'{webhook_output}\nHarvey pulled the project successfully.'
+            final_output = f'{webhook_output}\n:white_check_mark: Harvey pulled the project successfully.'
         elif pipeline == 'deploy':
             healthcheck = Container.run_container_healthcheck(webhook)
             deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)

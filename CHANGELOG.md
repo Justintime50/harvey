@@ -10,6 +10,7 @@
 * Fixed a bug that would pass `None` instead of an empty string to the `docker-compose` command when no `compose` key was used in the config
 * Reworked how we pulled json data from webhooks to be more straightforward
 * We now use the `docker` Python SDK instead of hitting raw socket endpoints (closes #49)
+* Adds `gunicorn` for production deployments instead of the development Flask server
 
 ## v0.14.0 (2021-09-06)
 

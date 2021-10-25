@@ -58,6 +58,10 @@ isort-check:
 lint:
 	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ test/
 
+## prod - Run the service in production
+prod:
+	venv/bin/gunicorn --workers=2 wsgi:APP
+
 ## run - Run the service locally
 run:
 	venv/bin/python harvey/app.py
@@ -66,4 +70,4 @@ run:
 test:
 	$(VIRTUAL_BIN)/pytest
 
-.PHONY: help build coverage clean black black-check format format-check install integration_test isort isort-check lint run test
+.PHONY: help build coverage clean black black-check format format-check install integration_test isort isort-check lint prod run test
