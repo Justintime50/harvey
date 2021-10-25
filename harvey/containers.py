@@ -1,28 +1,40 @@
 import time
 
-import requests
+import docker
 
 from harvey.globals import Global
 
 
 class Container:
     @staticmethod
-    def inspect_container(container_id):
-        """Inspect the details of a Docker container."""
-        # TODO: This could be where we use the docker package
-        # TODO: Down the road, create an endpoint that can take advantage of this
-        response = requests.get(f'{Global.BASE_URL}containers/{container_id}/json')
+    def create_client():
+        """Creates a Docker client to use for connections.
 
-        return response
+        Be aware that invoking this multiple times for different processes will open multiple
+        connections at once, there is probably some optimizations we can/should make with this.
+        """
+        client = docker.from_env(timeout=30)  # TODO: Allow this to be configurable
+
+        return client
+
+    @staticmethod
+    def get_container(container_id):
+        """Get the details of a Docker container."""
+        client = Container.create_client()
+        container = client.containers.get(container_id)
+
+        return container
 
     @staticmethod
     def list_containers():
-        """List all Docker containers."""
-        # TODO: This could be where we use the docker package
-        # TODO: Down the road, create an endpoint that can take advantage of this
-        response = requests.get(f'{Global.BASE_URL}containers/json')
+        """Return a list of all Docker containers.
 
-        return response
+        To grab details of a single record, use something like `container.attrs['Name']`.
+        """
+        client = Container.create_client()
+        containers = client.containers.list(limit=100)  # TODO: Allow this to be configurable
+
+        return containers
 
     @staticmethod
     def run_container_healthcheck(webhook, retry_attempt=0):
@@ -33,13 +45,10 @@ class Container:
         a few times before abandoning the healthcheck.
         """
         container_healthy = False
-        max_retries = 5
-        container = Container.inspect_container(Global.repo_name(webhook))
-        container_json = container.json()
-        container_state = container_json.get('State')
+        max_retries = 4
+        container = Container.get_container(Global.repo_name(webhook))
 
-        # We need to explicitly check for a state and a running key here
-        if container_state and container_state['Running'] is True:
+        if container.status.lower() == 'running':
             container_healthy = True
         elif retry_attempt < max_retries:
             # TODO: This is a great spot for logging what container is failing, what attempt it's on,

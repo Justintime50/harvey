@@ -4,6 +4,7 @@ with open('README.md', 'r') as fh:
     long_description = fh.read()
 
 REQUIREMENTS = [
+    'docker == 5.0.*',
     'flask == 2.*',
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',

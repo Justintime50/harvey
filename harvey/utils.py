@@ -30,7 +30,7 @@ class Utils:
 
     @staticmethod
     def generate_pipeline_logs(final_output, webhook):
-        """Generate a complete log file with the entire pipeline's output"""
+        """Generate a complete log file with the entire pipeline's output."""
         pipeline_log_path = os.path.join(Global.PROJECTS_LOG_PATH, Global.repo_full_name(webhook))
         if not os.path.exists(pipeline_log_path):
             os.makedirs(pipeline_log_path)

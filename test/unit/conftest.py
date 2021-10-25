@@ -1,4 +1,4 @@
-from unittest.mock import MagicMock, Mock
+from unittest.mock import MagicMock
 
 import pytest
 
@@ -71,17 +71,6 @@ def mock_project_path():
     return mock_project_path
 
 
-# TODO: Move this to a fixture
-def mock_response(status=201, json_data={'mock': 'json'}):
-    response = MagicMock()
-    response.json = MagicMock(
-        return_value=json_data,
-    )
-    response.status_code = status
-
-    return response
-
-
 # TODO: Make this fixture work and put it in the `test_build_image` test
 def mock_config(pipeline='deploy', compose=None):
     mock_config = {
@@ -90,21 +79,3 @@ def mock_config(pipeline='deploy', compose=None):
     }
 
     return mock_config
-
-
-# TODO: Move this to a fixture
-def mock_response_container(status=200, dead=False, paused=False, restarting=False, running=True):
-    response = Mock()
-    response.json = Mock(
-        return_value={
-            'State': {
-                'Dead': dead,
-                'Paused': paused,
-                'Restarting': restarting,
-                'Running': running,
-            }
-        }
-    )
-    response.status_code = status
-
-    return response
