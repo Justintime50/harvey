@@ -130,24 +130,30 @@ class Pipeline:
     def deploy(config, webhook, output):
         """Build Stage, used for `deploy` pipelines that hit the `compose` endpoint.
 
-        This flow doesn't use the standard Docker API and instead shells out to run
-        `docker-compose` commands, perfect for projects with docker-compose.yml files.
+        This flow doesn't use the standard Docker API and instead runs `docker-compose`
+        commands, perfect for projects with docker-compose.yml files.
         """
         start_time = datetime.now()
-        compose_file_flag = f'-f {config["compose"]}' if config.get('compose') else ''
+        repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
+        # TODO: This is sad for `docker-compose.yaml` files containing an "a", allow for both
+        default_docker_compose_filepath = os.path.join(repo_path, 'docker-compose.yml')
+        compose_file_flag = (
+            f'-f {os.path.join(repo_path, config["compose"])}'
+            if config.get('compose')
+            else f'-f {default_docker_compose_filepath}'
+        )
 
         try:
-            compose_command = subprocess.check_output(
-                f'cd {os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))}'
-                f' && docker-compose {compose_file_flag} up -d --build',
+            command = ['docker-compose', compose_file_flag, 'up', '-d', '--build']
+            compose_output = subprocess.check_output(
+                command,
                 stdin=None,
                 stderr=None,
-                shell=True,
                 timeout=Global.DEPLOY_TIMEOUT,
             )
-            compose_output = compose_command.decode('UTF-8')
+            decoded_output = compose_output.decode('UTF-8')
             execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
-            final_output = f'{compose_output}\n{execution_time}'
+            final_output = f'{decoded_output}\n{execution_time}'
             print(final_output)  # TODO: Replace with logging
         except subprocess.TimeoutExpired:
             final_output = 'Error: Harvey timed out deploying.'

@@ -23,11 +23,11 @@ class Git:
     def pull_repo(project_path, webhook):
         """Pull updates for a repo in the Harvey projects folder."""
         try:
+            command = ['git', '-C', project_path, 'pull', '--rebase']
             final_output = subprocess.check_output(
-                f'git -C {project_path} pull --rebase',
+                command,
                 stdin=None,
                 stderr=None,
-                shell=True,
                 timeout=Global.GIT_TIMEOUT,
             )
             print(final_output)
@@ -46,11 +46,11 @@ class Git:
     def clone_repo(project_path, webhook):
         """Clone a repo into the Harvey projects folder."""
         try:
+            command = ['git', 'clone', '--depth=10', Global.repo_url(webhook), project_path]
             final_output = subprocess.check_output(
-                f'git clone --depth=10 {Global.repo_url(webhook)} {project_path}',
+                command,
                 stdin=None,
                 stderr=None,
-                shell=True,
                 timeout=Global.GIT_TIMEOUT,
             )
             print(final_output)

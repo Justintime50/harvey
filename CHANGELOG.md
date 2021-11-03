@@ -11,6 +11,7 @@
 * Reworked how we pulled json data from webhooks to be more straightforward
 * We now use the `docker` Python SDK instead of hitting raw socket endpoints (closes #49)
 * Adds `gunicorn` for production deployments instead of the development Flask server
+* Refactors invocations of subprocesses to not use the shell, no longer change directories but invoke commands from within the context they require
 
 ## v0.14.0 (2021-09-06)
 
