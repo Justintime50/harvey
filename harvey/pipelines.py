@@ -136,15 +136,15 @@ class Pipeline:
         start_time = datetime.now()
         repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
         # TODO: This is sad for `docker-compose.yaml` files containing an "a", allow for both
-        default_docker_compose_filepath = os.path.join(repo_path, 'docker-compose.yml')
-        compose_file_flag = (
-            f'-f {os.path.join(repo_path, config["compose"])}'
+        default_compose_filepath = os.path.join(repo_path, 'docker-compose.yml')
+        compose_filepath = (
+            os.path.join(repo_path, config["compose"])
             if config.get('compose')
-            else f'-f {default_docker_compose_filepath}'
+            else default_compose_filepath
         )
 
         try:
-            command = ['docker-compose', compose_file_flag, 'up', '-d', '--build']
+            command = ['docker-compose', '-f', compose_filepath, 'up', '-d', '--build']
             compose_output = subprocess.check_output(
                 command,
                 stdin=None,
