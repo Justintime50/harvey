@@ -48,9 +48,9 @@ class Container:
 
         if container.status.lower() == 'running':
             container_healthy = True
+            print(f'{container_name} healthcheck passed!')  # TODO: Replace with logging
         elif retry_attempt < max_retries:
-            # TODO: This is a great spot for logging what container is failing, what attempt it's on,
-            # and why it's failing with some helpful data
+            print(f'{container_name} healthcheck failed, retrying...')  # TODO: Replace with logging
             retry_attempt += 1
             time.sleep(3)
             Container.run_container_healthcheck(container_name, retry_attempt)
