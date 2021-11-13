@@ -79,3 +79,10 @@ def mock_config(pipeline='deploy', compose=None):
     }
 
     return mock_config
+
+
+@pytest.fixture
+def mock_container_name():
+    mock_container_name = 'mock_container_name'
+
+    return mock_container_name

@@ -2,8 +2,6 @@ import time
 
 import docker
 
-from harvey.globals import Global
-
 
 class Container:
     @staticmethod
@@ -37,7 +35,7 @@ class Container:
         return containers
 
     @staticmethod
-    def run_container_healthcheck(webhook, retry_attempt=0):
+    def run_container_healthcheck(container_name, retry_attempt=0):
         """Run a healthcheck to ensure the container is running and not in a transitory state.
         Not to be confused with the "Docker Healthcheck" functionality which is different.
 
@@ -46,7 +44,7 @@ class Container:
         """
         container_healthy = False
         max_retries = 4
-        container = Container.get_container(Global.repo_name(webhook))
+        container = Container.get_container(container_name)
 
         if container.status.lower() == 'running':
             container_healthy = True
@@ -55,6 +53,6 @@ class Container:
             # and why it's failing with some helpful data
             retry_attempt += 1
             time.sleep(3)
-            Container.run_container_healthcheck(webhook, retry_attempt)
+            Container.run_container_healthcheck(container_name, retry_attempt)
 
         return container_healthy

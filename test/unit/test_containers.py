@@ -3,7 +3,6 @@ from unittest.mock import Mock, patch
 import pytest
 
 from harvey.containers import Container
-from harvey.globals import Global
 
 
 @pytest.mark.skip('Skipping for now as I am unable to mock the proper function')
@@ -34,19 +33,19 @@ def test_list_containers(mock_request, mock_client, mock_tag):
 
 @patch('time.sleep', return_value=None)
 @patch('harvey.containers.Container.get_container', return_value=Mock(status='running'))
-def test_run_container_healthcheck_success(mock_container, mock_sleep, mock_webhook):
-    healthcheck = Container.run_container_healthcheck(mock_webhook)
+def test_run_container_healthcheck_success(mock_container, mock_sleep, mock_container_name):
+    healthcheck = Container.run_container_healthcheck(mock_container_name)
 
-    mock_container.assert_called_once_with(Global.repo_name(mock_webhook))
+    mock_container.assert_called_once_with(mock_container_name)
     assert healthcheck is True
 
 
 @patch('time.sleep', return_value=None)
 @patch('harvey.containers.Container.get_container', return_value=Mock(status='exited'))
-def test_run_container_healthcheck_failed(mock_container, mock_sleep, mock_webhook):
+def test_run_container_healthcheck_failed(mock_container, mock_sleep, mock_container_name):
     """This test checks that if a healthcheck fails, we properly retry"""
-    healthcheck = Container().run_container_healthcheck(mock_webhook)
+    healthcheck = Container().run_container_healthcheck(mock_container_name)
 
-    mock_container.assert_called_with(Global.repo_name(mock_webhook))
+    mock_container.assert_called_with(mock_container_name)
     assert mock_container.call_count == 5
     assert healthcheck is False

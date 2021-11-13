@@ -12,6 +12,9 @@
 * We now use the `docker` Python SDK instead of hitting raw socket endpoints (closes #49)
 * Adds `gunicorn` for production deployments instead of the development Flask server
 * Refactors invocations of subprocesses to not use the shell, no longer change directories but invoke commands from within the context they require
+* Removes deprecated `/compose` endpoint which has been replaced with the `/start` endpoint
+* Adds a new `healthcheck` key on the config which accepts an array of container names to check for when deploying. Harvey will attempt to run healthchecks against these containers and retry a few times if they are not yet running. The pipeline will only show as success if we can only get a good healthcheck from the list of containers provided. This new option now allows healthchecks to be run against all containers in the stack instead of the base app alone (great for adding databases, caches, and other containers you may have)
+* Various bug fixes
 
 ## v0.14.0 (2021-09-06)
 

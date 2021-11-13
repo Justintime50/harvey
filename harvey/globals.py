@@ -2,6 +2,7 @@ import os
 
 
 class Global:
+    # TODO: Reconfigure all these constants and static methods below to be class variables/properties
     DOCKER_VERSION = 'v1.41'  # Docker API version
     # TODO: Figure out how to sync this version number with the one in `setup.py`
     HARVEY_VERSION = '0.14.0'  # Harvey release

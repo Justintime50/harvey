@@ -74,36 +74,45 @@ class Pipeline:
         webhook_config, webhook_output, start_time = Pipeline.initialize_pipeline(webhook)
         pipeline = webhook_config['pipeline'].lower()
 
-        if pipeline == 'pull':
-            # We simply assign the final message because if we got this far, the repo has already been pulled
-            final_output = f'{webhook_output}\n:white_check_mark: Harvey pulled the project successfully.'
-        elif pipeline == 'deploy':
-            healthcheck = Container.run_container_healthcheck(webhook)
+        if pipeline == 'deploy':
             deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)
 
-            # TODO: Can this be cleaned up a bit (DRY)
-            if healthcheck is False:
-                end_time = datetime.now()
-                pipeline_status = 'Project Healthcheck: :skull_and_crossbones:'
-                execution_time = f'Pipeline execution time: {end_time - start_time}'
-                healthcheck_message = 'Pipeline failed!'
+            healthcheck = webhook_config.get('healthcheck')
 
-                final_output = (
-                    f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
-                )
+            if healthcheck:
+                container_healthcheck_statuses = {}
+                for container in healthcheck:
+                    container_healthcheck = Container.run_container_healthcheck(container)
+                    container_healthcheck_statuses[container] = container_healthcheck
 
-                Utils.kill(final_output, webhook)
+                healthcheck_values = container_healthcheck_statuses.values()
+                all_healthchecks_passed = any(healthcheck_values) and list(healthcheck_values)[0] is True
+
+                if all_healthchecks_passed:
+                    healthcheck_message = 'Project Healthcheck: :white_check_mark:'
+                    pipeline_status = 'Pipeline succeeded!'
+                else:
+                    pipeline_status = 'Project Healthcheck: :skull_and_crossbones:'
+                    healthcheck_message = 'Pipeline failed!'
             else:
-                healthcheck_message = 'Project Healthcheck: :white_check_mark:'
-                end_time = datetime.now()
-                execution_time = f'Pipeline execution time: {end_time - start_time}'
-                pipeline_status = 'Pipeline succeeded!'
+                healthcheck_message = 'Project Healthcheck: :grey_question:'
+                pipeline_status = 'Pipeline status unknown due to missing healthcheck configuration.'
+                all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
-                final_output = (
-                    f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
-                )
+            end_time = datetime.now()
+            execution_time = f'Pipeline execution time: {end_time - start_time}'
+            final_output = (
+                f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
+            )
 
-        Utils.success(final_output, webhook)
+            if all_healthchecks_passed or not healthcheck:
+                Utils.success(final_output, webhook)
+            else:
+                Utils.kill(final_output, webhook)
+        elif pipeline == 'pull':
+            # We simply assign the final message because if we got this far, the repo has already been pulled
+            final_output = f'{webhook_output}\nHarvey pulled the project successfully. :white_check_mark:'
+            Utils.success(final_output, webhook)
 
     @staticmethod
     def open_project_config(webhook):
@@ -112,7 +121,11 @@ class Pipeline:
         Project configs look like the following:
         {
             "pipeline": "deploy",
-            "compose": "some-name-compose.yml"
+            "prod_compose": true,
+            "healthcheck": [
+                "container_name_1",
+                "container_name_2"
+            ]
         }
         """
         try:
@@ -128,25 +141,40 @@ class Pipeline:
             Utils.kill(final_output, webhook)
 
     def deploy(config, webhook, output):
-        """Build Stage, used for `deploy` pipelines that hit the `compose` endpoint.
+        """Build Stage, used for `deploy` pipelines.
 
-        This flow doesn't use the standard Docker API and instead runs `docker-compose`
-        commands, perfect for projects with docker-compose.yml files.
+        This flow doesn't use the standard Docker API and instead runs `docker-compose` commands.
         """
         start_time = datetime.now()
+
         repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
         # TODO: This is sad for `docker-compose.yaml` files containing an "a", allow for both
         default_compose_filepath = os.path.join(repo_path, 'docker-compose.yml')
-        compose_filepath = (
-            os.path.join(repo_path, config["compose"])
-            if config.get('compose')
-            else default_compose_filepath
-        )
+        prod_compose_filepath = os.path.join(repo_path, 'docker-compose-prod.yml')
 
         try:
-            command = ['docker-compose', '-f', compose_filepath, 'up', '-d', '--build']
+            if config.get('prod_compose'):
+                # fmt: off
+                compose_command = [
+                    'docker-compose',
+                    '-f', default_compose_filepath,
+                    '-f', prod_compose_filepath,
+                    'up', '-d',
+                    '--build',
+                ]
+                # fmt: on
+            else:
+                # fmt: off
+                compose_command = [
+                    'docker-compose',
+                    '-f', default_compose_filepath,
+                    'up', '-d',
+                    '--build'
+                ]
+                # fmt: on
+
             compose_output = subprocess.check_output(
-                command,
+                compose_command,
                 stdin=None,
                 stderr=None,
                 timeout=Global.DEPLOY_TIMEOUT,

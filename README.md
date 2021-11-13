@@ -67,13 +67,17 @@ make prod
 * Each repo either needs a `harvey.json` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `harvey.json` file if there is no `data` key present)
 * You can specify one of `deploy` or `pull` as the pipeline type to run
 * This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
-* Optional: `compose` value can be passed to specify the `docker-compose` file to be used. This key can also be used to specify a base file with additional compose files as overrides (eg: `docker-compose.yml -f docker-compose-prod.yml`).
+* Optional: `prod_compose: true` json can be passed to instruct Harvey to use a prod `docker-compose` file in addition to the base compose file. This will run the equivelant of the following when deploying: `docker-compose -f docker-compose.yml -f docker-compose-prod.yml`.
 
 **harvey.json Example**
-```javascript
+```json
 {
     "pipeline": "deploy",
-    "compose": "my-docker-compose-prod.yml"
+    "prod_compose": true,
+    "healthcheck": [
+        "container_name_1",
+        "container_name_2"
+    ]
 }
 ```
 
@@ -90,7 +94,7 @@ deploy:
             webhook_type: "json-extended"
             webhook_url: ${{ secrets.WEBHOOK_URL }}
             webhook_secret: ${{ secrets.WEBHOOK_SECRET }}
-            data: '{ "pipeline": "deploy", "compose" : "my-docker-compose-prod.yml" }'
+            data: '{ "pipeline": "deploy", "prod_compose" : true, "healthcheck": ["container_name_1", "container_name_2"] }'
 ```
 
 Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret and GitHub headers):

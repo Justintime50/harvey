@@ -40,7 +40,6 @@ def harvey_healthcheck():
     return response
 
 
-@APP.route('/pipelines/start/compose', methods=['POST'])  # TODO: This is deprecated, remove in a future release
 @APP.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
