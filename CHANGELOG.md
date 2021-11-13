@@ -1,17 +1,17 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v0.15.0 (2021-11-13)
 
 * Adds the ability to pass Harvey configuration data in a `data` field in the webhook instead of the default `harvey.json` configuration file kept in the repo (either are now options)
 * Configuration data now properly gets validated (pipeline key and existence)
 * Added emojis to the healthcheck messages via Slack
 * The `pipelines` and `stages` modules were consolidated into `pipelines` now that the testing functionality has been removed
 * Removed the `filter webhook` functionality as it was prohibitively expensive to do correctly due to the vast number of IPs to guard against
-* Fixed a bug that would pass `None` instead of an empty string to the `docker-compose` command when no `compose` key was used in the config
 * Reworked how we pulled json data from webhooks to be more straightforward
 * We now use the `docker` Python SDK instead of hitting raw socket endpoints (closes #49)
 * Adds `gunicorn` for production deployments instead of the development Flask server
 * Refactors invocations of subprocesses to not use the shell, no longer change directories but invoke commands from within the context they require
+    * Changes the `compose` key to `prod_compose` which now accepts a boolean. We no longer support custom flags to the compose endpoint
 * Removes deprecated `/compose` endpoint which has been replaced with the `/start` endpoint
 * Adds a new `healthcheck` key on the config which accepts an array of container names to check for when deploying. Harvey will attempt to run healthchecks against these containers and retry a few times if they are not yet running. The pipeline will only show as success if we can only get a good healthcheck from the list of containers provided. This new option now allows healthchecks to be run against all containers in the stack instead of the base app alone (great for adding databases, caches, and other containers you may have)
 * Various bug fixes
