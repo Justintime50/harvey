@@ -97,7 +97,7 @@ deploy:
             data: '{ "pipeline": "deploy", "prod_compose" : true, "healthcheck": ["container_name_1", "container_name_2"] }'
 ```
 
-Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint (ensure you have an environment variable `MODE=test` to bypass the need for a webhook secret and GitHub headers):
+Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
 
 ```json
 {
