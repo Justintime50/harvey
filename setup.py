@@ -1,5 +1,7 @@
 import setuptools
 
+from harvey.globals.Global import HARVEY_VERSION
+
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
@@ -11,6 +13,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
+    'woodchips >= 0.1.1',
 ]
 
 DEV_REQUIREMENTS = [
@@ -24,7 +27,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.15.0',
+    version=HARVEY_VERSION,
     description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",

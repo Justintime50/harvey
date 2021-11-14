@@ -3,6 +3,8 @@ import sys
 
 import slack
 
+from harvey.globals import Global
+
 SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
 SLACK_CHANNEL = os.getenv('SLACK_CHANNEL')
 
@@ -18,8 +20,8 @@ class Message:
                 channel=SLACK_CHANNEL,
                 text=message,
             )
-            print('Slack message sent!')
+            Global.LOGGER.debug('Slack message sent!')
         except slack.errors.SlackApiError:
             final_output = 'Harvey could not send the Slack message.'
-            print(final_output)
+            Global.LOGGER.error(final_output)
             sys.exit()

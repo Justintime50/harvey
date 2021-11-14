@@ -44,6 +44,7 @@ def mock_webhook_object(branch='main'):
         "ref": f'refs/heads/{branch}',
         "repository": {
             "name": "TEST-repo-name",
+            "full_name": "TEST_user/TEST-repo-name",
         },
     }
 

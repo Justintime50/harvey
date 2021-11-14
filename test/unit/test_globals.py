@@ -34,4 +34,4 @@ def test_repo_owner_name(mock_webhook):
 def test_repo_commit_id(mock_webhook):
     result = Global.repo_commit_id(mock_webhook)
 
-    assert result == 123456
+    assert result == '123456'

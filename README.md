@@ -35,7 +35,7 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 # Install Harvey via GitHub
 git clone https://github.com/Justintime50/harvey.git
 make install
-cp .env.example .env
+cp .env-example .env
 ```
 
 1. Install Docker & login
@@ -134,10 +134,9 @@ Environment Variables:
     SLACK_CHANNEL     The Slack channel to send messages to
     SLACK_BOT_TOKEN   The Slackbot token to use to authenticate each request to Slack
     WEBHOOK_SECRET    The Webhook secret required by GitHub (if enabled, leave blank to ignore) to secure your webhooks. Default: disabled
-    FILTER_WEBHOOKS   Setting this to `true` will filter webhooks and only accept those from GitHub's list of webhook IP ranges. Default: False
     HOST              The host Harvey will run on. Default: 127.0.0.1
     PORT              The port Harvey will run on. Default: 5000
-    DEBUG             Whether the Flask API will run in debug mode or not. Default: False
+    LOG_LEVEL         The logging level used for the entire application. Default: INFO
     ALLOWED_BRANCHES  A comma separated list of branch names that are allowed to trigger pipelines from a webhook event. Default: "main,master"
 ```
 

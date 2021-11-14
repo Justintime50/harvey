@@ -26,6 +26,8 @@ class Webhook:
         signature = request.headers.get('X-Hub-Signature')
 
         if payload_json:
+            Global.LOGGER.debug(f'{Global.repo_full_name(payload_json)} webhook: {payload_json}')
+
             if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
@@ -40,15 +42,21 @@ class Webhook:
                     args=(payload_json,),
                 ).start()
 
-                message = f'Started pipeline for {payload_json["repository"]["name"]}'
+                message = f'Started pipeline for {Global.repo_full_name(payload_json)}'
                 status_code = 200
                 success = True
+
+                Global.LOGGER.info(message)
             else:
                 message = 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.'
                 status_code = 422
+
+                Global.LOGGER.debug(message)
         else:
             message = 'Malformed or missing JSON data in webhook.'
             status_code = 422
+
+            Global.LOGGER.debug(message)
 
         response = {
             'success': success,
@@ -69,5 +77,7 @@ class Webhook:
 
             if hmac.compare_digest(digest, signature):
                 secret_validated = True
+
+        Global.LOGGER.debug(f'{signature} webhook validated: {secret_validated}')
 
         return secret_validated

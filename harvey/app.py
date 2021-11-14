@@ -9,11 +9,10 @@ from flask import Flask, abort, request
 from harvey.globals import Global
 from harvey.webhooks import Webhook
 
-load_dotenv()  # must remain at the top of this file
+load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
 HOST = os.getenv('HOST', '127.0.0.1')
 PORT = os.getenv('PORT', '5000')
-DEBUG = os.getenv('DEBUG', 'True')
 
 
 @APP.errorhandler(404)
@@ -84,7 +83,8 @@ def retrieve_pipelines():
 def main():
     # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
-    APP.run(host=HOST, port=PORT, debug=DEBUG)
+    flask_debug = Global.LOG_LEVEL == 'DEBUG'
+    APP.run(host=HOST, port=PORT, debug=flask_debug)
 
 
 if __name__ == '__main__':
