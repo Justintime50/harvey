@@ -12,7 +12,8 @@ class Global:
     DEPLOY_TIMEOUT = 1800  # 30 minutes
     GIT_TIMEOUT = 300  # 5 minutes
     HARVEY_LOG_PATH = 'logs/harvey'
-    HARVEY_VERSION = '0.15.0'  # Harvey release
+    # TODO: Is there a way to sync this with `setup.py`? (short answer: not easily since you can't import this there)
+    HARVEY_VERSION = '0.15.0'
     PROJECTS_LOG_PATH = 'logs/projects'
     PROJECTS_PATH = 'projects'
     SLACK = os.getenv('SLACK')
