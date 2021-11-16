@@ -10,7 +10,7 @@ class Container:
     def create_client():
         """Creates a Docker client to use for connections.
 
-        Be aware that invoking this multiple times for different processes will open multiple
+        TODO: Be aware that invoking this multiple times for different processes will open multiple
         connections at once, there is probably some optimizations we can/should make with this.
         """
         Global.LOGGER.debug('Setting up Docker client...')

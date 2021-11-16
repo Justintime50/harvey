@@ -11,7 +11,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
-    'woodchips >= 0.1.1',
+    'woodchips ~= 0.1.1',
 ]
 
 DEV_REQUIREMENTS = [

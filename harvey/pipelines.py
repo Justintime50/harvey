@@ -13,7 +13,7 @@ from harvey.utils import Utils
 class Pipeline:
     @staticmethod
     def initialize_pipeline(webhook):
-        """Initialize the setup for a pipeline by cloning/pulling the project
+        """Initialize the setup for a pipeline by cloning or pulling the project
         and setting up standard logging info.
         """
         start_time = datetime.now()
@@ -22,38 +22,41 @@ class Pipeline:
 
         webhook_data_key = webhook.get('data')
         if webhook_data_key:
+            Global.LOGGER.debug(f'Pulling Harvey config for {Global.repo_full_name(webhook)} from webhook...')
             config = webhook_data_key
             pipeline = webhook_data_key.get('pipeline')
         else:
+            Global.LOGGER.debug(f'Pulling Harvey config for {Global.repo_full_name(webhook)} from config file...')
             config = Pipeline.open_project_config(webhook)
             pipeline = config.get('pipeline')
 
-        # TODO: We may want to setup a default pipeline of `deploy` or `pull` if none is specified
         if pipeline not in Global.SUPPORTED_PIPELINES:
             final_output = (
-                f'Error: Harvey could not run for `{Global.repo_full_name(webhook)}`, there was no acceptable pipeline'
+                f'Harvey could not run for `{Global.repo_full_name(webhook)}`, there was no acceptable pipeline'
                 ' specified.'
             )
+            Global.LOGGER.error(final_output)
             pipeline = Utils.kill(final_output, webhook)
 
+        pipeline_started_message = (
+            f':hammer_and_wrench: Harvey has started a `{config["pipeline"]}` pipeline for'
+            f' `{Global.repo_full_name(webhook)}`.'
+        )
         if Global.SLACK:
-            Message.send_slack_message(
-                f':hammer_and_wrench: Harvey has started a `{config["pipeline"]}` pipeline for'
-                f' `{Global.repo_full_name(webhook)}`.'
-            )
+            Message.send_slack_message(pipeline_started_message)
 
         # TODO: Rework the logs of a pipeline to be more informative and clean
         preamble = (
             f'Running Harvey v{Global.HARVEY_VERSION}\n{config["pipeline"].title()} Pipeline Started: {start_time}'
         )
         pipeline_id = f'Pipeline ID: {Global.repo_commit_id(webhook)}'
-        print(preamble)  # TODO: Replace with logging
+        Global.LOGGER.info(preamble + ' | ' + pipeline_id)
         git_message = (
             f'New commit by: {Global.repo_commit_author(webhook)}.'
             f'\nCommit made on repo: {Global.repo_full_name(webhook)}.'
         )
 
-        execution_time = f'Startup execution time: {datetime.now() - start_time}\n'
+        execution_time = f'{Global.repo_full_name(webhook)} startup execution time: {datetime.now() - start_time}'
         output = (
             f'{preamble}'
             f'\n{pipeline_id}'
@@ -62,7 +65,7 @@ class Pipeline:
             f'\n{git}'
             f'\n{execution_time}'
         )
-        print(execution_time)  # TODO: Replace with logging
+        Global.LOGGER.info(execution_time)
 
         return config, output, start_time
 
@@ -78,32 +81,28 @@ class Pipeline:
             deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)
 
             healthcheck = webhook_config.get('healthcheck')
+            healthcheck_messages = ''
 
             if healthcheck:
                 container_healthcheck_statuses = {}
                 for container in healthcheck:
                     container_healthcheck = Container.run_container_healthcheck(container)
                     container_healthcheck_statuses[container] = container_healthcheck
+                    if container_healthcheck is True:
+                        healthcheck_message = f'\n{container} Healthcheck: :white_check_mark:'
+                    else:
+                        container_healthcheck = f'\n{container} Healthcheck: :skull_and_crossbones:'
+                    healthcheck_messages += healthcheck_message
 
                 healthcheck_values = container_healthcheck_statuses.values()
                 all_healthchecks_passed = any(healthcheck_values) and list(healthcheck_values)[0] is True
-
-                if all_healthchecks_passed:
-                    healthcheck_message = 'Project Healthcheck: :white_check_mark:'
-                    pipeline_status = 'Pipeline succeeded!'
-                else:
-                    pipeline_status = 'Project Healthcheck: :skull_and_crossbones:'
-                    healthcheck_message = 'Pipeline failed!'
             else:
-                healthcheck_message = 'Project Healthcheck: :grey_question:'
-                pipeline_status = 'Pipeline status unknown due to missing healthcheck configuration.'
                 all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
             end_time = datetime.now()
-            execution_time = f'Pipeline execution time: {end_time - start_time}'
-            final_output = (
-                f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_message}\n{pipeline_status}'
-            )
+            execution_time = f'{Global.repo_full_name(webhook)} pipeline execution time: {end_time - start_time}'
+            Global.LOGGER.info(execution_time)
+            final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}'
 
             if all_healthchecks_passed or not healthcheck:
                 Utils.success(final_output, webhook)
@@ -111,7 +110,9 @@ class Pipeline:
                 Utils.kill(final_output, webhook)
         elif pipeline == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
-            final_output = f'{webhook_output}\nHarvey pulled the project successfully. :white_check_mark:'
+            pull_success_message = f'Harvey pulled {Global.repo_full_name(webhook)} successfully. :white_check_mark:'
+            Global.LOGGER.info(pull_success_message)
+            final_output = f'{webhook_output}\n{pull_success_message}'
             Utils.success(final_output, webhook)
 
     @staticmethod
@@ -133,11 +134,11 @@ class Pipeline:
             filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), 'harvey.json')
             with open(filename, 'r') as config_file:
                 config = json.loads(config_file.read())
-                print(json.dumps(config, indent=4))
+                Global.LOGGER.debug(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
-            final_output = f'Error: Harvey could not find a "harvey.json" file in {Global.repo_full_name(webhook)}.'
-            print(final_output)
+            final_output = f'Harvey could not find a "harvey.json" file in {Global.repo_full_name(webhook)}.'
+            Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
 
     def deploy(config, webhook, output):
@@ -182,13 +183,14 @@ class Pipeline:
             decoded_output = compose_output.decode('UTF-8')
             execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
             final_output = f'{decoded_output}\n{execution_time}'
-            print(final_output)  # TODO: Replace with logging
+            Global.LOGGER.info(final_output)
         except subprocess.TimeoutExpired:
-            final_output = 'Error: Harvey timed out deploying.'
-            print(final_output)  # TODO: Replace with logging
+            final_output = 'Harvey timed out deploying.'
+            Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'{output}\nError: Harvey could not finish the deploy.'
+            final_output = f'{output}Harvey could not finish the deploy.'
+            Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
 
         return final_output

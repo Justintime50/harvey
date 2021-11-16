@@ -51,7 +51,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
         _ = Pipeline.open_project_config(mock_webhook)
 
         mock_utils_kill.assert_called_once_with(
-            f'Error: Harvey could not find a "harvey.json" file in {Global.repo_full_name(mock_webhook)}.', mock_webhook
+            f'Harvey could not find a "harvey.json" file in {Global.repo_full_name(mock_webhook)}.', mock_webhook
         )
 
 

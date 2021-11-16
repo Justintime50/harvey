@@ -12,7 +12,7 @@ class Utils:
         tear down Docker stuff, and quit.
         """
         Utils.generate_pipeline_logs(final_output, webhook)
-        Global.LOGGER.info(f'{Global.repo_full_name(webhook)} pipeline failed!')
+        Global.LOGGER.warning(f'{Global.repo_full_name(webhook)} pipeline failed!')
 
         if Global.SLACK:
             Message.send_slack_message(final_output)

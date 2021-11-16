@@ -35,11 +35,11 @@ class Git:
 
             return decoded_output
         except subprocess.TimeoutExpired:
-            final_output = '\nHarvey timed out during git pull operation.'
+            final_output = 'Harvey timed out during git pull operation.'
             Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'\nHarvey could not pull {Global.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not pull {Global.repo_full_name(webhook)}.'
             Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
 
@@ -59,10 +59,10 @@ class Git:
 
             return decoded_output
         except subprocess.TimeoutExpired:
-            final_output = '\nHarvey timed out during git clone operation.'
+            final_output = 'Harvey timed out during git clone operation.'
             Global.LOGGER.warning(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'\nHarvey could not clone {Global.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not clone {Global.repo_full_name(webhook)}.'
             Global.LOGGER.warning(final_output)
             Utils.kill(final_output, webhook)
