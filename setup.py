@@ -11,7 +11,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
-    'woodchips ~= 0.1.1',
+    'woodchips == 0.2.*',
 ]
 
 DEV_REQUIREMENTS = [
@@ -45,5 +45,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['harvey-ci=harvey.app:main'],
     },
-    python_requires='>=3.7',
+    python_requires='>=3.7, <4',
 )

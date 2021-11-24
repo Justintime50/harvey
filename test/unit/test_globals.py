@@ -1,4 +1,12 @@
-from harvey.globals import Global
+import logging
+
+from harvey.globals import Global, _setup_logger
+
+
+def test_setup_logger():
+    logger = _setup_logger()
+
+    assert type(logger) == logging.Logger
 
 
 def test_repo_name(mock_webhook):

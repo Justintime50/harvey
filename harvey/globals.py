@@ -1,9 +1,29 @@
+import logging  # Used for type hinting only, logging done via `woodchips`
 import os
 
 import woodchips
 from dotenv import load_dotenv
 
 load_dotenv()  # Must remain at the top of this file
+
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+
+
+def _setup_logger() -> logging.Logger:
+    """Sets up a `woodchips` logger instance."""
+    logger = woodchips.Logger(
+        name=__name__,
+        level=LOG_LEVEL,
+    )
+    logger.log_to_console()
+
+    # TODO: We should be able to prepend every logged message with the name of the repo for easy organization and
+    # searching of log files
+    logger.log_to_file(location=os.path.expanduser('~/harvey/logs'))
+
+    logger_instance = woodchips.get(logger.logger.name)
+
+    return logger_instance
 
 
 class Global:
@@ -21,15 +41,7 @@ class Global:
         'deploy',
         'pull',
     }
-
-    # TODO: We should be able to prepend every logged message with the name of the repo for easy organization and
-    # searching of log files, this will most likely require a change on the woodchips side to allow for this config
-    LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
-    LOGGER = woodchips.setup(
-        logger_name=__name__,
-        log_location=os.path.expanduser('~/harvey/logs'),
-        log_level=LOG_LEVEL,
-    )
+    LOGGER = _setup_logger()
 
     @staticmethod
     def repo_name(webhook):
