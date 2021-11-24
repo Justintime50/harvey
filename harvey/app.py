@@ -6,7 +6,7 @@ import requests_unixsocket
 from dotenv import load_dotenv
 from flask import Flask, abort, request
 
-from harvey.globals import Global
+from harvey.globals import LOG_LEVEL, Global
 from harvey.webhooks import Webhook
 
 load_dotenv()  # Must remain at the top of this file
@@ -83,7 +83,7 @@ def retrieve_pipelines():
 def main():
     # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
-    flask_debug = Global.LOG_LEVEL == 'DEBUG'
+    flask_debug = LOG_LEVEL == 'DEBUG'
     APP.run(host=HOST, port=PORT, debug=flask_debug)
 
 
