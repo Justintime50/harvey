@@ -30,16 +30,17 @@ class Git:
                 stderr=None,
                 timeout=Global.GIT_TIMEOUT,
             )
-            print(final_output)
+            decoded_output = final_output.decode('UTF-8')
+            Global.LOGGER.debug(f'{decoded_output}')
 
-            return final_output.decode('UTF-8')
+            return decoded_output
         except subprocess.TimeoutExpired:
-            final_output = 'Error: Harvey timed out during git pull operation.'
-            print(final_output)
+            final_output = 'Harvey timed out during git pull operation.'
+            Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'\nError: Harvey could not pull {Global.repo_full_name(webhook)}.'
-            print(final_output)
+            final_output = f'Harvey could not pull {Global.repo_full_name(webhook)}.'
+            Global.LOGGER.error(final_output)
             Utils.kill(final_output, webhook)
 
     @staticmethod
@@ -53,14 +54,15 @@ class Git:
                 stderr=None,
                 timeout=Global.GIT_TIMEOUT,
             )
-            print(final_output)
+            decoded_output = final_output.decode('UTF-8')
+            Global.LOGGER.debug(decoded_output)
 
-            return final_output.decode('UTF-8')
+            return decoded_output
         except subprocess.TimeoutExpired:
-            final_output = 'Error: Harvey timed out during git clone operation.'
-            print(final_output)
+            final_output = 'Harvey timed out during git clone operation.'
+            Global.LOGGER.warning(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'\nError: Harvey could not clone {Global.repo_full_name(webhook)}.'
-            print(final_output)
+            final_output = f'Harvey could not clone {Global.repo_full_name(webhook)}.'
+            Global.LOGGER.warning(final_output)
             Utils.kill(final_output, webhook)

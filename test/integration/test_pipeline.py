@@ -1,4 +1,5 @@
 import json
+import os
 
 import requests
 
@@ -6,7 +7,8 @@ import requests
 # TODO: Make integration testing automated
 
 
-with open('examples/git_webhook.json', 'r') as file:
+mock_webhook_path = os.path.join('test', 'integration', 'mock_webhook.json')
+with open(mock_webhook_path, 'r') as file:
     data = json.load(file)
     request = requests.post(
         'http://127.0.0.1:5000/pipelines/start',
@@ -15,4 +17,5 @@ with open('examples/git_webhook.json', 'r') as file:
             'Content-Type': 'application/json',
         },
     )
+
     print(request.json())

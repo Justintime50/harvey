@@ -1,26 +1,54 @@
+import logging  # Used for type hinting only, logging done via `woodchips`
 import os
+
+import woodchips
+from dotenv import load_dotenv
+
+load_dotenv()  # Must remain at the top of this file
+
+LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
+
+
+def _setup_logger() -> logging.Logger:
+    """Sets up a `woodchips` logger instance."""
+    logger = woodchips.Logger(
+        name=__name__,
+        level=LOG_LEVEL,
+    )
+    logger.log_to_console()
+
+    # TODO: We should be able to prepend every logged message with the name of the repo for easy organization and
+    # searching of log files
+    logger.log_to_file(location=os.path.expanduser('~/harvey/logs'))
+
+    logger_instance = woodchips.get(logger.logger.name)
+
+    return logger_instance
 
 
 class Global:
     # TODO: Reconfigure all these constants and static methods below to be class variables/properties
-    DOCKER_VERSION = 'v1.41'  # Docker API version
-    # TODO: Figure out how to sync this version number with the one in `setup.py`
-    HARVEY_VERSION = '0.14.0'  # Harvey release
-    PROJECTS_PATH = 'projects'
-    PROJECTS_LOG_PATH = 'logs/projects'
-    HARVEY_LOG_PATH = 'logs/harvey'
-    DEPLOY_TIMEOUT = 1800  # 30 minutes
-    GIT_TIMEOUT = 300
-    BASE_URL = f'http+unix://%2Fvar%2Frun%2Fdocker.sock/{DOCKER_VERSION}/'
-    FILTER_WEBHOOKS = os.getenv('FILTER_WEBHOOKS', False)
     ALLOWED_BRANCHES = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
+    DEPLOY_TIMEOUT = 1800  # 30 minutes
+    GIT_TIMEOUT = 300  # 5 minutes
+    HARVEY_LOG_PATH = 'logs/harvey'
+    # TODO: Is there a way to sync this with `setup.py`? (short answer: not easily since you can't import this there)
+    HARVEY_VERSION = '0.15.0'
+    PROJECTS_LOG_PATH = 'logs/projects'
+    PROJECTS_PATH = 'projects'
     SLACK = os.getenv('SLACK')
-    SUPPORTED_PIPELINES = [
-        'pull',
-        'test',
+    SUPPORTED_PIPELINES = {
         'deploy',
-        'full',
-    ]
+        'pull',
+    }
+    LOGGER = _setup_logger()
+
+    # Emoji (used for Slack messages, set defaults if slack isn't in use)
+    # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will
+    # still show up in log files, we should be writting the fallback message to logs instead of emojis
+    WORK_EMOJI = ':hammer_and_wrench:' if SLACK else ''
+    SUCCESS_EMOJI = ':white_check_mark:' if SLACK else 'Success!'
+    FAILURE_EMOJI = ':skull_and_crossbones:' if SLACK else 'Failure!'
 
     @staticmethod
     def repo_name(webhook):
@@ -50,4 +78,4 @@ class Global:
     @staticmethod
     def repo_commit_id(webhook):
         """Return the repo's id from the webhook JSON."""
-        return webhook['commits'][0]['id']
+        return str(webhook['commits'][0]['id'])

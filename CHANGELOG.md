@@ -1,5 +1,12 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+* Added logging with configurable log level
+* Cleaned up various dead env variables and documentation
+* Various other code refactor and cleanup
+* Various bug fixes with better code coverage
+
 ## v0.15.0 (2021-11-13)
 
 * Adds the ability to pass Harvey configuration data in a `data` field in the webhook instead of the default `harvey.json` configuration file kept in the repo (either are now options)

@@ -5,6 +5,7 @@ projects/*
 !projects/.harvey
 logs
 *.json
+!mock_webhook.json
 .env
 *.egg-info
 venv

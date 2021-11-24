@@ -1,4 +1,12 @@
-from harvey.globals import Global
+import logging
+
+from harvey.globals import Global, _setup_logger
+
+
+def test_setup_logger():
+    logger = _setup_logger()
+
+    assert type(logger) == logging.Logger
 
 
 def test_repo_name(mock_webhook):
@@ -34,4 +42,4 @@ def test_repo_owner_name(mock_webhook):
 def test_repo_commit_id(mock_webhook):
     result = Global.repo_commit_id(mock_webhook)
 
-    assert result == 123456
+    assert result == '123456'
