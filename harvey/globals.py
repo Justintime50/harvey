@@ -43,6 +43,13 @@ class Global:
     }
     LOGGER = _setup_logger()
 
+    # Emoji (used for Slack messages, set defaults if slack isn't in use)
+    # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will
+    # still show up in log files, we should be writting the fallback message to logs instead of emojis
+    WORK_EMOJI = ':hammer_and_wrench:' if SLACK else ''
+    SUCCESS_EMOJI = ':white_check_mark:' if SLACK else 'Success!'
+    FAILURE_EMOJI = ':skull_and_crossbones:' if SLACK else 'Failure!'
+
     @staticmethod
     def repo_name(webhook):
         """Return the repo name from the webhook JSON."""
