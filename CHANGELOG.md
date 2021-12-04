@@ -6,6 +6,7 @@
 * Cleaned up various dead env variables and documentation
 * Various other code refactor and cleanup
 * Various bug fixes with better code coverage
+* Use new `docker compose` invocation over older `docker-compose`
 
 ## v0.15.0 (2021-11-13)
 

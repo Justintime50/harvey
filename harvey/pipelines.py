@@ -146,7 +146,7 @@ class Pipeline:
     def deploy(config, webhook, output):
         """Build Stage, used for `deploy` pipelines.
 
-        This flow doesn't use the standard Docker API and instead runs `docker-compose` commands.
+        This flow doesn't use the standard Docker API and instead runs `docker compose` commands.
         """
         start_time = datetime.now()
 
@@ -159,7 +159,8 @@ class Pipeline:
             if config.get('prod_compose'):
                 # fmt: off
                 compose_command = [
-                    'docker-compose',
+                    'docker',
+                    'compose',
                     '-f', default_compose_filepath,
                     '-f', prod_compose_filepath,
                     'up', '-d',
@@ -169,7 +170,8 @@ class Pipeline:
             else:
                 # fmt: off
                 compose_command = [
-                    'docker-compose',
+                    'docker',
+                    'compose',
                     '-f', default_compose_filepath,
                     'up', '-d',
                     '--build'
