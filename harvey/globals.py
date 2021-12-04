@@ -11,6 +11,7 @@ LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
 
 def _setup_logger() -> logging.Logger:
     """Sets up a `woodchips` logger instance."""
+    # TODO: Don't return a logger from this function, use `woodchips.get()` to retrieve the logger where needed
     logger = woodchips.Logger(
         name=__name__,
         level=LOG_LEVEL,
@@ -21,7 +22,7 @@ def _setup_logger() -> logging.Logger:
     # searching of log files
     logger.log_to_file(location=os.path.expanduser('~/harvey/logs'))
 
-    logger_instance = woodchips.get(logger.logger.name)
+    logger_instance = woodchips.get(logger._logger.name)
 
     return logger_instance
 
