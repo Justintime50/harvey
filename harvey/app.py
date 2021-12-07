@@ -2,11 +2,12 @@ import json
 import os
 import time
 
-import requests_unixsocket
+import requests_unixsocket  # type: ignore
 from dotenv import load_dotenv
 from flask import Flask, abort, request
 
-from harvey.globals import LOG_LEVEL, Global
+from harvey.globals import Global
+from harvey.utils import LOG_LEVEL, setup_logger
 from harvey.webhooks import Webhook
 
 load_dotenv()  # Must remain at the top of this file
@@ -46,7 +47,7 @@ def start_pipeline():
 
 
 @APP.route('/pipelines/<pipeline_id>', methods=['GET'])
-def retrieve_pipeline(pipeline_id):
+def retrieve_pipeline(pipeline_id: str):
     """Retrieve a pipeline's logs by ID."""
     # TODO: Add authentication to this endpoint
 
@@ -84,6 +85,7 @@ def main():
     # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
     flask_debug = LOG_LEVEL == 'DEBUG'
+    setup_logger()
     APP.run(host=HOST, port=PORT, debug=flask_debug)
 
 

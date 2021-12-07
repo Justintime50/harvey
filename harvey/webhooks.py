@@ -2,22 +2,29 @@ import hashlib
 import hmac
 import os
 from threading import Thread
+from typing import Any, Dict, Tuple
+
+import requests
+import woodchips
 
 from harvey.globals import Global
 from harvey.pipelines import Pipeline
+from harvey.utils import LOGGER_NAME
 
-WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET')
+WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET', '')
 
 
 class Webhook:
     @staticmethod
-    def parse_webhook(request):
+    def parse_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:
         """Parse a webhook's data. Return success or error status.
 
         1. Check if the payload is valid JSON
         2. Check if the branch is in the allowed set of branches to run a pipeline from
         3. Check if the webhook secret matches (optional)
         """
+        logger = woodchips.get(LOGGER_NAME)
+
         success = False
         message = 'Server-side error.'
         status_code = 500
@@ -26,7 +33,7 @@ class Webhook:
         signature = request.headers.get('X-Hub-Signature')
 
         if payload_json:
-            Global.LOGGER.debug(f'{Global.repo_full_name(payload_json)} webhook: {payload_json}')
+            logger.debug(f'{Global.repo_full_name(payload_json)} webhook: {payload_json}')
 
             if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
@@ -46,17 +53,17 @@ class Webhook:
                 status_code = 200
                 success = True
 
-                Global.LOGGER.info(message)
+                logger.info(message)
             else:
                 message = 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.'
                 status_code = 422
 
-                Global.LOGGER.debug(message)
+                logger.debug(message)
         else:
             message = 'Malformed or missing JSON data in webhook.'
             status_code = 422
 
-            Global.LOGGER.debug(message)
+            logger.debug(message)
 
         response = {
             'success': success,
@@ -66,8 +73,10 @@ class Webhook:
         return response
 
     @staticmethod
-    def validate_webhook_secret(data, signature):
+    def validate_webhook_secret(data: Any, signature: str) -> bool:  # TODO: Lock down the type of the `data` field
         """Decode and validate a webhook's secret key."""
+        logger = woodchips.get(LOGGER_NAME)
+
         secret_validated = False
 
         if signature:
@@ -78,6 +87,6 @@ class Webhook:
             if hmac.compare_digest(digest, signature):
                 secret_validated = True
 
-        Global.LOGGER.debug(f'{signature} webhook validated: {secret_validated}')
+        logger.debug(f'{signature} webhook validated: {secret_validated}')
 
         return secret_validated

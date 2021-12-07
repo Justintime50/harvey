@@ -1,30 +1,9 @@
-import logging  # Used for type hinting only, logging done via `woodchips`
 import os
+from typing import Any, Dict
 
-import woodchips
 from dotenv import load_dotenv
 
 load_dotenv()  # Must remain at the top of this file
-
-LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
-
-
-def _setup_logger() -> logging.Logger:
-    """Sets up a `woodchips` logger instance."""
-    # TODO: Don't return a logger from this function, use `woodchips.get()` to retrieve the logger where needed
-    logger = woodchips.Logger(
-        name=__name__,
-        level=LOG_LEVEL,
-    )
-    logger.log_to_console()
-
-    # TODO: We should be able to prepend every logged message with the name of the repo for easy organization and
-    # searching of log files
-    logger.log_to_file(location=os.path.expanduser('~/harvey/logs'))
-
-    logger_instance = woodchips.get(logger._logger.name)
-
-    return logger_instance
 
 
 class Global:
@@ -42,7 +21,6 @@ class Global:
         'deploy',
         'pull',
     }
-    LOGGER = _setup_logger()
 
     # Emoji (used for Slack messages, set defaults if slack isn't in use)
     # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will
@@ -52,31 +30,31 @@ class Global:
     FAILURE_EMOJI = ':skull_and_crossbones:' if SLACK else 'Failure!'
 
     @staticmethod
-    def repo_name(webhook):
+    def repo_name(webhook: Dict[str, Any]) -> str:
         """Return the repo name from the webhook JSON."""
         return webhook['repository']['name'].lower()
 
     @staticmethod
-    def repo_full_name(webhook):
+    def repo_full_name(webhook: Dict[str, Any]) -> str:
         """Return the repo's full name from the webhook JSON."""
         return webhook['repository']['full_name'].lower()
 
     @staticmethod
-    def repo_commit_author(webhook):
+    def repo_commit_author(webhook: Dict[str, Any]) -> str:
         """Return the repo's commit author name from the webhook JSON."""
         return webhook['commits'][0]['author']['name']
 
     @staticmethod
-    def repo_url(webhook):
+    def repo_url(webhook: Dict[str, Any]) -> str:
         """Return the repo's URL from the webhook JSON."""
         return webhook['repository']['ssh_url']  # Use SSH URL so private repos can be cloned/pulled
 
     @staticmethod
-    def repo_owner_name(webhook):
+    def repo_owner_name(webhook: Dict[str, Any]) -> str:
         """Return the repo's owner's name from the webhook JSON."""
         return webhook['repository']['owner']['name'].lower()
 
     @staticmethod
-    def repo_commit_id(webhook):
+    def repo_commit_id(webhook: Dict[str, Any]) -> str:
         """Return the repo's id from the webhook JSON."""
         return str(webhook['commits'][0]['id'])

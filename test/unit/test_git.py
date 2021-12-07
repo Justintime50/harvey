@@ -20,55 +20,65 @@ def test_update_git_repo_path_does_not_exist(mock_clone_repo, mock_path_exists, 
     mock_clone_repo.assert_called_once_with(mock_project_path, mock_webhook)
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.debug')
 @patch('subprocess.check_output')
 def test_clone_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhook):
     # TODO: Mock the subprocess better to ensure it does what it's supposed to
     Git.clone_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_subprocess.assert_called_once()
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.error')
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd=subprocess.check_output, timeout=0.1))
+@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_clone_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_logger, mock_project_path, mock_webhook):
     Git.clone_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_utils_kill.assert_called_once()
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.error')
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))
+@patch(
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+)
 def test_clone_repo_process_error(mock_subprocess, mock_utils_kill, mock_logger, mock_project_path, mock_webhook):
     Git.clone_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_utils_kill.assert_called_once()
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.debug')
 @patch('subprocess.check_output')
 def test_pull_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhook):
     # TODO: Mock the subprocess better to ensure it does what it's supposed to
     Git.pull_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_subprocess.assert_called_once()
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.error')
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd=subprocess.check_output, timeout=0.1))
+@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_pull_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_logger, mock_project_path, mock_webhook):
     Git.pull_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_utils_kill.assert_called_once()
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.error')
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))
+@patch(
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+)
 def test_pull_repo_process_error(mock_subprocess, mock_utils_kill, mock_logger, mock_project_path, mock_webhook):
     Git.pull_repo(mock_project_path, mock_webhook)
 
+    mock_logger.assert_called()
     mock_utils_kill.assert_called_once()

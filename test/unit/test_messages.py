@@ -7,16 +7,17 @@ from harvey.messages import Message
 
 @patch('harvey.messages.SLACK_CHANNEL', 'mock-channel')
 @patch('harvey.messages.SLACK_BOT_TOKEN', '123')
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.debug')
 @patch('slack.WebClient.chat_postMessage')
 def test_send_slack_message_success(mock_slack, mock_logger):
     message = 'mock message'
     Message.send_slack_message(message)
 
+    mock_logger.assert_called()
     mock_slack.assert_called_once_with(channel='mock-channel', text=message)
 
 
-@patch('harvey.globals.Global.LOGGER')
+@patch('logging.Logger.error')
 @patch('sys.exit')
 @patch(
     'slack.WebClient.chat_postMessage',
@@ -32,4 +33,5 @@ def test_send_slack_message_exception(mock_slack, mock_sys_exit, mock_logger):
     message = 'mock message'
     Message.send_slack_message(message)
 
+    mock_logger.assert_called()
     mock_sys_exit.assert_called_once()

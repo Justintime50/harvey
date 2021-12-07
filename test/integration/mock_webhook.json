@@ -20,9 +20,7 @@
   "data": {
     "pipeline": "deploy",
     "healthcheck": [
-      "justinpaulhammond-justinpaulhammond-1",
-      "justinpaulhammond-justinpaulhammond-2"
-    ],
-    "prod_compose": true
+      "justinpaulhammond-justinpaulhammond-1"
+    ]
   }
 }

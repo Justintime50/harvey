@@ -93,7 +93,7 @@ def test_deploy_compose_stage_success(mock_subprocess, mock_healthcheck, mock_we
 
 
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd=subprocess.check_output, timeout=0.1))
+@patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_deploy_compose_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
     _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 
@@ -101,7 +101,9 @@ def test_deploy_compose_stage_subprocess_timeout(mock_subprocess, mock_utils_kil
 
 
 @patch('harvey.utils.Utils.kill')
-@patch('subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd=subprocess.check_output))
+@patch(
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+)
 def test_deploy_compose_stage_process_error(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):  # noqa
     _ = Pipeline.deploy(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
 
