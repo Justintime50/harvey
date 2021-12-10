@@ -7,6 +7,7 @@
 * Various code refactor including bug fixes and optimizations, and improved code coverage
     * Cleaned up various dead env variables and documentation
 * No longer log progress bars of Docker image builds
+* Gracefully handles not being able to find a container or list of containers
 
 ## v0.15.0 (2021-11-13)
 

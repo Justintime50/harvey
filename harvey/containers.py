@@ -1,10 +1,10 @@
 import time
-from typing import List
+from typing import Any, Dict, List, Optional
 
 import docker  # type: ignore
 import woodchips
 
-from harvey.utils import LOGGER_NAME
+from harvey.utils import LOGGER_NAME, Utils
 
 
 class Container:
@@ -23,18 +23,22 @@ class Container:
         return client
 
     @staticmethod
-    def get_container(container_id: str):
+    def get_container(client, container_id: str) -> Optional[Any]:
         """Get the details of a Docker container."""
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.debug(f'Getting details from {container_id}')
-        client = Container.create_client()
-        container = client.containers.get(container_id)
+        logger.debug(f'Getting details from {container_id}...')
+
+        try:
+            container = client.containers.get(container_id)
+        except (docker.errors.NotFound, docker.errors.APIError):
+            # If the Docker API errors or the image doesn't exist, fail gracefully by returning `None`
+            container = None
 
         return container
 
     @staticmethod
-    def list_containers() -> List:
+    def list_containers(client) -> List[Any]:
         """Return a list of all Docker containers.
 
         To grab details of a single record, use something like `container.attrs['Name']`.
@@ -42,13 +46,17 @@ class Container:
         logger = woodchips.get(LOGGER_NAME)
 
         logger.debug('Listing containers...')
-        client = Container.create_client()
-        containers = client.containers.list(limit=100)  # TODO: Allow this to be configurable
+
+        try:
+            containers = client.containers.list(limit=100)  # TODO: Allow this to be configurable
+        except docker.errors.APIError:
+            # If the Docker API errors, fail gracefully with an empty list
+            containers = []
 
         return containers
 
     @staticmethod
-    def run_container_healthcheck(container_name: str, retry_attempt: int = 1) -> bool:
+    def run_container_healthcheck(docker_client, container_name: str, webhook: Dict[str, Any]) -> bool:
         """Run a healthcheck to ensure the container is running and not in a transitory state.
         Not to be confused with the "Docker Healthcheck" functionality which is different.
 
@@ -57,18 +65,24 @@ class Container:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.info(f'Running healthcheck attempt #{retry_attempt} for {container_name}...')
         container_healthy = False
         max_retries = 5
-        container = Container.get_container(container_name)
+        retry_delay_seconds = 3
 
-        if container.status.lower() == 'running':
-            container_healthy = True
-            logger.info(f'{container_name} healthcheck passed!')
-        elif retry_attempt < max_retries:
-            logger.warning(f'{container_name} healthcheck failed, retrying...')
-            retry_attempt += 1
-            time.sleep(3)
-            Container.run_container_healthcheck(container_name, retry_attempt)
+        for attempt in range(1, max_retries + 1):
+            logger.info(f'Running healthcheck attempt #{attempt} for {container_name}...')
+
+            container = Container.get_container(docker_client, container_name)
+
+            if container is None:
+                Utils.kill(f'Harvey could not get container details for {container_name}.', webhook)
+                break
+            elif container.status.lower() == 'running':
+                container_healthy = True
+                logger.info(f'{container_name} healthcheck passed!')
+                break
+            else:
+                logger.warning(f'{container_name} healthcheck failed, retrying...')
+                time.sleep(retry_delay_seconds)
 
         return container_healthy

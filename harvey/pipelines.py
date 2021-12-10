@@ -89,11 +89,12 @@ class Pipeline:
 
             healthcheck = webhook_config.get('healthcheck')
             healthcheck_messages = ''
+            docker_client = Container.create_client()
 
             if healthcheck:
                 container_healthcheck_statuses = {}
                 for container in healthcheck:
-                    container_healthcheck = Container.run_container_healthcheck(container)
+                    container_healthcheck = Container.run_container_healthcheck(docker_client, container, webhook)
                     container_healthcheck_statuses[container] = container_healthcheck
                     if container_healthcheck is True:
                         healthcheck_message = f'\n{container} Healthcheck: {Global.SUCCESS_EMOJI}'
