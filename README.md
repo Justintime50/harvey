@@ -34,8 +34,8 @@ Because of the way Harvey was built with Docker (using sockets) this project tha
 ```bash
 # Install Harvey via GitHub
 git clone https://github.com/Justintime50/harvey.git
-make install
 cp .env-example .env
+make install
 ```
 
 1. Install Docker & login

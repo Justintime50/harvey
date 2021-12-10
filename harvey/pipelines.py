@@ -177,6 +177,7 @@ class Pipeline:
                     '-f', prod_compose_filepath,
                     'up', '-d',
                     '--build',
+                    '--quiet-pull',
                 ]
                 # fmt: on
             else:
@@ -186,7 +187,8 @@ class Pipeline:
                     'compose',
                     '-f', default_compose_filepath,
                     'up', '-d',
-                    '--build'
+                    '--build',
+                    '--quiet-pull',
                 ]
                 # fmt: on
 

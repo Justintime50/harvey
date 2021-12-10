@@ -6,6 +6,7 @@
 * Use new `docker compose` invocation over older `docker-compose`
 * Various code refactor including bug fixes and optimizations, and improved code coverage
     * Cleaned up various dead env variables and documentation
+* No longer log progress bars of Docker image builds
 
 ## v0.15.0 (2021-11-13)
 
