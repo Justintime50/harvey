@@ -157,7 +157,7 @@ class Pipeline:
     def deploy(config: Dict[str, Any], webhook: Dict[str, Any], output: str) -> str:
         """Build Stage, used for `deploy` pipelines.
 
-        This flow doesn't use the standard Docker API and instead runs `docker compose` commands.
+        This flow doesn't use the Docker API but instead runs `docker compose` commands.
         """
         logger = woodchips.get(LOGGER_NAME)
 
