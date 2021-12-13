@@ -1,6 +1,6 @@
 import os
 import subprocess
-from typing import Any, Dict
+from typing import Any, Dict, List
 
 import woodchips
 
@@ -17,37 +17,9 @@ class Git:
         if os.path.exists(project_path):
             output = Git.pull_repo(project_path, webhook)
         else:
-            # TODO: Fail fast if a repo doesn't exist
             output = Git.clone_repo(project_path, webhook)
 
         return output
-
-    @staticmethod
-    def pull_repo(project_path: str, webhook: Dict[str, Any]) -> str:
-        """Pull updates for a repo in the Harvey projects folder."""
-        logger = woodchips.get(LOGGER_NAME)
-        decoded_output = ''
-
-        try:
-            command = ['git', '-C', project_path, 'pull', '--rebase']
-            command_output = subprocess.check_output(
-                command,
-                stdin=None,
-                stderr=None,
-                timeout=Global.GIT_TIMEOUT,
-            )
-            decoded_output = command_output.decode()
-            logger.debug(f'{decoded_output}')
-        except subprocess.TimeoutExpired:
-            final_output = 'Harvey timed out during git pull operation.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
-        except subprocess.CalledProcessError:
-            final_output = f'Harvey could not pull {Global.repo_full_name(webhook)}.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
-
-        return decoded_output
 
     @staticmethod
     def clone_repo(project_path: str, webhook: Dict[str, Any]) -> str:
@@ -56,13 +28,8 @@ class Git:
         decoded_output = ''
 
         try:
-            command = ['git', 'clone', '--depth=10', Global.repo_url(webhook), project_path]
-            command_output = subprocess.check_output(
-                command,
-                stdin=None,
-                stderr=None,
-                timeout=Global.GIT_TIMEOUT,
-            )
+            command = ['git', 'clone', '--depth=1', Global.repo_url(webhook), project_path]
+            command_output = Git._git_subprocess(command)
             decoded_output = command_output.decode()
             logger.debug(decoded_output)
         except subprocess.TimeoutExpired:
@@ -75,3 +42,52 @@ class Git:
             Utils.kill(final_output, webhook)
 
         return decoded_output
+
+    @staticmethod
+    def pull_repo(project_path: str, webhook: Dict[str, Any], pull_attempt: int = 1) -> str:
+        """Pull updates for a repo in the Harvey projects folder."""
+        logger = woodchips.get(LOGGER_NAME)
+        decoded_output = ''
+
+        try:
+            command = ['git', '-C', project_path, 'pull', '--rebase']
+            command_output = Git._git_subprocess(command)
+            decoded_output = command_output.decode()
+            logger.debug(f'{decoded_output}')
+        except subprocess.TimeoutExpired:
+            final_output = 'Harvey timed out during git pull operation.'
+            logger.error(final_output)
+            Utils.kill(final_output, webhook)
+        except subprocess.CalledProcessError:
+            # The biggest offender of this action failing is local, uncommitted changes,
+            # try stashing and retry again before failing.
+            logger.error(f'Harvey could not pull {Global.repo_full_name(webhook)}.')
+            logger.info(f'Attempting to stash {Global.repo_full_name(webhook)} before pulling again...')
+
+            try:
+                command = ['git', '-C', project_path, 'stash']
+                command_output = Git._git_subprocess(command)
+                decoded_output = command_output.decode()
+                logger.debug(f'{decoded_output}')
+            except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
+                final_output = f'Harvey could not stash {Global.repo_full_name(webhook)}.'
+                logger.error(final_output)
+                Utils.kill(final_output, webhook)
+
+            if pull_attempt == 1:
+                pull_attempt += 1
+                decoded_output = Git.pull_repo(project_path, webhook, pull_attempt)
+
+        return decoded_output
+
+    @staticmethod
+    def _git_subprocess(command: List[str]) -> str:
+        """Runs a git command via subprocess."""
+        command_output = subprocess.check_output(
+            command,
+            stdin=None,
+            stderr=None,
+            timeout=Global.GIT_TIMEOUT,
+        )
+
+        return command_output

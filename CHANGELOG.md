@@ -8,6 +8,8 @@
     * Cleaned up various dead env variables and documentation
 * No longer log progress bars of Docker image builds
 * Gracefully handles not being able to find a container or list of containers
+* Shallow clone repos to 1 commit instead of 10
+* Retry pipelines that fail due to local, uncommitted changes present when pulling the repo (closes #38)
 
 ## v0.15.0 (2021-11-13)
 
