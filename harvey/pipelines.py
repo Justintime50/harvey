@@ -164,35 +164,60 @@ class Pipeline:
         start_time = datetime.now()
 
         repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
-        # TODO: This is sad for `docker-compose.yaml` files containing an "a", allow for both
-        default_compose_filepath = os.path.join(repo_path, 'docker-compose.yml')
-        prod_compose_filepath = os.path.join(repo_path, 'docker-compose-prod.yml')
+
+        docker_compose_yml = 'docker-compose.yml'
+        docker_compose_yaml = 'docker-compose.yaml'
+        docker_compose_prod_yml = 'docker-compose-prod.yml'
+        docker_compose_prod_yaml = 'docker-compose-prod.yaml'
+
+        # Setup the `docker-compose.yml` file for all deployments
+        if os.path.exists(os.path.join(repo_path, docker_compose_yml)):
+            default_compose_filepath = os.path.join(repo_path, docker_compose_yml)
+        elif os.path.exists(os.path.join(repo_path, docker_compose_yaml)):
+            default_compose_filepath = os.path.join(repo_path, docker_compose_yaml)
+        else:
+            final_output = f'Harvey could not find a "docker-compose.yml" file in {Global.repo_full_name(webhook)}.'
+            logger.error(final_output)
+            Utils.kill(final_output, webhook)
+
+        if config.get('prod_compose'):
+            # If this is a prod deployment, setup the `docker-compose-prod.yml` file
+            # in addition to the base `docker-compose.yml` file
+            if os.path.exists(os.path.join(repo_path, docker_compose_prod_yml)):
+                prod_compose_filepath = os.path.join(repo_path, docker_compose_prod_yml)
+            elif os.path.exists(os.path.join(repo_path, docker_compose_prod_yaml)):
+                prod_compose_filepath = os.path.join(repo_path, docker_compose_prod_yaml)
+            else:
+                final_output = (
+                    f'Harvey could not find a "docker-compose-prod.yml" file in {Global.repo_full_name(webhook)}.'
+                )
+                logger.error(final_output)
+                Utils.kill(final_output, webhook)
+
+            # fmt: off
+            compose_command = [
+                'docker',
+                'compose',
+                '-f', default_compose_filepath,
+                '-f', prod_compose_filepath,
+                'up', '-d',
+                '--build',
+                '--quiet-pull',
+            ]
+            # fmt: on
+        else:
+            # fmt: off
+            compose_command = [
+                'docker',
+                'compose',
+                '-f', default_compose_filepath,
+                'up', '-d',
+                '--build',
+                '--quiet-pull',
+            ]
+            # fmt: on
 
         try:
-            if config.get('prod_compose'):
-                # fmt: off
-                compose_command = [
-                    'docker',
-                    'compose',
-                    '-f', default_compose_filepath,
-                    '-f', prod_compose_filepath,
-                    'up', '-d',
-                    '--build',
-                    '--quiet-pull',
-                ]
-                # fmt: on
-            else:
-                # fmt: off
-                compose_command = [
-                    'docker',
-                    'compose',
-                    '-f', default_compose_filepath,
-                    'up', '-d',
-                    '--build',
-                    '--quiet-pull',
-                ]
-                # fmt: on
-
             compose_output = subprocess.check_output(
                 compose_command,
                 stdin=None,
@@ -208,7 +233,7 @@ class Pipeline:
             logger.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'{output}Harvey could not finish the deploy.'
+            final_output = f'{output}\nHarvey could not finish the deploy.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 

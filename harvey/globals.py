@@ -11,11 +11,11 @@ class Global:
     ALLOWED_BRANCHES = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
     DEPLOY_TIMEOUT = 1800  # 30 minutes
     GIT_TIMEOUT = 300  # 5 minutes
-    HARVEY_LOG_PATH = 'logs/harvey'
+    HARVEY_LOG_PATH = os.path.join('logs', 'harvey')
     # TODO: Is there a way to sync this with `setup.py`? (short answer: not easily since you can't import this there)
     HARVEY_VERSION = '0.15.0'
-    PROJECTS_LOG_PATH = 'logs/projects'
-    PROJECTS_PATH = 'projects'
+    PROJECTS_LOG_PATH = os.path.expanduser('~/harvey/project_logs')
+    PROJECTS_PATH = os.path.expanduser('~/harvey/projects')
     SLACK = os.getenv('SLACK')
     SUPPORTED_PIPELINES = {
         'deploy',

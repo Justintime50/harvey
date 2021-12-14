@@ -107,10 +107,10 @@ Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook fro
     "name": "justinpaulhammond",
     "full_name": "Justintime50/justinpaulhammond",
     "url": "https://github.com/Justintime50/justinpaulhammond",
-    "ssh_url": "git@github.com:Justintime50/justinpaulhammond.git"
-  },
-  "owner": {
-    "name": "Justintime50"
+    "ssh_url": "git@github.com:Justintime50/justinpaulhammond.git",
+    "owner": {
+      "name": "Justintime50"
+    }
   },
   "commits": [
     {
@@ -124,7 +124,6 @@ Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook fro
     "pipeline": "deploy"
   }
 }
-
 ```
 
 ### App Configuration
@@ -155,8 +154,8 @@ venv/bin/python examples/examples.py
 # Retrieve a list of pipelines
 curl -X GET http://127.0.0.1:5000/pipelines
 
-# Retrieve the pipeline output from Harvey using a commit ID.
-curl -X GET http://127.0.0.1:5000/pipeline/f599cde2f2a0ad562bb7982328fe0aeee9d22b1c
+# Retrieve a pipeline log from Harvey using the full repo name
+curl -X GET http://127.0.0.1:5000/pipelines/justintime50/justinpaulhammond
 ```
 
 ## Development
