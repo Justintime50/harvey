@@ -86,7 +86,7 @@ def test_run_pipeline_deploy(
 @patch('os.path.exists', return_value=True)
 @patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
 @patch('subprocess.check_output')
-def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_webhook):
+def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exists, mock_webhook):
     # TODO: Mock the subprocess better to ensure it does what it's supposed to
     _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
@@ -96,7 +96,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_webhook):
 @patch('os.path.exists', return_value=True)
 @patch('harvey.utils.Utils.kill')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
-def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_webhook):
+def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):
     _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_utils_kill.assert_called_once()
@@ -107,7 +107,7 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )
-def test_deploy_stage_process_error(mock_subprocess, mock_utils_kill, mock_webhook):  # noqa
+def test_deploy_stage_process_error(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):  # noqa
     _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_utils_kill.assert_called_once()
@@ -116,7 +116,7 @@ def test_deploy_stage_process_error(mock_subprocess, mock_utils_kill, mock_webho
 @patch('os.path.exists', return_value=True)
 @patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
 @patch('subprocess.check_output')
-def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mock_webhook):
+def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mock_path_exists, mock_webhook):
     """This test simulates using the `prod_compose` flag and succeeding."""
     # TODO: Mock the subprocess better to ensure it does what it's supposed to
     config = mock_config('deploy', prod_compose=True)
