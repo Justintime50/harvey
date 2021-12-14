@@ -74,6 +74,7 @@ class Git:
                 logger.error(final_output)
                 Utils.kill(final_output, webhook)
 
+            # Recursively call this function again so we can try pulling after a stash when we fail the first time
             if pull_attempt == 1:
                 pull_attempt += 1
                 decoded_output = Git.pull_repo(project_path, webhook, pull_attempt)
@@ -81,7 +82,7 @@ class Git:
         return decoded_output
 
     @staticmethod
-    def _git_subprocess(command: List[str]) -> str:
+    def _git_subprocess(command: List[str]) -> bytes:
         """Runs a git command via subprocess."""
         command_output = subprocess.check_output(
             command,
