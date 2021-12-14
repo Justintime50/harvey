@@ -233,7 +233,7 @@ class Pipeline:
             logger.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            final_output = f'{output}Harvey could not finish the deploy.'
+            final_output = f'{output}\nHarvey could not finish the deploy.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 
