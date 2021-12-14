@@ -154,8 +154,8 @@ venv/bin/python examples/examples.py
 # Retrieve a list of pipelines
 curl -X GET http://127.0.0.1:5000/pipelines
 
-# Retrieve a pipeline log from Harvey using the full repo name
-curl -X GET http://127.0.0.1:5000/pipelines/justintime50/justinpaulhammond
+# Retrieve a pipeline from Harvey using the full repo name
+curl -X GET http://127.0.0.1:5000/pipelines/justintime50-justinpaulhammond
 ```
 
 ## Development
