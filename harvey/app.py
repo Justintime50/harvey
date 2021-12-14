@@ -86,6 +86,9 @@ def retrieve_pipelines():
 
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
         for filename in files:
+            # Skip the macOS meta directory file
+            if filename == '.DS_Store':
+                continue
             full_file_path = os.path.join(root, filename)
             last_run = datetime.datetime.strptime(time.ctime(os.path.getmtime(full_file_path)), '%c')
             log_file = filename.split('.')[0]

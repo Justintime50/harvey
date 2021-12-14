@@ -1,3 +1,4 @@
+import os
 import subprocess
 from unittest.mock import patch
 
@@ -9,7 +10,7 @@ from harvey.git import Git
 def test_update_git_repo_path_exists(mock_pull_repo, mock_path_exists, mock_project_path, mock_webhook):  # noqa
     Git.update_git_repo(mock_webhook)
 
-    mock_pull_repo.assert_called_once_with(mock_project_path, mock_webhook)
+    mock_pull_repo.assert_called_once_with(os.path.expanduser(os.path.join('~', mock_project_path)), mock_webhook)
 
 
 @patch('os.path.exists', return_value=False)
@@ -17,7 +18,7 @@ def test_update_git_repo_path_exists(mock_pull_repo, mock_path_exists, mock_proj
 def test_update_git_repo_path_does_not_exist(mock_clone_repo, mock_path_exists, mock_project_path, mock_webhook):
     Git.update_git_repo(mock_webhook)
 
-    mock_clone_repo.assert_called_once_with(mock_project_path, mock_webhook)
+    mock_clone_repo.assert_called_once_with(os.path.expanduser(os.path.join('~', mock_project_path)), mock_webhook)
 
 
 @patch('logging.Logger.debug')
