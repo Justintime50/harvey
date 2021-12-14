@@ -10,6 +10,12 @@
 * Gracefully handles not being able to find a container or list of containers
 * Shallow clone repos to 1 commit instead of 10
 * Retry pipelines that fail due to local, uncommitted changes present when pulling the repo (closes #38)
+* Now saves projects to `~/harvey/projects` instead of locally to `harvey/projects`
+* Now saves project_logs to `~/harvey/project_logs` instead of locally to `harvey/logs`
+* Adds a check to ensure there is a `docker-compose.yml` file present
+    * Now supports yaml files ending in both `yml` or `yaml`
+* Project logs are now overwritten on each deployment so there is only one log file for each project. This will conserve space as well as reduce complexity of the project when retrieving pipelines via the API
+* Overhauled the response of the `pipelines` endpoint to include a `id`, `updated_at`, and `status` key for each record
 
 ## v0.15.0 (2021-11-13)
 

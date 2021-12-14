@@ -1,4 +1,4 @@
-import json
+import datetime
 import os
 import time
 
@@ -48,37 +48,64 @@ def start_pipeline():
 
 @APP.route('/pipelines/<pipeline_id>', methods=['GET'])
 def retrieve_pipeline(pipeline_id: str):
-    """Retrieve a pipeline's logs by ID."""
-    # TODO: Add authentication to this endpoint
+    """Retrieve a pipeline's logs by ID.
 
-    # TODO: This is a hacky temporary solution until we can
-    # store this data in a database and is not meant to remain
-    # as a long-term solution
+    A `pipeline_id` will be `username-reponame` as they appear on GitHub.
+    """
     filename = f'{pipeline_id}.log'
-    for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH):
-        if filename in files:
-            with open(os.path.join(root, filename), 'r') as output:
-                response = output.read()
+    project_log_path = os.path.join(Global.PROJECTS_LOG_PATH, filename)
+
+    try:
+        with open(project_log_path, 'r') as output:
+            project_log = output.read()
+
+            last_run = datetime.datetime.strptime(time.ctime(os.path.getmtime(project_log_path)), '%c')
+            status = (
+                'Success' if 'success' in project_log.lower() or 'succeeded' in project_log.lower() else 'Failure'
+            )  # Naively check the logs for an indicator of the status being success
+
+            response = {
+                'project': pipeline_id,
+                'last_run': f'{last_run}',
+                'status': status,
+                'project_log': project_log,
+            }
+
             return response
-    return abort(404)
+    except Exception:
+        return abort(404)
 
 
 @APP.route('/pipelines', methods=['GET'])
 def retrieve_pipelines():
-    """Retrieve a list of pipelines."""
-    # TODO: Add authentication to this endpoint
+    """Retrieve a list of pipelines.
 
-    # TODO: This is a hacky temporary solution until we can
-    # store this data in a database and is not meant to remain
-    # as a long-term solution
-    pipelines = {
-        'pipelines': [],
-    }
+    The `project` values will be `username-reponame` as they appear on GitHub.
+    """
+    pipelines = {}
+
     for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
         for filename in files:
-            timestamp = time.ctime(os.path.getmtime(os.path.join(root, filename)))
-            pipelines['pipelines'].append(f'{timestamp}: {os.path.join(root, filename)}')
-    return json.dumps(pipelines, indent=4)
+            full_file_path = os.path.join(root, filename)
+            last_run = datetime.datetime.strptime(time.ctime(os.path.getmtime(full_file_path)), '%c')
+            log_file = filename.split('.')[0]
+
+            with open(full_file_path, 'r') as log_file_contents:
+                log_file_data = log_file_contents.read()
+
+                status = (
+                    'Success'
+                    if 'success' in log_file_data.lower() or 'succeeded' in log_file_data.lower()
+                    else 'Failure'
+                )  # Naively check the logs for an indicator of the status being success
+
+            pipelines[log_file] = {
+                'last_run': f'{last_run}',
+                'status': status,
+                'pipeline_log': '...',  # Retrieve a single record to get the pipeline_log
+            }
+
+    return pipelines
 
 
 def main():

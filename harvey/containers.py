@@ -10,15 +10,11 @@ from harvey.utils import LOGGER_NAME, Utils
 class Container:
     @staticmethod
     def create_client():
-        """Creates a Docker client to use for connections.
-
-        TODO: Be aware that invoking this multiple times for different processes will open multiple
-        connections at once, there is probably some optimizations we can/should make with this.
-        """
+        """Creates a Docker client to use for connections."""
         logger = woodchips.get(LOGGER_NAME)
 
         logger.debug('Setting up Docker client...')
-        client = docker.from_env(timeout=30)  # TODO: Allow this to be configurable
+        client = docker.from_env(timeout=30)
 
         return client
 
@@ -48,7 +44,7 @@ class Container:
         logger.debug('Listing containers...')
 
         try:
-            containers = client.containers.list(limit=100)  # TODO: Allow this to be configurable
+            containers = client.containers.list(limit=100)
         except docker.errors.APIError:
             # If the Docker API errors, fail gracefully with an empty list
             containers = []

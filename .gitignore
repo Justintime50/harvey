@@ -1,9 +1,5 @@
 __pycache__
 .DS_Store
-projects/*
-!projects/Dockerfile
-!projects/.harvey
-logs
 *.json
 !mock_webhook.json
 .env
