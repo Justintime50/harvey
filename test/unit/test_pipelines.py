@@ -1,5 +1,5 @@
+import datetime
 import subprocess
-from datetime import datetime
 from test.unit.conftest import mock_config  # Remove once fixtures are fixed
 from unittest.mock import mock_open, patch
 
@@ -7,7 +7,7 @@ from harvey.globals import Global
 from harvey.pipelines import Pipeline
 
 MOCK_OUTPUT = 'mock output'
-MOCK_TIME = datetime.now()
+MOCK_TIME = datetime.datetime.utcnow()
 
 
 @patch('harvey.globals.Global.SLACK', True)

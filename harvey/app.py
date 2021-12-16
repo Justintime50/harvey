@@ -1,10 +1,9 @@
-import datetime
 import os
-import time
 
 import requests_unixsocket  # type: ignore
 from dotenv import load_dotenv
 from flask import Flask, abort, request
+from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.globals import Global
 from harvey.utils import LOG_LEVEL, setup_logger
@@ -50,63 +49,37 @@ def start_pipeline():
 def retrieve_pipeline(pipeline_id: str):
     """Retrieve a pipeline's logs by ID.
 
-    A `pipeline_id` will be `username-reponame` as they appear on GitHub.
+    A `pipeline_id` will be `username-repo_name-commit_id`.
     """
-    filename = f'{pipeline_id}.log'
-    project_log_path = os.path.join(Global.PROJECTS_LOG_PATH, filename)
-
     try:
-        with open(project_log_path, 'r') as output:
-            project_log = output.read()
-
-            last_run = datetime.datetime.strptime(time.ctime(os.path.getmtime(project_log_path)), '%c')
-            status = (
-                'Success' if 'success' in project_log.lower() or 'succeeded' in project_log.lower() else 'Failure'
-            )  # Naively check the logs for an indicator of the status being success
-
-            response = {
-                'project': pipeline_id,
-                'last_run': f'{last_run}',
-                'status': status,
-                'project_log': project_log,
-            }
-
-            return response
+        with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
+            return mydict[pipeline_id]
     except Exception:
         return abort(404)
 
 
 @APP.route('/pipelines', methods=['GET'])
 def retrieve_pipelines():
-    """Retrieve a list of pipelines.
+    """Retrieves pipelines from the Sqlite store.
 
-    The `project` values will be `username-reponame` as they appear on GitHub.
+    - The keys will be `username-repo_name-commit_id`.
+    - The user can optionally pass a URL param of `project` to filter the results
     """
     pipelines = {}
+    pipeline_return_limit = 100
 
-    for root, dirs, files in os.walk(Global.PROJECTS_LOG_PATH, topdown=True):
-        for filename in files:
-            # Skip the macOS meta directory file
-            if filename == '.DS_Store':
-                continue
-            full_file_path = os.path.join(root, filename)
-            last_run = datetime.datetime.strptime(time.ctime(os.path.getmtime(full_file_path)), '%c')
-            log_file = filename.split('.')[0]
+    project_filter = request.args.get('project')
 
-            with open(full_file_path, 'r') as log_file_contents:
-                log_file_data = log_file_contents.read()
+    # TODO: Retrieve the most recent pipelines
+    with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
+        for index, (key, value) in enumerate(mydict.iteritems()):
+            if index >= pipeline_return_limit:
+                break
 
-                status = (
-                    'Success'
-                    if 'success' in log_file_data.lower() or 'succeeded' in log_file_data.lower()
-                    else 'Failure'
-                )  # Naively check the logs for an indicator of the status being success
-
-            pipelines[log_file] = {
-                'last_run': f'{last_run}',
-                'status': status,
-                'pipeline_log': '...',  # Retrieve a single record to get the pipeline_log
-            }
+            if project_filter and project_filter in key:
+                pipelines[key] = value
+            elif not project_filter:
+                pipelines[key] = value
 
     return pipelines
 
