@@ -93,8 +93,9 @@ def retrieve_projects():
     for project_owner in project_owners:
         project_names = os.listdir(os.path.join(Global.PROJECTS_PATH, project_owner))
         for project_name in project_names:
-            final_project_name = f'{project_owner}-{project_name}'
-            projects['projects'].append(final_project_name)
+            if not project_name.startswith('.'):
+                final_project_name = f'{project_owner}-{project_name}'
+                projects['projects'].append(final_project_name)
 
         if len(projects['projects']) > page_size:
             break
