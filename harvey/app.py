@@ -91,7 +91,7 @@ def retrieve_projects():
 
     project_owners = os.listdir(Global.PROJECTS_PATH)
     for project_owner in project_owners:
-        if not project_name.startswith('.'):
+        if not project_owner.startswith('.'):
             project_names = os.listdir(os.path.join(Global.PROJECTS_PATH, project_owner))
             for project_name in project_names:
                 if not project_name.startswith('.'):
