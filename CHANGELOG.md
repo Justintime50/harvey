@@ -15,7 +15,7 @@
 * Adds a check to ensure there is a `docker-compose.yml` file present
     * Now supports yaml files ending in both `yml` or `yaml`
 * Project logs are now overwritten on each deployment so there is only one log file for each project. This will conserve space as well as reduce complexity of the project when retrieving pipelines via the API
-* Overhauled the response of the `pipelines` endpoint to include a `id`, `updated_at`, and `status` key for each record
+* Overhauled the API to allow retrieval of projects in addition to pipelines. We now also store more metadata about each object including a timestamp, the full log, the project name, commit, status, etc
 * Fixed various path bugs that wouldn't resolve properly on Windows (used `os.path.join()`)
 * Changed all datetime/timestamp fields to use `utc` time
 
