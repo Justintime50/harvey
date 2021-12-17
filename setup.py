@@ -11,6 +11,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
+    'sqlitedict == 1.7.*',
     'woodchips == 0.2.*',
 ]
 

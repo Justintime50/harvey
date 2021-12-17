@@ -58,7 +58,7 @@ make prod
 
 * Harvey will timeout git clone/pull after 300 seconds
 * Harvey will timeout deploys after 30 minutes
-* Harvey will shallow clone your project with the latest 10 commits
+* Harvey will shallow clone your project to the most recent commit
 * Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
 * Harvey assumes that `Docker Compose v2` is installed and active
 

@@ -1,7 +1,7 @@
+import datetime
 import json
 import os
 import subprocess
-from datetime import datetime
 from typing import Any, Dict, Tuple
 
 import woodchips
@@ -15,13 +15,13 @@ from harvey.utils import LOGGER_NAME, Utils
 
 class Pipeline:
     @staticmethod
-    def initialize_pipeline(webhook: Dict[str, Any]) -> Tuple[Dict[str, Any], str, datetime]:
+    def initialize_pipeline(webhook: Dict[str, Any]) -> Tuple[Dict[str, Any], str, datetime.datetime]:
         """Initialize the setup for a pipeline by cloning or pulling the project
         and setting up standard logging info.
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        start_time = datetime.now()
+        start_time = datetime.datetime.utcnow()
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)
 
@@ -61,7 +61,9 @@ class Pipeline:
             f'\nCommit made on repo: {Global.repo_full_name(webhook)}.'
         )
 
-        execution_time = f'{Global.repo_full_name(webhook)} startup execution time: {datetime.now() - start_time}'
+        execution_time = (
+            f'{Global.repo_full_name(webhook)} startup execution time: {datetime.datetime.utcnow() - start_time}'
+        )
         output = (
             f'{preamble}'
             f'\n{pipeline_id}'
@@ -107,7 +109,7 @@ class Pipeline:
             else:
                 all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
-            end_time = datetime.now()
+            end_time = datetime.datetime.utcnow()
             execution_time = f'{Global.repo_full_name(webhook)} pipeline execution time: {end_time - start_time}'
             logger.info(execution_time)
             final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}'
@@ -161,7 +163,7 @@ class Pipeline:
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        start_time = datetime.now()
+        start_time = datetime.datetime.utcnow()
 
         repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
 
@@ -225,7 +227,7 @@ class Pipeline:
                 timeout=Global.DEPLOY_TIMEOUT,
             )
             decoded_output = compose_output.decode('UTF-8')
-            execution_time = f'Deploy stage execution time: {datetime.now() - start_time}'
+            execution_time = f'Deploy stage execution time: {datetime.datetime.utcnow() - start_time}'
             final_output = f'{decoded_output}\n{execution_time}'
             logger.info(final_output)
         except subprocess.TimeoutExpired:

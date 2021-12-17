@@ -14,8 +14,9 @@ class Global:
     HARVEY_LOG_PATH = os.path.join('logs', 'harvey')
     # TODO: Is there a way to sync this with `setup.py`? (short answer: not easily since you can't import this there)
     HARVEY_VERSION = '0.15.0'
-    PROJECTS_LOG_PATH = os.path.expanduser('~/harvey/project_logs')
     PROJECTS_PATH = os.path.expanduser('~/harvey/projects')
+    STORES_PATH = os.path.expanduser('~/harvey/stores')
+    PIPELINES_STORE_PATH = os.path.join(STORES_PATH, 'pipelines.sqlite')
     SLACK = os.getenv('SLACK')
     SUPPORTED_PIPELINES = {
         'deploy',

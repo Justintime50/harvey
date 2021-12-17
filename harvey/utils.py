@@ -1,8 +1,10 @@
+import datetime
 import os
 import sys
 from typing import Any, Dict
 
 import woodchips
+from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.globals import Global
 from harvey.messages import Message
@@ -24,7 +26,7 @@ class Utils:
         logger.warning(failure_message)
 
         pipeline_logs = final_output + failure_message
-        Utils.generate_pipeline_logs(pipeline_logs, webhook)
+        Utils.store_pipeline_details(webhook, pipeline_logs)
 
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
@@ -41,7 +43,7 @@ class Utils:
         logger.info(success_message)
 
         pipeline_logs = final_output + success_message
-        Utils.generate_pipeline_logs(pipeline_logs, webhook)
+        Utils.store_pipeline_details(webhook, pipeline_logs)
 
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
@@ -50,27 +52,33 @@ class Utils:
         sys.exit()
 
     @staticmethod
-    def generate_pipeline_logs(final_output: str, webhook: Dict[str, Any]):
-        """Generate a complete log file with the entire pipeline's output.
+    def store_pipeline_details(webhook: Dict[str, Any], final_output: str = 'NA'):
+        """Store the pipeline's details including logs and metadata to a Sqlite database.
 
-        These logs are not to be confused with the internal Harvey `woodchips` logs for the
-        app itself; instead, there is a log file for every project deployed via Harvey that
-        contains the details of the last deploy of that service on the platform.
+        A project ID consists of the `project_name@commit_id`.
         """
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.debug(f'Generating pipeline logs for {Global.repo_full_name(webhook)}...')
+        logger.debug(f'Storing pipeline details for {Global.repo_full_name(webhook)}...')
 
-        project_log_name = f'{Global.repo_owner_name(webhook)}-{Global.repo_name(webhook)}.log'
-        project_log_path = os.path.join(Global.PROJECTS_LOG_PATH, project_log_name)
+        with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
+            # Naively check the logs for an indicator of the status being success
+            if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
+                pipeline_status = 'Success'
+            elif final_output == 'NA':
+                pipeline_status = 'In-Progress'
+            else:
+                pipeline_status = 'Failure'
 
-        try:
-            with open(project_log_path, 'w') as log:
-                log.write(final_output)
-        except OSError as error:
-            final_output = f'Harvey could not save the log file for {Global.repo_full_name(webhook)}.'
-            logger.error(error)
-            Utils.kill(final_output, webhook)
+            pipeline_id = f'{Global.repo_full_name(webhook).replace("/", "-")}@{Global.repo_commit_id(webhook)}'
+            mydict[pipeline_id] = {
+                'project': Global.repo_full_name(webhook).replace("/", "-"),
+                'commit': Global.repo_commit_id(webhook),
+                'log': final_output,
+                'status': pipeline_status,
+                'timestamp': str(datetime.datetime.utcnow()),
+            }
+            mydict.commit()
 
 
 def setup_logger():
