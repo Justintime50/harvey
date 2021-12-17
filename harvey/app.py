@@ -75,7 +75,6 @@ def retrieve_pipelines():
     page_size = int(request.args.get('page_size', return_limit))
     project_name = request.args.get('project')
 
-    # TODO: Retrieve the most recent pipelines
     with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
         for record_num, (key, value) in enumerate(mydict.iteritems(), start=1):
             if record_num > page_size:
@@ -87,6 +86,9 @@ def retrieve_pipelines():
                 pipelines['pipelines'].append(value)
             else:
                 pass
+
+    sorted_pipelines = sorted(pipelines['pipelines'], key=lambda i: i['timestamp'], reverse=True)
+    pipelines['pipelines'] = sorted_pipelines
 
     return pipelines
 
