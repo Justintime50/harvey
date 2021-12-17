@@ -26,7 +26,7 @@ class Utils:
         logger.warning(failure_message)
 
         pipeline_logs = final_output + failure_message
-        Utils.store_pipeline_details(pipeline_logs, webhook)
+        Utils.store_pipeline_details(webhook, pipeline_logs)
 
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
@@ -43,7 +43,7 @@ class Utils:
         logger.info(success_message)
 
         pipeline_logs = final_output + success_message
-        Utils.store_pipeline_details(pipeline_logs, webhook)
+        Utils.store_pipeline_details(webhook, pipeline_logs)
 
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
@@ -52,21 +52,31 @@ class Utils:
         sys.exit()
 
     @staticmethod
-    def store_pipeline_details(final_output: str, webhook: Dict[str, Any]):
-        """Store the pipeline's details including logs and metadata to a Sqlite database."""
+    def store_pipeline_details(webhook: Dict[str, Any], final_output: str = 'NA'):
+        """Store the pipeline's details including logs and metadata to a Sqlite database.
+
+        A project ID consists of the `project_name@commit_id`.
+        """
         logger = woodchips.get(LOGGER_NAME)
 
-        logger.debug(f'Generating pipeline logs for {Global.repo_full_name(webhook)}...')
+        logger.debug(f'Storing pipeline details for {Global.repo_full_name(webhook)}...')
 
+        # TODO: This could probably be moved to an overall "bootstrap" or "startup" utility for the app
         if not os.path.exists(Global.STORES_PATH):
             os.mkdir(Global.STORES_PATH)
 
         with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
-            pipeline_status = (
-                'Success' if 'success' in final_output.lower() or 'succeeded' in final_output.lower() else 'Failure'
-            )  # Naively check the logs for an indicator of the status being success
+            # Naively check the logs for an indicator of the status being success
+            if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
+                pipeline_status = 'Success'
+            elif final_output == 'NA':
+                pipeline_status = 'In-Progress'
+            else:
+                pipeline_status = 'Failure'
 
-            mydict[f'{Global.repo_full_name(webhook).replace("/", "-")}-{Global.repo_commit_id(webhook)}'] = {
+            pipeline_id = f'{Global.repo_full_name(webhook).replace("/", "-")}@{Global.repo_commit_id(webhook)}'
+            mydict[pipeline_id] = {
+                'project': Global.repo_full_name(webhook).replace("/", "-"),
                 'commit': Global.repo_commit_id(webhook),
                 'log': final_output,
                 'status': pipeline_status,

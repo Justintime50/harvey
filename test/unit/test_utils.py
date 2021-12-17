@@ -56,7 +56,7 @@ def test_success_with_slack(mock_logger, mock_sys_exit, mock_generate_logs, mock
 @patch('logging.Logger.debug')
 def test_store_pipeline_details(mock_logger, mock_output, mock_webhook):
     with patch('builtins.open', mock_open()):
-        Utils.store_pipeline_details(mock_output, mock_webhook)
+        Utils.store_pipeline_details(mock_webhook, mock_output)
 
         mock_logger.assert_called()
 
