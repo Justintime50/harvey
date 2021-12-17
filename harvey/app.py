@@ -54,7 +54,8 @@ def retrieve_pipeline(pipeline_id: str):
     try:
         with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
             for key, value in mydict.iteritems():
-                if key == pipeline_id:
+                transformed_key = key.split('@')
+                if pipeline_id == f'{transformed_key[0]}-{transformed_key[1]}':
                     return value
     except Exception:
         return abort(404)
