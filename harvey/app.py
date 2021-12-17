@@ -53,7 +53,9 @@ def retrieve_pipeline(pipeline_id: str):
     """
     try:
         with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
-            return mydict[pipeline_id]
+            for key, value in mydict.iteritems():
+                if key == pipeline_id:
+                    return value
     except Exception:
         return abort(404)
 
