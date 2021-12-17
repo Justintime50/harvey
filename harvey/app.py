@@ -90,13 +90,15 @@ def retrieve_projects():
     page_size = int(request.args.get('page_size', return_limit))
 
     project_owners = os.listdir(Global.PROJECTS_PATH)
+    if '.DS_Store' in project_owners:
+        project_owners.remove('.DS_Store')
     for project_owner in project_owners:
-        if not project_owner.startswith('.'):
-            project_names = os.listdir(os.path.join(Global.PROJECTS_PATH, project_owner))
-            for project_name in project_names:
-                if not project_name.startswith('.'):
-                    final_project_name = f'{project_owner}-{project_name}'
-                    projects['projects'].append(final_project_name)
+        project_names = os.listdir(os.path.join(Global.PROJECTS_PATH, project_owner))
+        if '.DS_Store' in project_names:
+            project_names.remove('.DS_Store')
+        for project_name in project_names:
+            final_project_name = f'{project_owner}-{project_name}'
+            projects['projects'].append(final_project_name)
 
         if len(projects['projects']) > page_size:
             break
