@@ -61,10 +61,6 @@ class Utils:
 
         logger.debug(f'Storing pipeline details for {Global.repo_full_name(webhook)}...')
 
-        # TODO: This could probably be moved to an overall "bootstrap" or "startup" utility for the app
-        if not os.path.exists(Global.STORES_PATH):
-            os.mkdir(Global.STORES_PATH)
-
         with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
             # Naively check the logs for an indicator of the status being success
             if 'success' in final_output.lower() or 'succeeded' in final_output.lower():

@@ -117,9 +117,15 @@ def retrieve_projects():
 
 
 def main():
-    requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
-    flask_debug = LOG_LEVEL == 'DEBUG'
     setup_logger()
+
+    # Setup the directory for the Sqlite databases
+    if not os.path.exists(Global.STORES_PATH):
+        os.mkdir(Global.STORES_PATH)
+
+    requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
+
+    flask_debug = LOG_LEVEL == 'DEBUG'
     APP.run(host=HOST, port=PORT, debug=flask_debug)
 
 
