@@ -34,7 +34,7 @@ jobs:
         # TODO: Remove the mkdir bit here when we get a better solution to setting up the stores directory
         # This will automatically happen if the user runs the service, but not here in CI
         run: |
-          mkdir -p harvey/stores
+          mkdir ~/harvey/stores
           make coverage
       - name: Coveralls
         if: github.ref == 'refs/heads/main'
