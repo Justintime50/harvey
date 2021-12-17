@@ -1,4 +1,3 @@
-import tempfile
 from unittest.mock import mock_open, patch
 
 from harvey.utils import Utils, setup_logger

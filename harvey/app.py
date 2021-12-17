@@ -67,11 +67,13 @@ def retrieve_pipelines():
 
     - The keys will be `username-repo_name-commit_id`.
     - The user can optionally pass a URL param of `page_size` to limit how many results are returned
+    - The user can optionally pass a URL param of `project` to filter what pipelines get returned
     """
     pipelines = {'pipelines': []}
     return_limit = 100
 
     page_size = int(request.args.get('page_size', return_limit))
+    project_name = request.args.get('project')
 
     # TODO: Retrieve the most recent pipelines
     with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
@@ -79,7 +81,12 @@ def retrieve_pipelines():
             if record_num > page_size:
                 break
 
-            pipelines['pipelines'].append(value)
+            if project_name and value['project'] == project_name:
+                pipelines['pipelines'].append(value)
+            elif not project_name:
+                pipelines['pipelines'].append(value)
+            else:
+                pass
 
     return pipelines
 
@@ -107,32 +114,6 @@ def retrieve_projects():
             break
 
     return projects
-
-
-@APP.route('/project-pipelines/<project_name>', methods=['GET'])
-def retrieve_project_pipelines(project_name: str):
-    """Retrieves a list of pipelines for a given project from the Sqlite store.
-
-    - The user can optionally pass a URL param of `page_size` to limit how many results are returned
-    """
-    pipelines = {'pipelines': []}
-    return_limit = 100
-
-    page_size = int(request.args.get('page_size', return_limit))
-
-    # TODO: Retrieve the most recent pipelines
-    with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
-        for key, value in mydict.iteritems():
-            if value['project'] == project_name:
-                pipelines['pipelines'].append(value)
-            else:
-                # Don't include pipelines for another project
-                pass
-
-            if len(pipelines['pipelines']) > page_size:
-                break
-
-    return pipelines
 
 
 def main():
