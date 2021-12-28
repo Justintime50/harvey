@@ -22,6 +22,7 @@ class Pipeline:
         logger = woodchips.get(LOGGER_NAME)
 
         start_time = datetime.datetime.utcnow()
+        Utils.store_pipeline_details(webhook)
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)
 
