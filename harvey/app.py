@@ -6,7 +6,7 @@ from flask import Flask, abort, request
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.globals import Global
-from harvey.utils import LOG_LEVEL, setup_logger
+from harvey.utils import LOG_LEVEL, Utils, setup_logger
 from harvey.webhooks import Webhook
 
 load_dotenv()  # Must remain at the top of this file
@@ -94,7 +94,7 @@ def retrieve_pipelines():
 
 @APP.route('/projects', methods=['GET'])
 def retrieve_projects():
-    """Retrieves projects from the Sqlite store."""
+    """Retrieves a list of project names from the git repos stored in Harvey."""
     projects = {'projects': []}
 
     page_size = int(request.args.get('page_size', Global.PAGINATION_LIMIT))
@@ -114,6 +114,17 @@ def retrieve_projects():
             break
 
     return projects
+
+
+@APP.route('/locks/<project_name>', methods=['GET'])
+def retrieve_lock(project_name: str):
+    """Retrieves the lock status of a project by its name."""
+    try:
+        lock_status = Utils.lookup_project_lock(project_name)
+
+        return {'locked': lock_status}
+    except Exception:
+        return abort(404)
 
 
 # TODO: Add a `lock` and `unlock` endpoint for deployments

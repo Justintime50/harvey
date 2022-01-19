@@ -97,20 +97,21 @@ class Utils:
         logger.info(f'{locked_string} deployments for {Global.repo_full_name(webhook)}...')
 
         with SqliteDict(Global.LOCKS_STORE_PATH) as mydict:
-            mydict[Global.repo_full_name(webhook)] = {
+            mydict[Global.repo_full_name(webhook).replace("/", "-")] = {
                 'locked': locked,
             }
 
             mydict.commit()
 
     @staticmethod
-    def lookup_project_lock(webhook: Dict[str, Any]) -> bool:
-        """Checks if a project is locked or not."""
+    def lookup_project_lock(project_name: str) -> bool:
+        """Checks if a project is locked or not by its full name."""
         locked_value = False
+        corrected_project_name = project_name.replace("/", "-")
 
         with SqliteDict(Global.LOCKS_STORE_PATH) as mydict:
             for key, value in mydict.iteritems():
-                if key == Global.repo_full_name(webhook):
+                if key == corrected_project_name:
                     locked_value = value['locked']
                     break
 

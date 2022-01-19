@@ -26,9 +26,18 @@ import harvey
 # )
 # print(request.json())
 
-"""Retrieve all pipelines"""
+# """Retrieve all pipelines"""
+# request = requests.get(
+#     'http://127.0.0.1:5000/pipelines',
+#     headers={
+#         'Content-Type': 'application/json',
+#     },
+# )
+# print(json.dumps(request.json(), indent=4))
+
+"""Retrieve the lock status of a project"""
 request = requests.get(
-    'http://127.0.0.1:5000/pipelines',
+    'http://127.0.0.1:5000/locks/justintime50-justinpaulhammond',
     headers={
         'Content-Type': 'application/json',
     },
