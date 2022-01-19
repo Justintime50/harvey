@@ -17,11 +17,13 @@ class Global:
     PROJECTS_PATH = os.path.expanduser('~/harvey/projects')
     STORES_PATH = os.path.expanduser('~/harvey/stores')
     PIPELINES_STORE_PATH = os.path.join(STORES_PATH, 'pipelines.sqlite')
+    LOCKS_STORE_PATH = os.path.join(STORES_PATH, 'locks.sqlite')
     SLACK = os.getenv('SLACK')
     SUPPORTED_PIPELINES = {
         'deploy',
         'pull',
     }
+    PAGINATION_LIMIT = 100
 
     # Emoji (used for Slack messages, set defaults if slack isn't in use)
     # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will
@@ -59,3 +61,8 @@ class Global:
     def repo_commit_id(webhook: Dict[str, Any]) -> str:
         """Return the repo's id from the webhook JSON."""
         return str(webhook['commits'][0]['id'])
+
+    @staticmethod
+    def pipeline_id(webhook: Dict[str, Any]) -> str:
+        """Return the pipeline ID used for the SQLite stores."""
+        return f'{Global.repo_full_name(webhook).replace("/", "-")}@{Global.repo_commit_id(webhook)}'

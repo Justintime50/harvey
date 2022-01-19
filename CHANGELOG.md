@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v0.16.0 (2022-01-18)
 
 * Added logging with configurable log level
 * Use new `docker compose` invocation over older `docker-compose`
@@ -10,6 +10,7 @@
 * Gracefully handles not being able to find a container or list of containers
 * Shallow clone repos to 1 commit instead of 10
 * Retry pipelines that fail due to local, uncommitted changes present when pulling the repo (closes #38)
+* Adds a locking mechanism to deployments when a pipeline is in-flight to avoid crashing Docker when multiple `docker compose` commands are run simultaneously for a single project (closes #58)
 * Now saves projects to `~/harvey/projects` instead of locally to `harvey/projects`
 * Now saves project_logs to `~/harvey/project_logs` instead of locally to `harvey/logs`
 * Adds a check to ensure there is a `docker-compose.yml` file present

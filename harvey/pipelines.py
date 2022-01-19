@@ -21,7 +21,17 @@ class Pipeline:
         """
         logger = woodchips.get(LOGGER_NAME)
 
+        # Kill the pipeline if the project is locked
+        if Utils.lookup_project_lock(webhook) is True:
+            Utils.kill(
+                f'{Global.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                ' deployments.',
+                webhook,
+            )
+
         start_time = datetime.datetime.utcnow()
+
+        Utils.update_project_lock(webhook=webhook, locked=True)
         Utils.store_pipeline_details(webhook)
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)

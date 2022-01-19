@@ -70,9 +70,8 @@ def retrieve_pipelines():
     - The user can optionally pass a URL param of `project` to filter what pipelines get returned
     """
     pipelines = {'pipelines': []}
-    return_limit = 100
 
-    page_size = int(request.args.get('page_size', return_limit))
+    page_size = int(request.args.get('page_size', Global.PAGINATION_LIMIT))
     project_name = request.args.get('project')
 
     with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
@@ -97,9 +96,8 @@ def retrieve_pipelines():
 def retrieve_projects():
     """Retrieves projects from the Sqlite store."""
     projects = {'projects': []}
-    return_limit = 100
 
-    page_size = int(request.args.get('page_size', return_limit))
+    page_size = int(request.args.get('page_size', Global.PAGINATION_LIMIT))
 
     project_owners = os.listdir(Global.PROJECTS_PATH)
     if '.DS_Store' in project_owners:
@@ -118,10 +116,14 @@ def retrieve_projects():
     return projects
 
 
+# TODO: Add a `lock` and `unlock` endpoint for deployments
+
+
 def main():
     setup_logger()
 
-    # Setup the directory for the Sqlite databases
+    # Setup the directory for the SQLite databases
+    # TODO: Move this to a bootstrap function so that it's always taken care of
     if not os.path.exists(Global.STORES_PATH):
         os.mkdir(Global.STORES_PATH)
 

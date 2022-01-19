@@ -31,6 +31,8 @@ class Utils:
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
 
+        Utils.update_project_lock(webhook=webhook, locked=False)
+
         # Close the thread safely
         sys.exit()
 
@@ -47,6 +49,8 @@ class Utils:
 
         if Global.SLACK:
             Message.send_slack_message(pipeline_logs)
+
+        Utils.update_project_lock(webhook=webhook, locked=False)
 
         # Close the thread safely
         sys.exit()
@@ -70,15 +74,44 @@ class Utils:
             else:
                 pipeline_status = 'Failure'
 
-            pipeline_id = f'{Global.repo_full_name(webhook).replace("/", "-")}@{Global.repo_commit_id(webhook)}'
-            mydict[pipeline_id] = {
+            mydict[Global.pipeline_id(webhook)] = {
                 'project': Global.repo_full_name(webhook).replace("/", "-"),
                 'commit': Global.repo_commit_id(webhook),
                 'log': final_output,
                 'status': pipeline_status,
                 'timestamp': str(datetime.datetime.utcnow()),
             }
+
             mydict.commit()
+
+    @staticmethod
+    def update_project_lock(webhook: Dict[str, Any], locked: bool = False):
+        """Locks or unlocks the project's deployments to ensure we don't crash Docker with two inflight deployments.
+
+        Locking should only happen once a pipeline is begun. A locked deployment should then always be
+        unlocked once it's finished regardless of status so another deployment can follow.
+        """
+        logger = woodchips.get(LOGGER_NAME)
+
+        locked_string = 'Locking' if locked is True else 'Unlocking'
+        logger.info(f'{locked_string} deployments for {Global.repo_full_name(webhook)}...')
+
+        with SqliteDict(Global.LOCKS_STORE_PATH) as mydict:
+            mydict[Global.repo_full_name(webhook)] = {
+                'locked': locked,
+            }
+
+            mydict.commit()
+
+    @staticmethod
+    def lookup_project_lock(webhook: Dict[str, Any]) -> bool:
+        """Checks if a project is locked or not."""
+        with SqliteDict(Global.LOCKS_STORE_PATH) as mydict:
+            for key, value in mydict.iteritems():
+                if key == Global.repo_full_name(webhook):
+                    return value['locked']
+                else:
+                    return False
 
 
 def setup_logger():
