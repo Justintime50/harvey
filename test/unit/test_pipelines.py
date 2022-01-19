@@ -20,9 +20,10 @@ def test_initialize_pipeline_slack(mock_slack_message, mock_open_project_config,
     mock_slack_message.assert_called_once()
 
 
+@patch('harvey.utils.Utils.lookup_project_lock', return_value=False)
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.pipelines.Pipeline.open_project_config', return_value=mock_config())
-def test_initialize_pipeline(mock_open_project_config, mock_update_git_repo, mock_webhook):
+def test_initialize_pipeline(mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_webhook):
     _, _, _ = Pipeline.initialize_pipeline(mock_webhook)
 
     mock_open_project_config.assert_called_once_with(mock_webhook)

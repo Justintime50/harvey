@@ -106,12 +106,15 @@ class Utils:
     @staticmethod
     def lookup_project_lock(webhook: Dict[str, Any]) -> bool:
         """Checks if a project is locked or not."""
+        locked_value = False
+
         with SqliteDict(Global.LOCKS_STORE_PATH) as mydict:
             for key, value in mydict.iteritems():
                 if key == Global.repo_full_name(webhook):
-                    return value['locked']
-                else:
-                    return False
+                    locked_value = value['locked']
+                    break
+
+        return locked_value
 
 
 def setup_logger():
