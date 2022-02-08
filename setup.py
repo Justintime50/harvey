@@ -1,5 +1,7 @@
 import setuptools
 
+from version import VERSION
+
 with open('README.md', 'r') as fh:
     long_description = fh.read()
 
@@ -28,7 +30,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-ci',
-    version='0.16.0',
+    version=VERSION,
     description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",

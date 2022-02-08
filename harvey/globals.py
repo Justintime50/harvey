@@ -3,17 +3,18 @@ from typing import Any, Dict
 
 from dotenv import load_dotenv
 
+from version import VERSION
+
 load_dotenv()  # Must remain at the top of this file
 
 
 class Global:
     # TODO: Reconfigure all these constants and static methods below to be class variables/properties
     ALLOWED_BRANCHES = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
-    DEPLOY_TIMEOUT = 1800  # 30 minutes
-    GIT_TIMEOUT = 300  # 5 minutes
+    DEPLOY_TIMEOUT = int(os.getenv('DEPLOY_TIMEOUT', 1800))  # Default is 30 minutes
+    GIT_TIMEOUT = int(os.getenv('GIT_TIMEOUT', 300))  # Default is 5 minutes
     HARVEY_LOG_PATH = os.path.join('logs', 'harvey')
-    # TODO: Is there a way to sync this with `setup.py`? (short answer: not easily since you can't import this there)
-    HARVEY_VERSION = '0.15.0'
+    HARVEY_VERSION = VERSION
     PROJECTS_PATH = os.path.expanduser('~/harvey/projects')
     STORES_PATH = os.path.expanduser('~/harvey/stores')
     PIPELINES_STORE_PATH = os.path.join(STORES_PATH, 'pipelines.sqlite')
@@ -23,7 +24,8 @@ class Global:
         'deploy',
         'pull',
     }
-    PAGINATION_LIMIT = 100
+    PAGINATION_LIMIT = int(os.getenv('PAGINATION_LIMIT', 20))
+    DEPLOY_ON_TAG = os.getenv('DEPLOY_ON_TAG', True)  # Whether a tag pushed will trigger a deploy or not
 
     # Emoji (used for Slack messages, set defaults if slack isn't in use)
     # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will

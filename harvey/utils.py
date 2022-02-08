@@ -125,7 +125,4 @@ def setup_logger():
         level=LOG_LEVEL,
     )
     logger.log_to_console()
-
-    # TODO: We should be able to prepend every logged message with the name of the repo for easy organization and
-    # searching of log files
     logger.log_to_file(location=LOG_LOCATION)

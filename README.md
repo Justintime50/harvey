@@ -130,14 +130,18 @@ Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook fro
 
 ```
 Environment Variables:
-    SLACK             Set to "true" to send slack messages
+    SLACK             Set to "true" to send slack messages. Default: False
     SLACK_CHANNEL     The Slack channel to send messages to
     SLACK_BOT_TOKEN   The Slackbot token to use to authenticate each request to Slack
-    WEBHOOK_SECRET    The Webhook secret required by GitHub (if enabled, leave blank to ignore) to secure your webhooks. Default: disabled
+    WEBHOOK_SECRET    The Webhook secret required by GitHub (if enabled, leave blank to ignore) to secure your webhooks. Default: None
     HOST              The host Harvey will run on. Default: 127.0.0.1
     PORT              The port Harvey will run on. Default: 5000
     LOG_LEVEL         The logging level used for the entire application. Default: INFO
     ALLOWED_BRANCHES  A comma separated list of branch names that are allowed to trigger pipelines from a webhook event. Default: "main,master"
+    PAGINATION_LIMIT  The number of records to return via API. Default: 20
+    DEPLOY_TIMEOUT    The number of seconds any given deploy can take before timing out. Default: 1800
+    GIT_TIMEOUT       The number of seconds any given git operation can take before timing out. Default: 300
+    DEPLOY_ON_TAG     A boolean specifying if a tag pushed will trigger a deploy. Default: True
 ```
 
 ### Example Python Functions

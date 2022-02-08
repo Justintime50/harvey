@@ -35,14 +35,16 @@ class Webhook:
         if payload_json:
             logger.debug(f'{Global.repo_full_name(payload_json)} webhook: {payload_json}')
 
+            # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
+            # slash to get the branch name and check against the user-allowed list of branches.
+            branch_name = payload_json['ref'].rsplit('/', 1)[-1]
+            tag_commit = 'refs/tags'
+
             if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
                 message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
                 status_code = 403
-            # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
-            # slash to get the branch name and check against the user-allowed list of branches.
-            # TODO: We need to allow the user to specify if they want to deploy on allowed branchs or tags
-            elif (
-                payload_json['ref'].rsplit('/', 1)[-1] in Global.ALLOWED_BRANCHES or 'refs/tags' in payload_json['ref']
+            elif (branch_name in Global.ALLOWED_BRANCHES) or (
+                Global.DEPLOY_ON_TAG and tag_commit in payload_json['ref']
             ):
                 Thread(
                     target=Pipeline.run_pipeline,
@@ -73,7 +75,7 @@ class Webhook:
         return response
 
     @staticmethod
-    def validate_webhook_secret(data: Any, signature: str) -> bool:  # TODO: Lock down the type of the `data` field
+    def validate_webhook_secret(data: Any, signature: str) -> bool:
         """Decode and validate a webhook's secret key."""
         logger = woodchips.get(LOGGER_NAME)
 
