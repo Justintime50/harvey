@@ -142,6 +142,7 @@ Environment Variables:
     DEPLOY_TIMEOUT    The number of seconds any given deploy can take before timing out. Default: 1800
     GIT_TIMEOUT       The number of seconds any given git operation can take before timing out. Default: 300
     DEPLOY_ON_TAG     A boolean specifying if a tag pushed will trigger a deploy. Default: True
+    HARVEY_PATH       The path where Harvey will store projects, logs, and the SQLite databases. Default: ~/harvey
 ```
 
 ### Example Python Functions

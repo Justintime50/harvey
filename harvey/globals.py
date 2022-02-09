@@ -10,22 +10,27 @@ load_dotenv()  # Must remain at the top of this file
 
 class Global:
     # TODO: Reconfigure all these constants and static methods below to be class variables/properties
+    # User configurable settings
     ALLOWED_BRANCHES = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
     DEPLOY_TIMEOUT = int(os.getenv('DEPLOY_TIMEOUT', 1800))  # Default is 30 minutes
     GIT_TIMEOUT = int(os.getenv('GIT_TIMEOUT', 300))  # Default is 5 minutes
-    HARVEY_LOG_PATH = os.path.join('logs', 'harvey')
-    HARVEY_VERSION = VERSION
-    PROJECTS_PATH = os.path.expanduser('~/harvey/projects')
-    STORES_PATH = os.path.expanduser('~/harvey/stores')
-    PIPELINES_STORE_PATH = os.path.join(STORES_PATH, 'pipelines.sqlite')
-    LOCKS_STORE_PATH = os.path.join(STORES_PATH, 'locks.sqlite')
+    PAGINATION_LIMIT = int(os.getenv('PAGINATION_LIMIT', 20))
+    DEPLOY_ON_TAG = os.getenv('DEPLOY_ON_TAG', True)  # Whether a tag pushed will trigger a deploy or not
     SLACK = os.getenv('SLACK')
+
+    # Harvey constants
+    HARVEY_VERSION = VERSION
     SUPPORTED_PIPELINES = {
         'deploy',
         'pull',
     }
-    PAGINATION_LIMIT = int(os.getenv('PAGINATION_LIMIT', 20))
-    DEPLOY_ON_TAG = os.getenv('DEPLOY_ON_TAG', True)  # Whether a tag pushed will trigger a deploy or not
+
+    # Paths
+    HARVEY_PATH = os.getenv('HARVEY_PATH', os.path.expanduser('~/harvey'))
+    PROJECTS_PATH = os.path.join(HARVEY_PATH, 'projects')
+    STORES_PATH = os.path.join(HARVEY_PATH, 'stores')
+    PIPELINES_STORE_PATH = os.path.join(STORES_PATH, 'pipelines.sqlite')
+    LOCKS_STORE_PATH = os.path.join(STORES_PATH, 'locks.sqlite')
 
     # Emoji (used for Slack messages, set defaults if slack isn't in use)
     # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will

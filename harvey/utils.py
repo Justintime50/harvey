@@ -11,7 +11,7 @@ from harvey.messages import Message
 
 LOG_LEVEL = os.getenv('LOG_LEVEL', 'INFO').upper()
 LOGGER_NAME = 'harvey'
-LOG_LOCATION = os.path.expanduser(os.path.join('~', 'harvey', 'logs'))
+LOG_LOCATION = os.path.join(Global.HARVEY_PATH, 'logs')
 
 
 class Utils:

@@ -3,7 +3,7 @@
 ## NEXT RELEASE
 
 * Sets the default pagination limit down to 20 from 100, adds `PAGINATION_LIMIT` env var to allow customization
-* Added new `GIT_TIMEOUT`, `DEPLPOY_TIMEOUT`, and `DEPLOY_ON_TAG` env vars for customization
+* Added new `HARVEY_PATH`, `GIT_TIMEOUT`, `DEPLPOY_TIMEOUT`, and `DEPLOY_ON_TAG` env vars for customization
 * Better syncing of the version string for the release and what appears in logs
 
 ## v0.16.0 (2022-01-18)
@@ -21,7 +21,6 @@
 * Now saves project_logs to `~/harvey/project_logs` instead of locally to `harvey/logs`
 * Adds a check to ensure there is a `docker-compose.yml` file present
     * Now supports yaml files ending in both `yml` or `yaml`
-* Project logs are now overwritten on each deployment so there is only one log file for each project. This will conserve space as well as reduce complexity of the project when retrieving pipelines via the API
 * Overhauled the API to allow retrieval of projects in addition to pipelines. We now also store more metadata about each object including a timestamp, the full log, the project name, commit, status, etc
 * Fixed various path bugs that wouldn't resolve properly on Windows (used `os.path.join()`)
 * Changed all datetime/timestamp fields to use `utc` time

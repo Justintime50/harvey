@@ -134,7 +134,6 @@ def main():
     setup_logger()
 
     # Setup the directory for the SQLite databases
-    # TODO: Move this to a bootstrap function so that it's always taken care of
     if not os.path.exists(Global.STORES_PATH):
         os.mkdir(Global.STORES_PATH)
 
