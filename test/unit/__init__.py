@@ -4,6 +4,6 @@ from harvey.globals import Global
 
 
 def setup_module():
-    stores_path = Global.STORES_PATH
-    if not os.path.exists(stores_path):
-        os.mkdir(stores_path)
+    """Set up the test suite."""
+    if not os.path.exists(Global.STORES_PATH):
+        os.mkdir(Global.STORES_PATH)
