@@ -4,7 +4,6 @@ import os
 import requests
 
 # USAGE: Run Harvey in the background `make run`, then do `make integration_test`. Confirm the pipeline succeeds
-# TODO: Make integration testing automated
 
 
 mock_webhook_path = os.path.join('test', 'integration', 'mock_webhook.json')

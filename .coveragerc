@@ -2,6 +2,3 @@
 exclude_lines =
     if __name__ == '__main__':
     main()
-
-    # TODO: TEMPORARY, Remove when replaced with a long-term solution
-    retrieve_pipeline

@@ -57,6 +57,7 @@ def retrieve_pipeline(pipeline_id: str):
                 transformed_key = key.split('@')
                 if pipeline_id == f'{transformed_key[0]}-{transformed_key[1]}':
                     return value
+        raise Exception
     except Exception:
         return abort(404)
 
@@ -122,7 +123,10 @@ def retrieve_lock(project_name: str):
     try:
         lock_status = Utils.lookup_project_lock(project_name)
 
-        return {'locked': lock_status}
+        if lock_status:
+            return {'locked': lock_status}
+        else:
+            raise Exception
     except Exception:
         return abort(404)
 

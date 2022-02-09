@@ -73,16 +73,6 @@ def mock_project_path():
     return mock_project_path
 
 
-# TODO: Make this fixture work and put it in the `test_build_image` test
-def mock_config(pipeline='deploy', prod_compose=False):
-    mock_config = {
-        'pipeline': pipeline,
-        'prod_compose': prod_compose,
-    }
-
-    return mock_config
-
-
 @pytest.fixture
 def mock_container_name():
     mock_container_name = 'mock_container_name'

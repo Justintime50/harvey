@@ -6,6 +6,7 @@
 * Sets the default pagination limit down to 20 from 100, adds `PAGINATION_LIMIT` env var to allow customization
 * Added new `HARVEY_PATH`, `GIT_TIMEOUT`, `DEPLPOY_TIMEOUT`, and `DEPLOY_ON_TAG` env vars for customization
 * Better syncing of the version string for the release and what appears in logs
+* Better error handling around `404`s at the API level
 
 ## v0.16.0 (2022-01-18)
 
