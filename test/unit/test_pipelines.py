@@ -30,14 +30,23 @@ def test_initialize_pipeline(mock_open_project_config, mock_update_git_repo, moc
     mock_update_git_repo.assert_called_once_with(mock_webhook)
 
 
-@patch('json.loads', return_value={'mock': 'json'})
-def test_open_project_config(mock_json):
-    # We redeclare a basic mock webhook here because os.path.join on Python 3.7 gets
+@patch('os.path.isfile')
+@patch('yaml.safe_load', return_value={'mock': 'json'})
+def test_open_project_config(mock_json, mock_isfile):
+    # We re-declare a basic mock webhook here because os.path.join on Python 3.7 gets
     # angry with MagicMock objects being passed in
     mock_webhook = {
         "repository": {
             "full_name": "TEST_user/TEST-repo-name",
-        }
+        },
+        "commits": [
+            {
+                "id": 123456,
+                "author": {
+                    "name": "test_user",
+                },
+            }
+        ],
     }
     with patch('builtins.open', mock_open()):
         config = Pipeline.open_project_config(mock_webhook)
@@ -52,7 +61,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
         _ = Pipeline.open_project_config(mock_webhook)
 
         mock_utils_kill.assert_called_once_with(
-            f'Harvey could not find a "harvey.json" file in {Global.repo_full_name(mock_webhook)}.', mock_webhook
+            f'Harvey could not find a ".harvey.yml" file in {Global.repo_full_name(mock_webhook)}.', mock_webhook
         )
 
 

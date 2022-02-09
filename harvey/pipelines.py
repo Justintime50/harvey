@@ -5,6 +5,7 @@ import subprocess
 from typing import Any, Dict, Tuple
 
 import woodchips
+import yaml
 
 from harvey.containers import Container
 from harvey.git import Git
@@ -155,14 +156,22 @@ class Pipeline:
         logger = woodchips.get(LOGGER_NAME)
 
         try:
-            # TODO: Long-term, turn `harvey.json` into a hidden file and make it yml: `.harvey.yml`
-            filename = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), 'harvey.json')
-            with open(filename, 'r') as config_file:
-                config = json.loads(config_file.read())
+            yml_filepath = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), '.harvey.yml')
+            yaml_filepath = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), '.harvey.yaml')
+
+            if os.path.isfile(yml_filepath):
+                filepath = yml_filepath
+            elif os.path.isfile(yaml_filepath):
+                filepath = yaml_filepath
+            else:
+                raise FileNotFoundError
+
+            with open(filepath, 'r') as config_file:
+                config = yaml.safe_load(config_file.read())
                 logger.debug(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
-            final_output = f'Harvey could not find a "harvey.json" file in {Global.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not find a ".harvey.yml" file in {Global.repo_full_name(webhook)}.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 

@@ -65,21 +65,18 @@ make prod
 ## Harvey Configuration
 
 **Configuration Criteria**
-* Each repo either needs a `harvey.json` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `harvey.json` file if there is no `data` key present)
+* Each repo either needs a `.harvey.yml` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `.harvey.yml` file if there is no `data` key present)
 * You can specify one of `deploy` or `pull` as the pipeline type to run
 * This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 * Optional: `prod_compose: true` json can be passed to instruct Harvey to use a prod `docker-compose` file in addition to the base compose file. This will run the equivelant of the following when deploying: `docker-compose -f docker-compose.yml -f docker-compose-prod.yml`.
 
-**harvey.json Example**
-```json
-{
-    "pipeline": "deploy",
-    "prod_compose": true,
-    "healthcheck": [
-        "container_name_1",
-        "container_name_2"
-    ]
-}
+**.harvey.yml Example**
+```yml
+pipeline: deploy
+prod_compose: true
+healthcheck:
+    - container_name_1
+    - container_name_2
 ```
 
 **GitHub Action Example**

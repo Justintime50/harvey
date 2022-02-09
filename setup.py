@@ -10,6 +10,7 @@ REQUIREMENTS = [
     'flask == 2.*',
     'gunicorn == 20.1.*',
     'python-dotenv == 0.19.*',
+    'pyyaml == 6.*',
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
     'slackclient == 2.*',
@@ -26,6 +27,7 @@ DEV_REQUIREMENTS = [
     'pytest == 7.*',
     'pytest-cov == 3.*',
     'types-requests',
+    'types-PyYAML',
 ]
 
 setuptools.setup(

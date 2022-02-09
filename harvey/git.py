@@ -59,8 +59,8 @@ class Git:
             logger.error(final_output)
             Utils.kill(final_output, webhook)
         except subprocess.CalledProcessError:
-            # The biggest offender of this action failing is local, uncommitted changes,
-            # try stashing and retry again before failing.
+            # The biggest offender of this action failing is local, uncommitted changes.
+            # Try stashing and retry again before failing.
             logger.error(f'Harvey could not pull {Global.repo_full_name(webhook)}.')
             logger.info(f'Attempting to stash {Global.repo_full_name(webhook)} before pulling again...')
 

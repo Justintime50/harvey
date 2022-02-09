@@ -2,6 +2,7 @@
 
 ## NEXT RELEASE
 
+* Changed the required `harvey.json` file for each project to `.harvey.yml` (expected fields/values remain the same)
 * Sets the default pagination limit down to 20 from 100, adds `PAGINATION_LIMIT` env var to allow customization
 * Added new `HARVEY_PATH`, `GIT_TIMEOUT`, `DEPLPOY_TIMEOUT`, and `DEPLOY_ON_TAG` env vars for customization
 * Better syncing of the version string for the release and what appears in logs
