@@ -135,7 +135,7 @@ def main():
 
     # Setup the directory for the SQLite databases
     if not os.path.exists(Global.STORES_PATH):
-        os.mkdir(Global.STORES_PATH)
+        os.makedirs(Global.STORES_PATH)
 
     requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
 
