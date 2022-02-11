@@ -13,7 +13,7 @@ def test_kill(mock_logger, mock_sys_exit, mock_generate_logs, mock_output, mock_
     mock_sys_exit.assert_called_once()
 
 
-@patch('harvey.globals.Global.SLACK', True)
+@patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
 @patch('harvey.utils.Utils.store_pipeline_details')
 @patch('sys.exit')
@@ -38,7 +38,7 @@ def test_success(mock_logger, mock_sys_exit, mock_generate_logs, mock_output, mo
     mock_sys_exit.assert_called_once()
 
 
-@patch('harvey.globals.Global.SLACK', True)
+@patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
 @patch('harvey.utils.Utils.store_pipeline_details')
 @patch('sys.exit')

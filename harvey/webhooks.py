@@ -1,88 +1,22 @@
 import hashlib
 import hmac
-import os
-from threading import Thread
-from typing import Any, Dict, Tuple
+from typing import Any, Dict
 
-import requests
 import woodchips
 
-from harvey.globals import Global
-from harvey.pipelines import Pipeline
-from harvey.utils import LOGGER_NAME
-
-WEBHOOK_SECRET = os.getenv('WEBHOOK_SECRET', '')
+from harvey.config import Config
 
 
 class Webhook:
     @staticmethod
-    def parse_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:
-        """Parse a webhook's data. Return success or error status.
-
-        1. Check if the payload is valid JSON
-        2. Check if the branch is in the allowed set of branches to run a pipeline from
-        3. Check if the webhook secret matches (optional)
-        """
-        logger = woodchips.get(LOGGER_NAME)
-
-        success = False
-        message = 'Server-side error.'
-        status_code = 500
-        payload_json = request.json
-        payload_data = request.data  # We need this to properly decode the webhook secret
-        signature = request.headers.get('X-Hub-Signature')
-
-        if payload_json:
-            logger.debug(f'{Global.repo_full_name(payload_json)} webhook: {payload_json}')
-
-            # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
-            # slash to get the branch name and check against the user-allowed list of branches.
-            branch_name = payload_json['ref'].rsplit('/', 1)[-1]
-            tag_commit = 'refs/tags'
-
-            if WEBHOOK_SECRET and not Webhook.validate_webhook_secret(payload_data, signature):
-                message = 'The X-Hub-Signature did not match the WEBHOOK_SECRET.'
-                status_code = 403
-            elif (branch_name in Global.ALLOWED_BRANCHES) or (
-                Global.DEPLOY_ON_TAG and tag_commit in payload_json['ref']
-            ):
-                Thread(
-                    target=Pipeline.run_pipeline,
-                    args=(payload_json,),
-                ).start()
-
-                message = f'Started pipeline for {Global.repo_full_name(payload_json)}'
-                status_code = 200
-                success = True
-
-                logger.info(message)
-            else:
-                message = 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.'
-                status_code = 422
-
-                logger.debug(message)
-        else:
-            message = 'Malformed or missing JSON data in webhook.'
-            status_code = 422
-
-            logger.debug(message)
-
-        response = {
-            'success': success,
-            'message': message,
-        }, status_code
-
-        return response
-
-    @staticmethod
     def validate_webhook_secret(data: Any, signature: str) -> bool:
         """Decode and validate a webhook's secret key."""
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         secret_validated = False
 
         if signature:
-            secret = bytes(WEBHOOK_SECRET, 'utf-8')
+            secret = bytes(Config.webhook_secret, 'utf-8')
             expected_signature = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
             digest = 'sha1=' + expected_signature.hexdigest()
 
@@ -92,3 +26,38 @@ class Webhook:
         logger.debug(f'{signature} webhook validated: {secret_validated}')
 
         return secret_validated
+
+    @staticmethod
+    def repo_full_name(webhook: Dict[str, Any]) -> str:
+        """Return the repo's full name from the webhook JSON."""
+        return webhook['repository']['full_name'].lower()
+
+    @staticmethod
+    def repo_commit_author(webhook: Dict[str, Any]) -> str:
+        """Return the repo's commit author name from the webhook JSON."""
+        return webhook['commits'][0]['author']['name']
+
+    @staticmethod
+    def repo_url(webhook: Dict[str, Any]) -> str:
+        """Return the repo's URL from the webhook JSON."""
+        return webhook['repository']['ssh_url']  # Use SSH URL so private repos can be cloned/pulled
+
+    @staticmethod
+    def repo_owner_name(webhook: Dict[str, Any]) -> str:
+        """Return the repo owner's name from the webhook JSON."""
+        return webhook['repository']['owner']['name'].lower()
+
+    @staticmethod
+    def repo_commit_id(webhook: Dict[str, Any]) -> str:
+        """Return the repo's ID from the webhook JSON."""
+        return str(webhook['commits'][0]['id'])
+
+    @staticmethod
+    def repo_commit_message(webhook: Dict[str, Any]) -> str:
+        """Return the repo's commit message from the webhook JSON."""
+        return str(webhook['commits'][0]['message'])
+
+    @staticmethod
+    def pipeline_id(webhook: Dict[str, Any]) -> str:
+        """Return the pipeline ID used for the SQLite stores."""
+        return f'{Webhook.repo_full_name(webhook).replace("/", "-")}@{Webhook.repo_commit_id(webhook)}'

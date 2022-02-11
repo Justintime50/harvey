@@ -1,9 +1,9 @@
 import os
 
-from harvey.globals import Global
+from harvey.config import Config
 
 
 def setup_module():
     """Set up the test suite."""
-    if not os.path.exists(Global.STORES_PATH):
-        os.makedirs(Global.STORES_PATH)
+    if not os.path.exists(Config.stores_path):
+        os.makedirs(Config.stores_path)

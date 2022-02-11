@@ -2,8 +2,8 @@ import datetime
 import subprocess
 from unittest.mock import ANY, mock_open, patch
 
-from harvey.globals import Global
 from harvey.pipelines import Pipeline
+from harvey.webhooks import Webhook
 
 MOCK_OUTPUT = 'mock output'
 MOCK_TIME = datetime.datetime.utcnow()
@@ -18,7 +18,7 @@ def mock_config(pipeline='deploy', prod_compose=False):
     return mock_config
 
 
-@patch('harvey.globals.Global.SLACK', True)
+@patch('harvey.config.Config.use_slack', True)
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.pipelines.Pipeline.open_project_config', return_value=mock_config())
 @patch('harvey.messages.Message.send_slack_message')
@@ -69,7 +69,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
         _ = Pipeline.open_project_config(mock_webhook)
 
         mock_utils_kill.assert_called_once_with(
-            f'Harvey could not find a ".harvey.yml" file in {Global.repo_full_name(mock_webhook)}.', mock_webhook
+            f'Harvey could not find a ".harvey.yml" file in {Webhook.repo_full_name(mock_webhook)}.', mock_webhook
         )
 
 

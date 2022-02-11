@@ -5,8 +5,8 @@ import slack
 from harvey.messages import Message
 
 
-@patch('harvey.messages.SLACK_CHANNEL', 'mock-channel')
-@patch('harvey.messages.SLACK_BOT_TOKEN', '123')
+@patch('harvey.config.Config.slack_channel', 'mock-channel')
+@patch('harvey.config.Config.slack_bot_token', '123')
 @patch('logging.Logger.debug')
 @patch('slack.WebClient.chat_postMessage')
 def test_send_slack_message_success(mock_slack, mock_logger):

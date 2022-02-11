@@ -7,11 +7,12 @@ from typing import Any, Dict, Tuple
 import woodchips
 import yaml
 
+from harvey.config import Config
 from harvey.containers import Container
 from harvey.git import Git
-from harvey.globals import Global
 from harvey.messages import Message
-from harvey.utils import LOG_LEVEL, LOGGER_NAME, Utils
+from harvey.utils import Utils
+from harvey.webhooks import Webhook
 
 
 class Pipeline:
@@ -20,12 +21,12 @@ class Pipeline:
         """Initialize the setup for a pipeline by cloning or pulling the project
         and setting up standard logging info.
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         # Kill the pipeline if the project is locked
-        if Utils.lookup_project_lock(Global.repo_full_name(webhook)) is True:
+        if Utils.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
             Utils.kill(
-                f'{Global.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
                 ' deployments.',
                 webhook,
             )
@@ -39,46 +40,46 @@ class Pipeline:
 
         webhook_data_key = webhook.get('data')
         if webhook_data_key:
-            logger.debug(f'Pulling Harvey config for {Global.repo_full_name(webhook)} from webhook...')
+            logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from webhook...')
             config = webhook_data_key
             pipeline = webhook_data_key.get('pipeline')
         else:
-            logger.debug(f'Pulling Harvey config for {Global.repo_full_name(webhook)} from config file...')
+            logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from config file...')
             config = Pipeline.open_project_config(webhook)
             pipeline = config.get('pipeline')
 
-        if pipeline not in Global.SUPPORTED_PIPELINES:
+        if pipeline not in Config.supported_pipelines:
             final_output = (
-                f'Harvey could not run for `{Global.repo_full_name(webhook)}`, there was no acceptable pipeline'
+                f'Harvey could not run for `{Webhook.repo_full_name(webhook)}`, there was no acceptable pipeline'
                 ' specified.'
             )
             logger.error(final_output)
             pipeline = Utils.kill(final_output, webhook)
 
         pipeline_started_message = (
-            f'{Global.WORK_EMOJI} Harvey has started a `{config["pipeline"]}` pipeline for'
-            f' `{Global.repo_full_name(webhook)}`.'
+            f'{Config.work_emoji} Harvey has started a `{config["pipeline"]}` pipeline for'
+            f' `{Webhook.repo_full_name(webhook)}`.'
         )
-        if Global.SLACK:
+        if Config.use_slack:
             Message.send_slack_message(pipeline_started_message)
 
         preamble = (
-            f'Harvey v{Global.HARVEY_VERSION} ({config["pipeline"].title()} Pipeline)\n'
+            f'Harvey v{Config.harvey_version} ({config["pipeline"].title()} Pipeline)\n'
             f'Pipeline Started: {start_time}\n'
-            f'Pipeline ID: {Global.repo_commit_id(webhook)}'
+            f'Pipeline ID: {Webhook.repo_commit_id(webhook)}'
         )
         logger.info(preamble)
 
-        configuration = f'Configuration:\n{json.dumps(config, indent=4)}' if LOG_LEVEL == 'DEBUG' else ''
+        configuration = f'Configuration:\n{json.dumps(config, indent=4)}' if Config.log_level == 'DEBUG' else ''
         commit_details = (
-            f'New commit by: {Global.repo_commit_author(webhook)} to {Global.repo_full_name(webhook)}.\n'
-            f'Commit Details: {Global.repo_commit_message(webhook)}'
+            f'New commit by: {Webhook.repo_commit_author(webhook)} to {Webhook.repo_full_name(webhook)}.\n'
+            f'Commit Details: {Webhook.repo_commit_message(webhook)}'
         )
-        git_output = git if LOG_LEVEL == 'DEBUG' else ''
+        git_output = git if Config.log_level == 'DEBUG' else ''
         execution_time = f'Startup execution time: {datetime.datetime.utcnow() - start_time}'
 
         output = f'{preamble}\n\n{configuration}\n\n{commit_details}\n\n{git_output}\n\n{execution_time}'
-        logger.debug(f'{Global.repo_full_name(webhook)} {execution_time}')
+        logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
 
         return config, output, start_time
 
@@ -87,7 +88,7 @@ class Pipeline:
         """After receiving a webhook, spin up a pipeline based on the config.
         If a Pipeline fails, it fails early in the individual functions being called.
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         webhook_config, webhook_output, start_time = Pipeline.initialize_pipeline(webhook)
         pipeline = webhook_config['pipeline'].lower()
@@ -105,9 +106,9 @@ class Pipeline:
                     container_healthcheck = Container.run_container_healthcheck(docker_client, container, webhook)
                     container_healthcheck_statuses[container] = container_healthcheck
                     if container_healthcheck is True:
-                        healthcheck_message = f'\n{container} Healthcheck: {Global.SUCCESS_EMOJI}'
+                        healthcheck_message = f'\n{container} Healthcheck: {Config.success_emoji}'
                     else:
-                        healthcheck_message = f'\n{container} Healthcheck: {Global.FAILURE_EMOJI}'
+                        healthcheck_message = f'\n{container} Healthcheck: {Config.failure_emoji}'
                     healthcheck_messages += healthcheck_message
 
                 healthcheck_values = container_healthcheck_statuses.values()
@@ -117,7 +118,7 @@ class Pipeline:
 
             end_time = datetime.datetime.utcnow()
             execution_time = f'Pipeline execution time: {end_time - start_time}'
-            logger.debug(f'{Global.repo_full_name(webhook)} {execution_time}')
+            logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
             final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}'
 
             if all_healthchecks_passed or not healthcheck:
@@ -127,7 +128,7 @@ class Pipeline:
         elif pipeline == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
             pull_success_message = (
-                f'Harvey pulled {Global.repo_full_name(webhook)} successfully. {Global.SUCCESS_EMOJI}'
+                f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Config.success_emoji}'
             )
             logger.info(pull_success_message)
             final_output = f'{webhook_output}\n{pull_success_message}'
@@ -147,11 +148,11 @@ class Pipeline:
             ]
         }
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         try:
-            yml_filepath = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), '.harvey.yml')
-            yaml_filepath = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook), '.harvey.yaml')
+            yml_filepath = os.path.join(Config.projects_path, Webhook.repo_full_name(webhook), '.harvey.yml')
+            yaml_filepath = os.path.join(Config.projects_path, Webhook.repo_full_name(webhook), '.harvey.yaml')
 
             if os.path.isfile(yml_filepath):
                 filepath = yml_filepath
@@ -165,7 +166,7 @@ class Pipeline:
                 logger.debug(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
-            final_output = f'Harvey could not find a ".harvey.yml" file in {Global.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not find a ".harvey.yml" file in {Webhook.repo_full_name(webhook)}.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 
@@ -175,11 +176,11 @@ class Pipeline:
 
         This flow doesn't use the Docker API but instead runs `docker compose` commands.
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         start_time = datetime.datetime.utcnow()
 
-        repo_path = os.path.join(Global.PROJECTS_PATH, Global.repo_full_name(webhook))
+        repo_path = os.path.join(Config.projects_path, Webhook.repo_full_name(webhook))
 
         docker_compose_yml = 'docker-compose.yml'
         docker_compose_yaml = 'docker-compose.yaml'
@@ -192,7 +193,7 @@ class Pipeline:
         elif os.path.exists(os.path.join(repo_path, docker_compose_yaml)):
             default_compose_filepath = os.path.join(repo_path, docker_compose_yaml)
         else:
-            final_output = f'Harvey could not find a "docker-compose.yml" file in {Global.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not find a "docker-compose.yml" file in {Webhook.repo_full_name(webhook)}.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 
@@ -205,7 +206,7 @@ class Pipeline:
                 prod_compose_filepath = os.path.join(repo_path, docker_compose_prod_yaml)
             else:
                 final_output = (
-                    f'Harvey could not find a "docker-compose-prod.yml" file in {Global.repo_full_name(webhook)}.'
+                    f'Harvey could not find a "docker-compose-prod.yml" file in {Webhook.repo_full_name(webhook)}.'
                 )
                 logger.error(final_output)
                 Utils.kill(final_output, webhook)
@@ -238,7 +239,7 @@ class Pipeline:
                 compose_command,
                 stdin=None,
                 stderr=None,
-                timeout=Global.DEPLOY_TIMEOUT,
+                timeout=Config.deploy_timeout,
             )
             decoded_output = compose_output.decode('UTF-8')
             execution_time = f'Deploy stage execution time: {datetime.datetime.utcnow() - start_time}'

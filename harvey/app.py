@@ -5,14 +5,12 @@ from dotenv import load_dotenv
 from flask import Flask, abort, request
 from sqlitedict import SqliteDict  # type: ignore
 
-from harvey.globals import Global
-from harvey.utils import LOG_LEVEL, Utils, setup_logger
-from harvey.webhooks import Webhook
+from harvey.api import Api
+from harvey.config import Config
+from harvey.utils import Utils, setup_logger
 
 load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
-HOST = os.getenv('HOST', '127.0.0.1')
-PORT = os.getenv('PORT', '5000')
 
 
 @APP.errorhandler(404)
@@ -42,7 +40,7 @@ def harvey_healthcheck():
 @APP.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
-    return Webhook.parse_webhook(request=request)
+    return Api.parse_webhook(request=request)
 
 
 @APP.route('/pipelines/<pipeline_id>', methods=['GET'])
@@ -52,7 +50,7 @@ def retrieve_pipeline(pipeline_id: str):
     A `pipeline_id` will be `username-repo_name-commit_id`.
     """
     try:
-        with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
+        with SqliteDict(Config.pipelines_store_path) as mydict:
             for key, value in mydict.iteritems():
                 transformed_key = key.split('@')
                 if pipeline_id == f'{transformed_key[0]}-{transformed_key[1]}':
@@ -72,10 +70,10 @@ def retrieve_pipelines():
     """
     pipelines = {'pipelines': []}
 
-    page_size = int(request.args.get('page_size', Global.PAGINATION_LIMIT))
+    page_size = int(request.args.get('page_size', Config.pagination_limit))
     project_name = request.args.get('project')
 
-    with SqliteDict(Global.PIPELINES_STORE_PATH) as mydict:
+    with SqliteDict(Config.pipelines_store_path) as mydict:
         for record_num, (key, value) in enumerate(mydict.iteritems(), start=1):
             if record_num > page_size:
                 break
@@ -98,13 +96,13 @@ def retrieve_projects():
     """Retrieves a list of project names from the git repos stored in Harvey."""
     projects = {'projects': []}
 
-    page_size = int(request.args.get('page_size', Global.PAGINATION_LIMIT))
+    page_size = int(request.args.get('page_size', Config.pagination_limit))
 
-    project_owners = os.listdir(Global.PROJECTS_PATH)
+    project_owners = os.listdir(Config.projects_path)
     if '.DS_Store' in project_owners:
         project_owners.remove('.DS_Store')
     for project_owner in project_owners:
-        project_names = os.listdir(os.path.join(Global.PROJECTS_PATH, project_owner))
+        project_names = os.listdir(os.path.join(Config.projects_path, project_owner))
         if '.DS_Store' in project_names:
             project_names.remove('.DS_Store')
         for project_name in project_names:
@@ -138,13 +136,13 @@ def main():
     setup_logger()
 
     # Setup the directory for the SQLite databases
-    if not os.path.exists(Global.STORES_PATH):
-        os.makedirs(Global.STORES_PATH)
+    if not os.path.exists(Config.stores_path):
+        os.makedirs(Config.stores_path)
 
     requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
 
-    flask_debug = LOG_LEVEL == 'DEBUG'
-    APP.run(host=HOST, port=PORT, debug=flask_debug)
+    flask_debug = Config.log_level == 'DEBUG'
+    APP.run(host=Config.host, port=Config.port, debug=flask_debug)
 
 
 if __name__ == '__main__':

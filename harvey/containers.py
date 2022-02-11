@@ -4,14 +4,15 @@ from typing import Any, Dict, List, Optional
 import docker  # type: ignore
 import woodchips
 
-from harvey.utils import LOGGER_NAME, Utils
+from harvey.config import Config
+from harvey.utils import Utils
 
 
 class Container:
     @staticmethod
     def create_client():
         """Creates a Docker client to use for connections."""
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         logger.debug('Setting up Docker client...')
         client = docker.from_env(timeout=30)
@@ -21,7 +22,7 @@ class Container:
     @staticmethod
     def get_container(client, container_id: str) -> Optional[Any]:
         """Get the details of a Docker container."""
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         logger.debug(f'Getting details from {container_id}...')
 
@@ -39,7 +40,7 @@ class Container:
 
         To grab details of a single record, use something like `container.attrs['Name']`.
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         logger.debug('Listing containers...')
 
@@ -59,7 +60,7 @@ class Container:
         If we cannot inspect a container, it may not be up and running yet, we'll retry
         a few times before abandoning the healthcheck.
         """
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
         container_healthy = False
         max_retries = 5

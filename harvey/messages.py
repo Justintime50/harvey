@@ -1,25 +1,22 @@
-import os
 import sys
 
 import slack
 import woodchips
 
-SLACK_BOT_TOKEN = os.getenv('SLACK_BOT_TOKEN')
-SLACK_CHANNEL = os.getenv('SLACK_CHANNEL', 'general')
-LOGGER_NAME = 'harvey'  # Redefined here to avoid circular import
+from harvey.config import Config
 
 
 class Message:
     @staticmethod
     def send_slack_message(message: str):
         """Send a Slack message via a Slackbot."""
-        logger = woodchips.get(LOGGER_NAME)
+        logger = woodchips.get(Config.logger_name)
 
-        slack_client = slack.WebClient(SLACK_BOT_TOKEN)
+        slack_client = slack.WebClient(Config.slack_bot_token)
 
         try:
             slack_client.chat_postMessage(
-                channel=SLACK_CHANNEL,
+                channel=Config.slack_channel,
                 text=message,
             )
             logger.debug('Slack message sent!')
