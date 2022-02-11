@@ -11,7 +11,7 @@ from harvey.containers import Container
 from harvey.git import Git
 from harvey.globals import Global
 from harvey.messages import Message
-from harvey.utils import LOGGER_NAME, Utils
+from harvey.utils import LOG_LEVEL, LOGGER_NAME, Utils
 
 
 class Pipeline:
@@ -62,29 +62,23 @@ class Pipeline:
         if Global.SLACK:
             Message.send_slack_message(pipeline_started_message)
 
-        # TODO: Rework the logs of a pipeline to be more informative and clean
         preamble = (
-            f'Running Harvey v{Global.HARVEY_VERSION}\n{config["pipeline"].title()} Pipeline Started: {start_time}'
+            f'Harvey v{Global.HARVEY_VERSION} ({config["pipeline"].title()} Pipeline)\n'
+            f'Pipeline Started: {start_time}\n'
+            f'Pipeline ID: {Global.repo_commit_id(webhook)}'
         )
-        pipeline_id = f'Pipeline ID: {Global.repo_commit_id(webhook)}'
-        logger.info(preamble + ' | ' + pipeline_id)
-        git_message = (
-            f'New commit by: {Global.repo_commit_author(webhook)}.'
-            f'\nCommit made on repo: {Global.repo_full_name(webhook)}.'
-        )
+        logger.info(preamble)
 
-        execution_time = (
-            f'{Global.repo_full_name(webhook)} startup execution time: {datetime.datetime.utcnow() - start_time}'
+        configuration = f'Configuration:\n{json.dumps(config, indent=4)}' if LOG_LEVEL == 'DEBUG' else ''
+        commit_details = (
+            f'New commit by: {Global.repo_commit_author(webhook)} to {Global.repo_full_name(webhook)}.\n'
+            f'Commit Details: {Global.repo_commit_message(webhook)}'
         )
-        output = (
-            f'{preamble}'
-            f'\n{pipeline_id}'
-            f'\nConfiguration:\n{json.dumps(config, indent=4)}'
-            f'\n\n{git_message}'
-            f'\n{git}'
-            f'\n{execution_time}'
-        )
-        logger.info(execution_time)
+        git_output = git if LOG_LEVEL == 'DEBUG' else ''
+        execution_time = f'Startup execution time: {datetime.datetime.utcnow() - start_time}'
+
+        output = f'{preamble}\n\n{configuration}\n\n{commit_details}\n\n{git_output}\n\n{execution_time}'
+        logger.debug(f'{Global.repo_full_name(webhook)} {execution_time}')
 
         return config, output, start_time
 
@@ -102,7 +96,7 @@ class Pipeline:
             deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)
 
             healthcheck = webhook_config.get('healthcheck')
-            healthcheck_messages = ''
+            healthcheck_messages = 'Healthchecks:\n'
             docker_client = Container.create_client()
 
             if healthcheck:
@@ -122,8 +116,8 @@ class Pipeline:
                 all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
             end_time = datetime.datetime.utcnow()
-            execution_time = f'{Global.repo_full_name(webhook)} pipeline execution time: {end_time - start_time}'
-            logger.info(execution_time)
+            execution_time = f'Pipeline execution time: {end_time - start_time}'
+            logger.debug(f'{Global.repo_full_name(webhook)} {execution_time}')
             final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}'
 
             if all_healthchecks_passed or not healthcheck:

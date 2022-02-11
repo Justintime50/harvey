@@ -31,6 +31,12 @@ def test_repo_owner_name(mock_webhook):
     assert result == 'test_owner'
 
 
+def test_repo_commit_message(mock_webhook):
+    result = Global.repo_commit_message(mock_webhook)
+
+    assert result == 'Mock message'
+
+
 def test_repo_commit_id(mock_webhook):
     result = Global.repo_commit_id(mock_webhook)
 

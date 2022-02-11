@@ -30,6 +30,7 @@ def mock_webhook(branch='main'):
                 "author": {
                     "name": "test_user",
                 },
+                "message": "Mock message",
             }
         ],
     }

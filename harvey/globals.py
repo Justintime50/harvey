@@ -61,13 +61,18 @@ class Global:
 
     @staticmethod
     def repo_owner_name(webhook: Dict[str, Any]) -> str:
-        """Return the repo's owner's name from the webhook JSON."""
+        """Return the repo owner's name from the webhook JSON."""
         return webhook['repository']['owner']['name'].lower()
 
     @staticmethod
     def repo_commit_id(webhook: Dict[str, Any]) -> str:
-        """Return the repo's id from the webhook JSON."""
+        """Return the repo's ID from the webhook JSON."""
         return str(webhook['commits'][0]['id'])
+
+    @staticmethod
+    def repo_commit_message(webhook: Dict[str, Any]) -> str:
+        """Return the repo's commit message from the webhook JSON."""
+        return str(webhook['commits'][0]['message'])
 
     @staticmethod
     def pipeline_id(webhook: Dict[str, Any]) -> str:
