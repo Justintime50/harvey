@@ -10,6 +10,7 @@ import yaml
 from harvey.config import Config
 from harvey.containers import Container
 from harvey.git import Git
+from harvey.locks import Lock
 from harvey.messages import Message
 from harvey.utils import Utils
 from harvey.webhooks import Webhook
@@ -24,7 +25,7 @@ class Pipeline:
         logger = woodchips.get(Config.logger_name)
 
         # Kill the pipeline if the project is locked
-        if Utils.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
+        if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
             Utils.kill(
                 f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
                 ' deployments.',
@@ -33,7 +34,7 @@ class Pipeline:
 
         start_time = datetime.datetime.utcnow()
 
-        Utils.update_project_lock(webhook=webhook, locked=True)
+        _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=True)
         Utils.store_pipeline_details(webhook)
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)

@@ -8,6 +8,7 @@ import pytest
         'pipelines',
         'pipelines/mock-pipeline-id',
         'projects',
+        'locks',
         'locks/mock-project-name',
     ],
 )
@@ -25,6 +26,19 @@ def test_routes_are_reachable_get(mock_client, route):
 )
 def test_routes_are_reachable_post(mock_client, route):
     response = mock_client.post(route)
+
+    assert response
+
+
+@pytest.mark.parametrize(
+    'route',
+    [
+        'locks/mock-project-name/enable',
+        'locks/mock-project-name/disable',
+    ],
+)
+def test_routes_are_reachable_put(mock_client, route):
+    response = mock_client.put(route)
 
     assert response
 

@@ -8,12 +8,18 @@ import woodchips
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
+from harvey.locks import Lock
 from harvey.pipelines import Pipeline
-from harvey.utils import Utils
 from harvey.webhooks import Webhook
 
 
 class Api:
+    """The Api class contains all the actions accessible via an API endpoint.
+
+    These functions may call out to other modules in Harvey and ultimately serve as the "glue"
+    that pulls the entire action together prior to returning whatever the result is to the user via API.
+    """
+
     @staticmethod
     def parse_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:
         """Parse a webhook's data. Return success or error status.
@@ -132,11 +138,54 @@ class Api:
         return projects
 
     @staticmethod
-    def retrieve_lock(project_name: str) -> Dict[str, str]:
-        """Retrieve the `lock` status of a project."""
-        lock_status = Utils.lookup_project_lock(project_name)
+    def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
+        locks: Dict[str, List[Any]] = {'locks': []}
 
-        if lock_status:
+        page_size = int(request.args.get('page_size', Config.pagination_limit))
+
+        with SqliteDict(Config.locks_store_path) as mydict:
+            for record_num, (key, values) in enumerate(mydict.iteritems(), start=1):
+                if record_num > page_size:
+                    break
+                else:
+                    locks['locks'].append(
+                        {
+                            'project': key,
+                            'locked': values['locked'],
+                        }
+                    )
+
+        sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])
+        locks['locks'] = sorted_locks
+
+        return locks
+
+    @staticmethod
+    def retrieve_lock(project_name: str) -> Dict[str, str]:
+        """Retrieve the `lock` status of a project via its fully-qualified repo name."""
+        try:
+            lock_status = Lock.lookup_project_lock(project_name)
+
             return {'locked': lock_status}
-        else:
-            raise Exception
+        except Exception:
+            raise
+
+    @staticmethod
+    def enable_lock(project_name: str):
+        """Enables the deployment lock of a project."""
+        try:
+            lock_status = Lock.update_project_lock(project_name=project_name, locked=True)
+
+            return {'locked': lock_status}
+        except Exception:
+            raise
+
+    @staticmethod
+    def disable_lock(project_name: str):
+        """Disables the deployment lock of a project."""
+        try:
+            lock_status = Lock.update_project_lock(project_name=project_name, locked=False)
+
+            return {'locked': lock_status}
+        except Exception:
+            raise

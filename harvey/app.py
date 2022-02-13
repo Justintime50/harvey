@@ -18,7 +18,7 @@ def not_found(e):
     status_code = 404
     response = {
         'success': False,
-        'message': 'Not a valid endpoint.',
+        'message': 'The endpoint you hit is either not valid or the record was not found.',
     }, status_code
 
     return response
@@ -39,7 +39,10 @@ def harvey_healthcheck():
 @APP.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
-    return Api.parse_webhook(request=request)
+    try:
+        return Api.parse_webhook(request=request)
+    except Exception:
+        raise
 
 
 @APP.route('/pipelines/<pipeline_id>', methods=['GET'])
@@ -62,13 +65,28 @@ def retrieve_pipelines():
     - The user can optionally pass a URL param of `page_size` to limit how many results are returned
     - The user can optionally pass a URL param of `project` to filter what pipelines get returned
     """
-    return Api.retrieve_pipelines(request)
+    try:
+        return Api.retrieve_pipelines(request)
+    except Exception:
+        raise
 
 
 @APP.route('/projects', methods=['GET'])
 def retrieve_projects():
     """Retrieves a list of project names from the git repos stored in Harvey."""
-    return Api.retrieve_projects(request)
+    try:
+        return Api.retrieve_projects(request)
+    except Exception:
+        raise
+
+
+@APP.route('/locks', methods=['GET'])
+def retrieve_locks():
+    """Retrieves the list of locks"""
+    try:
+        return Api.retrieve_locks(request)
+    except Exception:
+        raise
 
 
 @APP.route('/locks/<project_name>', methods=['GET'])
@@ -80,7 +98,22 @@ def retrieve_lock(project_name: str):
         return abort(404)
 
 
-# TODO: Add a `lock` and `unlock` endpoint for deployments
+@APP.route('/locks/<project_name>/enable', methods=['PUT'])
+def enable_lock(project_name: str):
+    """Enables the deployment lock for a project."""
+    try:
+        return Api.enable_lock(project_name)
+    except Exception:
+        raise
+
+
+@APP.route('/locks/<project_name>/disable', methods=['PUT'])
+def disable_lock(project_name: str):
+    """Disables the deployment lock for a project."""
+    try:
+        return Api.disable_lock(project_name)
+    except Exception:
+        raise
 
 
 def main():

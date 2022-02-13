@@ -6,6 +6,7 @@ import woodchips
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
+from harvey.locks import Lock
 from harvey.messages import Message
 from harvey.webhooks import Webhook
 
@@ -27,7 +28,7 @@ class Utils:
         if Config.use_slack:
             Message.send_slack_message(pipeline_logs)
 
-        Utils.update_project_lock(webhook=webhook, locked=False)
+        _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
         # Close the thread safely
         sys.exit()
@@ -46,7 +47,7 @@ class Utils:
         if Config.use_slack:
             Message.send_slack_message(pipeline_logs)
 
-        Utils.update_project_lock(webhook=webhook, locked=False)
+        _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
         # Close the thread safely
         sys.exit()
@@ -90,39 +91,6 @@ class Utils:
             }
 
             mydict.commit()
-
-    @staticmethod
-    def update_project_lock(webhook: Dict[str, Any], locked: bool = False):
-        """Locks or unlocks the project's deployments to ensure we don't crash Docker with two inflight deployments.
-
-        Locking should only happen once a pipeline is begun. A locked deployment should then always be
-        unlocked once it's finished regardless of status so another deployment can follow.
-        """
-        logger = woodchips.get(Config.logger_name)
-
-        locked_string = 'Locking' if locked is True else 'Unlocking'
-        logger.info(f'{locked_string} deployments for {Webhook.repo_full_name(webhook)}...')
-
-        with SqliteDict(Config.locks_store_path) as mydict:
-            mydict[Webhook.repo_full_name(webhook).replace("/", "-")] = {
-                'locked': locked,
-            }
-
-            mydict.commit()
-
-    @staticmethod
-    def lookup_project_lock(project_name: str) -> bool:
-        """Checks if a project is locked or not by its full name."""
-        locked_value = False
-        corrected_project_name = project_name.replace("/", "-")
-
-        with SqliteDict(Config.locks_store_path) as mydict:
-            for key, value in mydict.iteritems():
-                if key == corrected_project_name:
-                    locked_value = value['locked']
-                    break
-
-        return locked_value
 
 
 def setup_logger():
