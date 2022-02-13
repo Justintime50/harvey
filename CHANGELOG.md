@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v0.17.0 (2022-02-12)
 
 * Overhauled the pipeline logs to provide more details that are easier to read
 * Changed the required `harvey.json` file for each project to `.harvey.yml` (expected fields/values remain the same)
