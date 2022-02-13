@@ -57,7 +57,7 @@ class Pipeline:
             pipeline = Utils.kill(final_output, webhook)
 
         pipeline_started_message = (
-            f'{Config.work_emoji} Harvey has started a `{config["pipeline"]}` pipeline for'
+            f'{Message.work_emoji} Harvey has started a `{config["pipeline"]}` pipeline for'
             f' `{Webhook.repo_full_name(webhook)}`.'
         )
         if Config.use_slack:
@@ -106,9 +106,9 @@ class Pipeline:
                     container_healthcheck = Container.run_container_healthcheck(docker_client, container, webhook)
                     container_healthcheck_statuses[container] = container_healthcheck
                     if container_healthcheck is True:
-                        healthcheck_message = f'\n{container} Healthcheck: {Config.success_emoji}'
+                        healthcheck_message = f'\n{container} Healthcheck: {Message.success_emoji}'
                     else:
-                        healthcheck_message = f'\n{container} Healthcheck: {Config.failure_emoji}'
+                        healthcheck_message = f'\n{container} Healthcheck: {Message.failure_emoji}'
                     healthcheck_messages += healthcheck_message
 
                 healthcheck_values = container_healthcheck_statuses.values()
@@ -128,7 +128,7 @@ class Pipeline:
         elif pipeline == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
             pull_success_message = (
-                f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Config.success_emoji}'
+                f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}'
             )
             logger.info(pull_success_message)
             final_output = f'{webhook_output}\n{pull_success_message}'

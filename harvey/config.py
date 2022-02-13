@@ -35,10 +35,3 @@ class Config:
     logger_name = 'harvey'
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
     log_location = os.path.join(harvey_path, 'logs')
-
-    # Emoji (used for Slack messages, set defaults if slack isn't in use)
-    # TODO: Defaults are nice for when slack isn't in use; however, the emoji text will
-    # still show up in log files, we should be writting the fallback message to logs instead of emojis
-    work_emoji = ':hammer_and_wrench:' if use_slack else ''
-    success_emoji = ':white_check_mark:' if use_slack else 'Success!'
-    failure_emoji = ':skull_and_crossbones:' if use_slack else 'Failure!'

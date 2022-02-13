@@ -8,6 +8,7 @@
 * Added new `HARVEY_PATH`, `GIT_TIMEOUT`, `DEPLPOY_TIMEOUT`, and `DEPLOY_ON_TAG` env vars for customization
 * Better syncing of the version string for the release and what appears in logs
 * Better error handling around `404`s at the API level
+* Emojis will now be converted to a fallback string representation in pipeline logs while they will remain emojis in Slack messages
 * Various bug fixes and refactoring improvements
 
 ## v0.16.0 (2022-01-18)

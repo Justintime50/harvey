@@ -22,7 +22,7 @@ class Utils:
         logger.warning(failure_message)
 
         pipeline_logs = final_output + failure_message
-        Utils.store_pipeline_details(webhook, pipeline_logs)
+        Utils.store_pipeline_details(webhook, Utils._strip_emojis_from_logs(pipeline_logs))
 
         if Config.use_slack:
             Message.send_slack_message(pipeline_logs)
@@ -41,7 +41,7 @@ class Utils:
         logger.info(success_message)
 
         pipeline_logs = final_output + success_message
-        Utils.store_pipeline_details(webhook, pipeline_logs)
+        Utils.store_pipeline_details(webhook, Utils._strip_emojis_from_logs(pipeline_logs))
 
         if Config.use_slack:
             Message.send_slack_message(pipeline_logs)
@@ -50,6 +50,17 @@ class Utils:
 
         # Close the thread safely
         sys.exit()
+
+    @staticmethod
+    def _strip_emojis_from_logs(output: str) -> str:
+        """Replace the emojis for logs since they won't render properly there."""
+        logs_without_emoji = (
+            output.replace(Message.success_emoji, 'Success!')
+            .replace(Message.failure_emoji, 'Failure!')
+            .replace(Message.work_emoji, '')
+        )
+
+        return logs_without_emoji
 
     @staticmethod
     def store_pipeline_details(webhook: Dict[str, Any], final_output: str = 'NA'):
