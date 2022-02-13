@@ -1,11 +1,15 @@
+import os
 from threading import Thread
-from typing import Dict, Tuple
+from typing import Any, Dict, List, Tuple
 
+import flask
 import requests
 import woodchips
+from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 from harvey.pipelines import Pipeline
+from harvey.utils import Utils
 from harvey.webhooks import Webhook
 
 
@@ -68,3 +72,71 @@ class Api:
         }, status_code
 
         return response
+
+    @staticmethod
+    def retrieve_pipeline(pipeline_id: str) -> Dict[str, Any]:
+        """Retrieve a pipeline's details from a given `pipeline_id`."""
+        with SqliteDict(Config.pipelines_store_path) as mydict:
+            for key, value in mydict.iteritems():
+                transformed_key = key.split('@')
+                if pipeline_id == f'{transformed_key[0]}-{transformed_key[1]}':
+                    return value
+        raise Exception
+
+    @staticmethod
+    def retrieve_pipelines(request: flask.Request) -> Dict[str, List[Any]]:
+        """Retrieve a list of pipelines until the pagination limit is reached."""
+        pipelines: Dict[str, List[Any]] = {'pipelines': []}
+
+        page_size = int(request.args.get('page_size', Config.pagination_limit))
+        project_name = request.args.get('project')
+
+        with SqliteDict(Config.pipelines_store_path) as mydict:
+            for record_num, (_, value) in enumerate(mydict.iteritems(), start=1):
+                if record_num > page_size:
+                    break
+
+                if project_name and value['project'] == project_name:
+                    pipelines['pipelines'].append(value)
+                elif not project_name:
+                    pipelines['pipelines'].append(value)
+                else:
+                    pass
+
+        sorted_pipelines = sorted(pipelines['pipelines'], key=lambda i: i['timestamp'], reverse=True)
+        pipelines['pipelines'] = sorted_pipelines
+
+        return pipelines
+
+    @staticmethod
+    def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
+        """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
+        projects = {'projects': []}
+
+        page_size = int(request.args.get('page_size', Config.pagination_limit))
+
+        project_owners = os.listdir(Config.projects_path)
+        if '.DS_Store' in project_owners:
+            project_owners.remove('.DS_Store')
+        for project_owner in project_owners:
+            project_names = os.listdir(os.path.join(Config.projects_path, project_owner))
+            if '.DS_Store' in project_names:
+                project_names.remove('.DS_Store')
+            for project_name in project_names:
+                final_project_name = f'{project_owner}-{project_name}'
+                projects['projects'].append(final_project_name)
+
+            if len(projects['projects']) > page_size:
+                break
+
+        return projects
+
+    @staticmethod
+    def retrieve_lock(project_name: str) -> Dict[str, str]:
+        """Retrieve the `lock` status of a project."""
+        lock_status = Utils.lookup_project_lock(project_name)
+
+        if lock_status:
+            return {'locked': lock_status}
+        else:
+            raise Exception
