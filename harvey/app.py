@@ -36,11 +36,16 @@ def harvey_healthcheck():
     return response
 
 
-@APP.route('/pipelines/start', methods=['POST'])
-def start_pipeline():
-    """Start a pipeline based on webhook data and the `docker-compose.yml` file."""
+@APP.route('/pipelines', methods=['GET'])
+def retrieve_pipelines():
+    """Retrieves pipelines from the Sqlite store.
+
+    - The keys will be `username-repo_name-commit_id`.
+    - The user can optionally pass a URL param of `page_size` to limit how many results are returned
+    - The user can optionally pass a URL param of `project` to filter what pipelines get returned
+    """
     try:
-        return Api.parse_webhook(request=request)
+        return Api.retrieve_pipelines(request)
     except Exception:
         raise
 
@@ -57,16 +62,14 @@ def retrieve_pipeline(pipeline_id: str):
         return abort(404)
 
 
-@APP.route('/pipelines', methods=['GET'])
-def retrieve_pipelines():
-    """Retrieves pipelines from the Sqlite store.
+@APP.route('/pipelines/start', methods=['POST'])
+def start_pipeline():
+    """Start a pipeline based on webhook data and the `docker-compose.yml` file.
 
-    - The keys will be `username-repo_name-commit_id`.
-    - The user can optionally pass a URL param of `page_size` to limit how many results are returned
-    - The user can optionally pass a URL param of `project` to filter what pipelines get returned
+    This is the main entrypoint for Harvey.
     """
     try:
-        return Api.retrieve_pipelines(request)
+        return Api.parse_github_webhook(request)
     except Exception:
         raise
 
@@ -98,20 +101,20 @@ def retrieve_lock(project_name: str):
         return abort(404)
 
 
-@APP.route('/locks/<project_name>/enable', methods=['PUT'])
-def enable_lock(project_name: str):
+@APP.route('/projects/<project_name>/lock', methods=['PUT'])
+def lock_project(project_name: str):
     """Enables the deployment lock for a project."""
     try:
-        return Api.enable_lock(project_name)
+        return Api.lock_project(project_name)
     except Exception:
         raise
 
 
-@APP.route('/locks/<project_name>/disable', methods=['PUT'])
-def disable_lock(project_name: str):
+@APP.route('/projects/<project_name>/unlock', methods=['PUT'])
+def unlock_project(project_name: str):
     """Disables the deployment lock for a project."""
     try:
-        return Api.disable_lock(project_name)
+        return Api.unlock_project(project_name)
     except Exception:
         raise
 

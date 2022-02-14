@@ -54,7 +54,7 @@ make run
 make prod
 ```
 
-## Things to Know
+### Things to Know
 
 * Harvey will timeout git clone/pull after 300 seconds
 * Harvey will timeout deploys after 30 minutes
@@ -62,7 +62,7 @@ make prod
 * Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
 * Harvey assumes that `Docker Compose v2` is installed and active
 
-## Harvey Configuration
+### Harvey Configuration
 
 **Configuration Criteria**
 * Each repo either needs a `.harvey.yml` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `.harvey.yml` file if there is no `data` key present)
@@ -141,6 +141,19 @@ Environment Variables:
     DEPLOY_ON_TAG     A boolean specifying if a tag pushed will trigger a deploy. Default: True
     HARVEY_PATH       The path where Harvey will store projects, logs, and the SQLite databases. Default: ~/harvey
 ```
+
+### API
+
+The following endpoints are available to interact with Harvey:
+
+* `/pipelines` (GET) - Retrieve a list of pipelines
+* `/pipelines/{pipeline_id}` (GET) - Retrieve the details of a single pipeline
+* `/pipelines/start` (POST) - Start a pipeline with data from a GitHub webhook
+* `/projects` (GET) - Retrieve a list of projects
+* `/projects/{project_name}/lock` (PUT) - Locks the deployments of a project
+* `/projects/{project_name}/unlock` (PUT) - Unlocks the deployments of a project
+* `/locks` (GET) - Retrieve a list of locks
+* `/locks/{project_name}` (GET) - Retrieve the lock status of a project
 
 ### Example Python Functions
 

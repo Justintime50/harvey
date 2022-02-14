@@ -3,7 +3,7 @@
 ## NEXT RELEASE
 
 * Moved all `lock` functionality to its own module
-* Added new `/locks/`, `/locks/{project_name}/enable`, and `/locks/{project_name}/disable` endpoints
+* Added new `/locks`, `/locks/{project_name}`, `/projects/{project_name}/lock`, and `/projects/{project_name}/unlock` endpoints
 * Fixed a bug where retrieving a lock status may return the wrong value
 
 ## v0.17.0 (2022-02-12)

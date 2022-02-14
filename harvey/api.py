@@ -21,7 +21,7 @@ class Api:
     """
 
     @staticmethod
-    def parse_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:
+    def parse_github_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:
         """Parse a webhook's data. Return success or error status.
 
         1. Check if the payload is valid JSON
@@ -171,8 +171,8 @@ class Api:
             raise
 
     @staticmethod
-    def enable_lock(project_name: str):
-        """Enables the deployment lock of a project."""
+    def lock_project(project_name: str):
+        """Locks the deployments of a project."""
         try:
             lock_status = Lock.update_project_lock(project_name=project_name, locked=True)
 
@@ -181,8 +181,8 @@ class Api:
             raise
 
     @staticmethod
-    def disable_lock(project_name: str):
-        """Disables the deployment lock of a project."""
+    def unlock_project(project_name: str):
+        """Unlocks the deployments of a project."""
         try:
             lock_status = Lock.update_project_lock(project_name=project_name, locked=False)
 
