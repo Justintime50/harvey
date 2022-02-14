@@ -12,6 +12,18 @@ load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
 
 
+@APP.errorhandler(401)
+def not_authorized(e):
+    """Return a 401 if the request is not authorized."""
+    status_code = 401
+    response = {
+        'success': False,
+        'message': 'You are not authorized to access this endpoint. Please check your credentials and try again.',
+    }, status_code
+
+    return response
+
+
 @APP.errorhandler(404)
 def not_found(e):
     """Return a 404 if the route is not found."""
@@ -37,6 +49,7 @@ def harvey_healthcheck():
 
 
 @APP.route('/pipelines', methods=['GET'])
+@Api.check_api_key
 def retrieve_pipelines():
     """Retrieves pipelines from the Sqlite store.
 
@@ -51,6 +64,7 @@ def retrieve_pipelines():
 
 
 @APP.route('/pipelines/<pipeline_id>', methods=['GET'])
+@Api.check_api_key
 def retrieve_pipeline(pipeline_id: str):
     """Retrieve a pipeline's details by ID.
 
@@ -62,6 +76,7 @@ def retrieve_pipeline(pipeline_id: str):
         return abort(404)
 
 
+# Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
 @APP.route('/pipelines/start', methods=['POST'])
 def start_pipeline():
     """Start a pipeline based on webhook data and the `docker-compose.yml` file.
@@ -75,6 +90,7 @@ def start_pipeline():
 
 
 @APP.route('/projects', methods=['GET'])
+@Api.check_api_key
 def retrieve_projects():
     """Retrieves a list of project names from the git repos stored in Harvey."""
     try:
@@ -84,6 +100,7 @@ def retrieve_projects():
 
 
 @APP.route('/locks', methods=['GET'])
+@Api.check_api_key
 def retrieve_locks():
     """Retrieves the list of locks"""
     try:
@@ -93,6 +110,7 @@ def retrieve_locks():
 
 
 @APP.route('/locks/<project_name>', methods=['GET'])
+@Api.check_api_key
 def retrieve_lock(project_name: str):
     """Retrieves the lock status of a project by its name."""
     try:
@@ -102,6 +120,7 @@ def retrieve_lock(project_name: str):
 
 
 @APP.route('/projects/<project_name>/lock', methods=['PUT'])
+@Api.check_api_key
 def lock_project(project_name: str):
     """Enables the deployment lock for a project."""
     try:
@@ -111,6 +130,7 @@ def lock_project(project_name: str):
 
 
 @APP.route('/projects/<project_name>/unlock', methods=['PUT'])
+@Api.check_api_key
 def unlock_project(project_name: str):
     """Disables the deployment lock for a project."""
     try:

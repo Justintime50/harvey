@@ -1,10 +1,13 @@
+import base64
 import os
+from functools import wraps
 from threading import Thread
 from typing import Any, Dict, List, Tuple
 
 import flask
 import requests
 import woodchips
+from flask import abort, request
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
@@ -19,6 +22,38 @@ class Api:
     These functions may call out to other modules in Harvey and ultimately serve as the "glue"
     that pulls the entire action together prior to returning whatever the result is to the user via API.
     """
+
+    @staticmethod
+    def check_api_key(func):
+        """Decorator for API endpoints that require an API key."""
+
+        @wraps(func)
+        def check_auth(*args, **kwargs):
+            """Checks that the Authorization header (Basic Auth) matches the secret on file."""
+            auth_header = request.headers.get('Authorization')
+
+            # Only check the API key if the Harvey instance expects one
+            if Config.webhook_secret:
+                if auth_header:
+                    split_auth = auth_header.strip().split(' ')
+
+                    if len(split_auth) == 2:
+                        try:
+                            password, _ = base64.b64decode(split_auth[1]).decode().split(':', 1)
+                        except Exception:
+                            raise
+                    else:
+                        raise Exception
+
+                    if password == Config.webhook_secret:
+                        return func(*args, **kwargs)
+                else:
+                    return abort(401)
+            else:
+                # The Harvey instance does not expect an API key, return the endpoint without validation
+                return func(*args, **kwargs)
+
+        return check_auth
 
     @staticmethod
     def parse_github_webhook(request: requests.Request) -> Tuple[Dict[str, object], int]:

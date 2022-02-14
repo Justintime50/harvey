@@ -144,6 +144,8 @@ Environment Variables:
 
 ### API
 
+The Harvey API can be secured via Basic Auth by setting the `WEBHOOK_SECRET` env var (this secret is used for authenticating a webhook came from GitHub in addition to securing the remaining endpoints).
+
 The following endpoints are available to interact with Harvey:
 
 * `/pipelines` (GET) - Retrieve a list of pipelines
