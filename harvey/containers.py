@@ -72,8 +72,9 @@ class Container:
             container = Container.get_container(docker_client, container_name)
 
             if container is None:
-                Utils.kill(f'Harvey could not get container details for {container_name}.', webhook)
-                break
+                message = f'Harvey could not get container details for {container_name} during Healthcheck.'
+                logger.error(message)
+                Utils.kill(message, webhook)
             elif container.status.lower() == 'running':
                 container_healthy = True
                 logger.info(f'{container_name} healthcheck passed!')
