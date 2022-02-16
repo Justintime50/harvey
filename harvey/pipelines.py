@@ -120,7 +120,7 @@ class Pipeline:
             end_time = datetime.datetime.utcnow()
             execution_time = f'Pipeline execution time: {end_time - start_time}'
             logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
-            final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}'
+            final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}\n'
 
             if all_healthchecks_passed or not healthcheck:
                 Utils.success(final_output, webhook)

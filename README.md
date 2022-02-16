@@ -127,7 +127,7 @@ Harvey's entrypoint (eg: `127.0.0.1:5000/pipelines/start`) accepts a webhook fro
 
 ```
 Environment Variables:
-    USE_SLACK             Set to "true" to send slack messages. Default: False
+    USE_SLACK         Set to "true" to send slack messages. Default: False
     SLACK_CHANNEL     The Slack channel to send messages to
     SLACK_BOT_TOKEN   The Slackbot token to use to authenticate each request to Slack
     WEBHOOK_SECRET    The Webhook secret required by GitHub (if enabled, leave blank to ignore) to secure your webhooks. Default: None

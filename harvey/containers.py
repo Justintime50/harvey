@@ -69,11 +69,16 @@ class Container:
         for attempt in range(1, max_retries + 1):
             logger.info(f'Running healthcheck attempt #{attempt} for {container_name}...')
 
+            # TODO: This function should check if the container uptime is under say 30 seconds to ensure
+            # it got restarted instead of failing silently and remaining on the old deploy
             container = Container.get_container(docker_client, container_name)
 
             if container is None:
-                message = f'Harvey could not get container details for {container_name} during Healthcheck.'
-                logger.error(message)
+                message = (
+                    f'Harvey could not get container details for {container_name} during Healthcheck.'
+                    ' As such, Harvey could not determine if the pipeline was successful or not.'
+                )
+                logger.warning(message)
                 Utils.kill(message, webhook)
             elif container.status.lower() == 'running':
                 container_healthy = True
