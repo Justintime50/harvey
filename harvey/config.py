@@ -22,7 +22,7 @@ class Config:
 
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
-    port = os.getenv('PORT', '5000')
+    port = int(os.getenv('PORT', 5000))
     harvey_version = VERSION
     supported_pipelines = {
         'deploy',

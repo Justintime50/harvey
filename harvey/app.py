@@ -139,7 +139,11 @@ def unlock_project(project_name: str):
         raise
 
 
-def main():
+def bootstrap():
+    """Bootstrap the Harvey instance on startup.
+
+    Any task required for Harvey to work that only needs to be instantiated once should go here.
+    """
     setup_logger()
 
     # Setup the directory for the SQLite databases
@@ -148,9 +152,15 @@ def main():
 
     requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
 
+
+if __name__ == '__main__':
+    # These tasks take place when run via Flask
+    bootstrap()
+
     flask_debug = Config.log_level == 'DEBUG'
     APP.run(host=Config.host, port=Config.port, debug=flask_debug)
 
 
-if __name__ == '__main__':
-    main()
+if __name__ != '__main__':
+    # These tasks take place when run via Gunicorn, the remaining config can be found in `wsgi.py`
+    bootstrap()

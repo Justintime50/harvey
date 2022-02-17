@@ -152,7 +152,7 @@ class Api:
     @staticmethod
     def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
         """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
-        projects = {'projects': []}
+        projects: Dict[str, List[str]] = {'projects': []}
 
         page_size = int(request.args.get('page_size', Config.pagination_limit))
 
@@ -196,7 +196,7 @@ class Api:
         return locks
 
     @staticmethod
-    def retrieve_lock(project_name: str) -> Dict[str, str]:
+    def retrieve_lock(project_name: str) -> Dict[str, bool]:
         """Retrieve the `lock` status of a project via its fully-qualified repo name."""
         try:
             lock_status = Lock.lookup_project_lock(project_name)
