@@ -247,11 +247,11 @@ class Pipeline:
             final_output = f'{decoded_output}\n{execution_time}'
             logger.info(final_output)
         except subprocess.TimeoutExpired:
-            final_output = 'Harvey timed out deploying.'
+            final_output = f'Harvey timed out deploying {Webhook.repo_full_name(webhook)}.'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
-        except subprocess.CalledProcessError:
-            final_output = f'{output}\nHarvey could not finish the deploy.'
+        except subprocess.CalledProcessError as error:
+            final_output = f'{output}\nHarvey could not finish the deploy: {error}'
             logger.error(final_output)
             Utils.kill(final_output, webhook)
 
