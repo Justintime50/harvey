@@ -1,6 +1,7 @@
 import os
 
 import requests_unixsocket  # type: ignore
+import sentry_sdk
 from dotenv import load_dotenv
 from flask import Flask, abort, request
 
@@ -145,6 +146,9 @@ def bootstrap():
     Any task required for Harvey to work that only needs to be instantiated once should go here.
     """
     setup_logger()
+
+    if Config.sentry_url:
+        sentry_sdk.init(Config.sentry_url)
 
     # Setup the directory for the SQLite databases
     if not os.path.exists(Config.stores_path):

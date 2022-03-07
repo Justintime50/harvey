@@ -13,6 +13,7 @@ REQUIREMENTS = [
     'pyyaml == 6.*',
     'requests == 2.*',
     'requests_unixsocket == 0.2.*',
+    'sentry-sdk == 1.5.*',
     'slackclient == 2.*',
     'sqlitedict == 1.7.*',
     'woodchips == 0.2.*',

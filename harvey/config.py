@@ -35,3 +35,4 @@ class Config:
     logger_name = 'harvey'
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
     log_location = os.path.join(harvey_path, 'logs')
+    sentry_url = os.getenv('SENTRY_URL')
