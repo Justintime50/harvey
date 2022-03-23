@@ -5,7 +5,8 @@
 - Adds a simple authentication system where endpoints can be protected with the same API key as the webhook secret (uses basic auth)
 - Moved all `lock` functionality to its own module
 - Added new `/locks`, `/locks/{project_name}`, `/projects/{project_name}/lock`, and `/projects/{project_name}/unlock` endpoints
-- Fixed a bug where retrieving a lock status may return the wrong value
+- Fixes a bug where retrieving a lock status may return the wrong value
+- Fixes a bug that kills builds when a lock cannot be found (eg: new projects)
 - Adds `sentry` integration
 
 ## v0.17.0 (2022-02-12)

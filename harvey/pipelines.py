@@ -25,12 +25,15 @@ class Pipeline:
         logger = woodchips.get(Config.logger_name)
 
         # Kill the pipeline if the project is locked
-        if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
-            Utils.kill(
-                f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
-                ' deployments.',
-                webhook,
-            )
+        try:
+            if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
+                Utils.kill(
+                    f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                    ' deployments.',
+                    webhook,
+                )
+        except Exception:
+            logger.warning(f'Could not determine project lock for {Webhook.repo_full_name(webhook)}.')
 
         start_time = datetime.datetime.utcnow()
 

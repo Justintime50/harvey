@@ -8,6 +8,7 @@ class Lock:
     @staticmethod
     def update_project_lock(project_name: str, locked: bool = False) -> bool:
         """Locks or unlocks the project's deployments to ensure we don't crash Docker with two inflight deployments.
+        This function will also create locks for new projects.
 
         Locking should only happen once a pipeline is begun. A locked deployment should then always be
         unlocked once it's finished regardless of status so another deployment can follow.
