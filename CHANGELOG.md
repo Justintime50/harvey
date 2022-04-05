@@ -8,6 +8,7 @@
 - Fixes a bug where retrieving a lock status may return the wrong value
 - Fixes a bug that kills builds when a lock cannot be found (eg: new projects)
 - Adds `sentry` integration
+- Removes the `sys.exit` call on the success and kill utils as it was triggering sentries since this raises `SystemExit`. Once we run either util, the thread should safely tear itself down anyway
 
 ## v0.17.0 (2022-02-12)
 

@@ -1,5 +1,4 @@
 import datetime
-import sys
 from typing import Any, Dict
 
 import woodchips
@@ -14,9 +13,7 @@ from harvey.webhooks import Webhook
 class Utils:
     @staticmethod
     def kill(final_output: str, webhook: Dict[str, Any]):
-        """A kill util to write everything to logs, send messages,
-        tear down Docker stuff, and quit.
-        """
+        """Log output, send message, and cleanup on pipeline failure."""
         logger = woodchips.get(Config.logger_name)
 
         failure_message = f'{Webhook.repo_full_name(webhook)} pipeline failed!'
@@ -30,12 +27,9 @@ class Utils:
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
-        # Close the thread safely
-        sys.exit()
-
     @staticmethod
     def success(final_output: str, webhook: Dict[str, Any]):
-        """Log output and send message on pipeline success."""
+        """Log output, send message, and cleanup on pipeline success."""
         logger = woodchips.get(Config.logger_name)
 
         success_message = f'{Webhook.repo_full_name(webhook)} pipeline succeeded!'
@@ -48,9 +42,6 @@ class Utils:
             Message.send_slack_message(pipeline_logs)
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
-
-        # Close the thread safely
-        sys.exit()
 
     @staticmethod
     def _strip_emojis_from_logs(output: str) -> str:
