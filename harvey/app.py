@@ -140,7 +140,7 @@ def unlock_project(project_name: str):
         raise
 
 
-def bootstrap():
+def bootstrap(debug_mode):
     """Bootstrap the Harvey instance on startup.
 
     Any task required for Harvey to work that only needs to be instantiated once should go here.
@@ -148,7 +148,10 @@ def bootstrap():
     setup_logger()
 
     if Config.sentry_url:
-        sentry_sdk.init(Config.sentry_url)
+        sentry_sdk.init(
+            Config.sentry_url,
+            debug=debug_mode,
+        )
 
     # Setup the directory for the SQLite databases
     if not os.path.exists(Config.stores_path):
@@ -159,10 +162,10 @@ def bootstrap():
 
 if __name__ == '__main__':
     # These tasks take place when run via Flask
-    bootstrap()
+    debug_mode = Config.log_level == 'DEBUG'
+    bootstrap(debug_mode)
 
-    flask_debug = Config.log_level == 'DEBUG'
-    APP.run(host=Config.host, port=Config.port, debug=flask_debug)
+    APP.run(host=Config.host, port=Config.port, debug=debug_mode)
 
 
 if __name__ != '__main__':
