@@ -170,4 +170,5 @@ if __name__ == '__main__':
 
 if __name__ != '__main__':
     # These tasks take place when run via Gunicorn, the remaining config can be found in `wsgi.py`
-    bootstrap()
+    debug_mode = Config.log_level == 'DEBUG'
+    bootstrap(debug_mode)
