@@ -132,7 +132,7 @@ class Pipeline:
         elif pipeline == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
             pull_success_message = (
-                f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}'
+                f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}\n'
             )
             logger.info(pull_success_message)
             final_output = f'{webhook_output}\n{pull_success_message}'
