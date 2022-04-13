@@ -1,0 +1,12 @@
+version: "3.8"
+services: 
+  harvey:
+    build: .
+    user: root
+    volumes:
+      - /usr/bin/docker:/usr/bin/docker
+      - /var/run/docker.sock:/var/run/docker.sock # Linux: allow us to interact with host containers
+      - ${HOME}/harvey:/harvey/data
+    ports:
+      # TODO: Determine why we can't use port 5000
+      - "5050:5000"

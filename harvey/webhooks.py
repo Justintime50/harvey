@@ -40,7 +40,8 @@ class Webhook:
     @staticmethod
     def repo_url(webhook: Dict[str, Any]) -> str:
         """Return the repo's URL from the webhook JSON."""
-        return webhook['repository']['ssh_url']  # Use SSH URL so private repos can be cloned/pulled
+        # TODO: Put this back to `ssh_url`, changing to test Docker
+        return webhook['repository']['url']  # Use `ssh_url` so private repos can be cloned/pulled
 
     @staticmethod
     def repo_owner_name(webhook: Dict[str, Any]) -> str:

@@ -18,10 +18,10 @@ class Config:
     webhook_secret = os.getenv('WEBHOOK_SECRET', '')
     slack_bot_token = os.getenv('SLACK_BOT_TOKEN')
     slack_channel = os.getenv('SLACK_CHANNEL', 'general')
-    harvey_path = os.getenv('HARVEY_PATH', os.path.expanduser('~/harvey'))
+    harvey_path = os.getenv('HARVEY_PATH', os.path.expanduser('data'))
 
     # Harvey settings
-    host = os.getenv('HOST', '127.0.0.1')
+    host = os.getenv('HOST', '0.0.0.0')
     port = int(os.getenv('PORT', 5000))
     harvey_version = VERSION
     supported_pipelines = {

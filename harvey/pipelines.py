@@ -217,8 +217,9 @@ class Pipeline:
 
             # fmt: off
             compose_command = [
-                'docker',
-                'compose',
+                # `harvey-compose` is just `docker compose` v2 with a custom
+                # binary name for use inside the Docker container.
+                'harvey-compose',
                 '-f', default_compose_filepath,
                 '-f', prod_compose_filepath,
                 'up', '-d',
@@ -229,8 +230,9 @@ class Pipeline:
         else:
             # fmt: off
             compose_command = [
-                'docker',
-                'compose',
+                # `harvey-compose` is just `docker compose` v2 with a custom
+                # binary name for use inside the Docker container.
+                'harvey-compose',
                 '-f', default_compose_filepath,
                 'up', '-d',
                 '--build',
