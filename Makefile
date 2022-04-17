@@ -61,7 +61,7 @@ lint:
 
 ## prod - Run the service in production
 prod:
-	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --build
 	venv/bin/gunicorn --workers=2 wsgi:APP
 
 ## run - Run the service locally
