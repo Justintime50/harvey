@@ -13,6 +13,8 @@ The lightweight Docker Compose deployment platform.
 
 </div>
 
+**NOTE:** Harvey is unstable and rapidly changing. Although used in the wild, it's not completely documented and interfaces are changing frequently. Keep an eye on the project as it continues to mature.
+
 ## Why Docker Compose Deployments
 
 I've long been a fan of the simplicity of a `docker-compose` file and its usage. Deploying with systems such as Rancher or a self-hosted GitLab seemed too daunting with uneccessary overhead for simple projects. Why can't I use the same setup in production for spinning up projects as I do during development? Skip the environment variable injection, key stores, and references by having a system such as Harvey spin up my project by simply [using docker-compose in production](https://docs.docker.com/compose/production/).
@@ -52,6 +54,10 @@ make run
 
 # Run in production (runs via Gunicorn)
 make prod
+
+# Spin up the optional reverse proxy (adjust the URLs in the docker-compose files)
+docker compose up -d # local
+docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 ```
 
 ### Things to Know

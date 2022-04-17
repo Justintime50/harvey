@@ -8,13 +8,17 @@ TEST_DIR := test
 help:
 	@cat Makefile | grep '^## ' --color=never | cut -c4- | sed -e "`printf 's/ - /\t- /;'`" | column -s "`printf '\t'`" -t
 
+## black - Runs the Black Python formatter against the project
+black:
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/
+
+## black-check - Checks if the project is formatted correctly against the Black rules
+black-check:
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
+
 ## build - Builds the project in preparation for release
 build:
-	$(PYTHON_BINARY) setup.py sdist bdist_wheel
-
-## coverage - Test the project and generate an HTML coverage report
-coverage:
-	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=term-missing
+	$(VIRTUAL_BIN)/python setup.py sdist bdist_wheel
 
 ## clean - Remove the virtual environment and clear out .pyc files
 clean:
@@ -24,13 +28,9 @@ clean:
 	rm -rf build
 	rm -rf *.egg-info
 
-## black - Runs the Black Python formatter against the project
-black:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/
-
-## black-check - Checks if the project is formatted correctly against the Black rules
-black-check:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
+## coverage - Test the project and generate an HTML coverage report
+coverage:
+	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=term-missing
 
 ## format - Runs all formatting tools against the project
 format: black isort lint mypy
@@ -61,6 +61,7 @@ lint:
 
 ## prod - Run the service in production
 prod:
+	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d
 	venv/bin/gunicorn --workers=2 wsgi:APP
 
 ## run - Run the service locally

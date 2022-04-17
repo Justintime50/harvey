@@ -1,0 +1,13 @@
+version: "3.8"
+services:
+  harvey-nginx:
+    build: .
+    restart: always
+    networks:
+      - traefik
+    labels:
+      - traefik.enable=true
+
+networks:
+  traefik:
+    name: traefik
