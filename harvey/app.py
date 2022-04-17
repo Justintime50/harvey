@@ -1,4 +1,5 @@
 import os
+import subprocess
 
 import requests_unixsocket  # type: ignore
 import sentry_sdk
@@ -11,6 +12,7 @@ from harvey.utils import setup_logger
 
 load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
+REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 
 
 @APP.errorhandler(401)
@@ -147,6 +149,17 @@ def bootstrap(debug_mode):
     """
     setup_logger()
 
+    # Ensure the correct Docker Compose version is available
+    docker_compose_version = subprocess.check_output(
+        ['docker-compose', '--version'],
+        stdin=None,
+        stderr=None,
+        timeout=3,
+    ).decode('UTF-8')
+    if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
+        raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
+
+    # Setup Sentry
     if Config.sentry_url:
         sentry_sdk.init(
             Config.sentry_url,
@@ -157,7 +170,8 @@ def bootstrap(debug_mode):
     if not os.path.exists(Config.stores_path):
         os.makedirs(Config.stores_path)
 
-    requests_unixsocket.monkeypatch()  # Allows us to use requests_unixsocket via requests
+    # Allows us to use requests_unixsocket via requests
+    requests_unixsocket.monkeypatch()
 
 
 if __name__ == '__main__':
