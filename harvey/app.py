@@ -150,14 +150,17 @@ def bootstrap(debug_mode):
     setup_logger()
 
     # Ensure the correct Docker Compose version is available
-    docker_compose_version = subprocess.check_output(
-        ['docker-compose', '--version'],
-        stdin=None,
-        stderr=None,
-        timeout=3,
-    ).decode('UTF-8')
-    if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
-        raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
+    try:
+        docker_compose_version = subprocess.check_output(
+            ['docker-compose', '--version'],
+            stdin=None,
+            stderr=None,
+            timeout=3,
+        ).decode('UTF-8')
+        if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
+            raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
+    except Exception:
+        raise
 
     # Setup Sentry
     if Config.sentry_url:
