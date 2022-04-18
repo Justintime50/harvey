@@ -10,6 +10,7 @@
 - Adds `sentry` integration
 - Removes the `sys.exit` call on the success and kill utils as it was triggering sentries since this raises `SystemExit`. Once we run either util, the thread should safely tear itself down anyway
 - Enforces Docker Compose v2 availability by checking during the bootstrap process
+- Large performance boost for sorting & paginating large lists of pipelines and locks
 
 ## v0.17.0 (2022-02-12)
 

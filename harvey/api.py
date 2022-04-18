@@ -179,18 +179,15 @@ class Api:
         page_size = int(request.args.get('page_size', Config.pagination_limit))
 
         with SqliteDict(Config.locks_store_path) as mydict:
-            for record_num, (key, values) in enumerate(mydict.iteritems(), start=1):
-                if record_num > page_size:
-                    break
-                else:
-                    locks['locks'].append(
-                        {
-                            'project': key,
-                            'locked': values['locked'],
-                        }
-                    )
+            for key, values in mydict.iteritems():
+                locks['locks'].append(
+                    {
+                        'project': key,
+                        'locked': values['locked'],
+                    }
+                )
 
-        sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])
+        sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])[:page_size]
         locks['locks'] = sorted_locks
 
         return locks
