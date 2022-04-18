@@ -8,6 +8,7 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'docker == 5.0.*',
     'flask == 2.*',
+    'gevent == 21.*',  # Used for gunicorn concurrency
     'gunicorn == 20.1.*',
     'python-dotenv == 0.19.*',
     'pyyaml == 6.*',

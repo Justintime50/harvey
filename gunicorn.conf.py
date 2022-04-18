@@ -11,4 +11,4 @@ harvey_port = os.getenv('PORT', '5000')
 loglevel = os.getenv('LOG_LEVEL', 'info').lower()
 
 bind = f'{harvey_host}:{harvey_port}'
-worker_class = 'gthread'
+worker_class = 'gevent'

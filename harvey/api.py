@@ -133,18 +133,18 @@ class Api:
         project_name = request.args.get('project')
 
         with SqliteDict(Config.pipelines_store_path) as mydict:
-            for record_num, (_, value) in enumerate(mydict.iteritems(), start=1):
-                if record_num > page_size:
-                    break
-
+            for _, value in mydict.iteritems():
+                # If a project name is provided, only return pipelines for that project
                 if project_name and value['project'] == project_name:
                     pipelines['pipelines'].append(value)
+                # This block is for a generic list of pipelines (all pipelines)
                 elif not project_name:
                     pipelines['pipelines'].append(value)
+                # If a project name was specified but doesn't match, don't add to list
                 else:
                     pass
 
-        sorted_pipelines = sorted(pipelines['pipelines'], key=lambda i: i['timestamp'], reverse=True)
+        sorted_pipelines = sorted(pipelines['pipelines'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
         pipelines['pipelines'] = sorted_pipelines
 
         return pipelines
