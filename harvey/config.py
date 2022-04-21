@@ -2,8 +2,6 @@ import os
 
 from dotenv import load_dotenv
 
-from version import VERSION
-
 load_dotenv()  # Must remain at the top of this file
 
 
@@ -23,7 +21,7 @@ class Config:
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
     port = int(os.getenv('PORT', 5000))
-    harvey_version = VERSION
+    harvey_version = '0.17.0'
     supported_pipelines = {
         'deploy',
         'pull',

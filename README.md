@@ -190,3 +190,8 @@ curl -X GET http://127.0.0.1:5000/pipelines/justintime50-justinpaulhammond
 # Get a comprehensive list of development tools
 make help
 ```
+
+### Releasing
+
+1. Update the version in `Config.harvey_version`
+1. Update the version in `setup.py`

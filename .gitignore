@@ -1,9 +1,10 @@
 __pycache__
-.DS_Store
-*.json
 !mock_webhook.json
+.coverage
+.DS_Store
 .env
 *.egg-info
-venv
+*.json
+dist
 htmlcov
-.coverage
+venv

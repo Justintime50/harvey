@@ -18,15 +18,12 @@ black-check:
 
 ## build - Builds the project in preparation for release
 build:
-	$(VIRTUAL_BIN)/python setup.py sdist bdist_wheel
+	$(VIRTUAL_BIN)/python -m build
 
 ## clean - Remove the virtual environment and clear out .pyc files
 clean:
-	rm -rf $(VIRTUAL_ENV)
+	rm -rf $(VIRTUAL_ENV) dist build *.egg-info .coverage
 	find . -name '*.pyc' -delete
-	rm -rf dist
-	rm -rf build
-	rm -rf *.egg-info
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
@@ -66,6 +63,7 @@ prod:
 
 ## run - Run the service locally
 run:
+	docker compose up -d --build
 	venv/bin/python harvey/app.py
 
 ## mypy - Run mypy type checking on the project
