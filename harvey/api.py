@@ -24,6 +24,11 @@ class Api:
     """
 
     @staticmethod
+    def _page_size(request: flask.Request) -> int:
+        """Return a sane page size based on the request."""
+        return int(request.args.get('page_size')) if request.args.get('page_size') else Config.pagination_limit
+
+    @staticmethod
     def check_api_key(func):
         """Decorator for API endpoints that require an API key."""
 
@@ -129,7 +134,7 @@ class Api:
         """Retrieve a list of pipelines until the pagination limit is reached."""
         pipelines: Dict[str, List[Any]] = {'pipelines': []}
 
-        page_size = int(request.args.get('page_size', Config.pagination_limit))
+        page_size = Api._page_size(request)
         project_name = request.args.get('project')
 
         with SqliteDict(Config.pipelines_store_path) as mydict:
@@ -154,7 +159,7 @@ class Api:
         """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
         projects: Dict[str, List[str]] = {'projects': []}
 
-        page_size = int(request.args.get('page_size', Config.pagination_limit))
+        page_size = Api._page_size(request)
 
         project_owners = os.listdir(Config.projects_path)
         if '.DS_Store' in project_owners:
@@ -176,7 +181,7 @@ class Api:
     def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
         locks: Dict[str, List[Any]] = {'locks': []}
 
-        page_size = int(request.args.get('page_size', Config.pagination_limit))
+        page_size = Api._page_size(request)
 
         with SqliteDict(Config.locks_store_path) as mydict:
             for key, values in mydict.iteritems():
