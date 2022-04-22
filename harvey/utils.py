@@ -1,4 +1,5 @@
 import datetime
+import os
 from typing import Any, Dict
 
 import woodchips
@@ -27,6 +28,9 @@ class Utils:
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
+        # Exit the thread safely to ensure we don't continue executing
+        os._exit(1)
+
     @staticmethod
     def success(final_output: str, webhook: Dict[str, Any]):
         """Log output, send message, and cleanup on pipeline success."""
@@ -42,6 +46,9 @@ class Utils:
             Message.send_slack_message(pipeline_logs)
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+
+        # Exit the thread safely to ensure we don't continue executing
+        os._exit(1)
 
     @staticmethod
     def _strip_emojis_from_logs(output: str) -> str:
