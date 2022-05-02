@@ -76,7 +76,7 @@ class Container:
             if container is None:
                 message = (
                     f'Harvey could not get container details for {container_name} during Healthcheck.'
-                    ' As such, Harvey could not determine if the pipeline was successful or not.'
+                    ' As such, Harvey could not determine if the deployment was successful or not.'
                 )
                 logger.warning(message)
                 Utils.kill(message, webhook)

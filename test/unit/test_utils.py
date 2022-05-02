@@ -3,51 +3,59 @@ from unittest.mock import mock_open, patch
 from harvey.utils import Utils, setup_logger
 
 
-@patch('harvey.utils.Utils.store_pipeline_details')
+@patch('sys.exit')
+@patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
-def test_kill(mock_logger, mock_generate_logs, mock_output, mock_webhook):
+def test_kill(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_webhook):
     Utils.kill(mock_output, mock_webhook)
 
     mock_generate_logs.assert_called_once()
+    mock_exit.assert_called_once()
 
 
+@patch('sys.exit')
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
-@patch('harvey.utils.Utils.store_pipeline_details')
+@patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.warning')
-def test_kill_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_output, mock_webhook):
+def test_kill_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_exit, mock_output, mock_webhook):
     Utils.kill(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()
     mock_slack.assert_called_once()
+    mock_exit.assert_called_once()
 
 
-@patch('harvey.utils.Utils.store_pipeline_details')
+@patch('sys.exit')
+@patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
-def test_success(mock_logger, mock_generate_logs, mock_output, mock_webhook):
+def test_success(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_webhook):
     Utils.success(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()
+    mock_exit.assert_called_once()
 
 
+@patch('sys.exit')
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
-@patch('harvey.utils.Utils.store_pipeline_details')
+@patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
-def test_success_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_output, mock_webhook):
+def test_success_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_exit, mock_output, mock_webhook):
     Utils.success(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()
     mock_slack.assert_called_once()
+    mock_exit.assert_called_once()
 
 
 @patch('logging.Logger.debug')
-def test_store_pipeline_details(mock_logger, mock_output, mock_webhook):
+def test_store_deployment_details(mock_logger, mock_output, mock_webhook):
     with patch('builtins.open', mock_open()):
-        Utils.store_pipeline_details(mock_webhook, mock_output)
+        Utils.store_deployment_details(mock_webhook, mock_output)
 
         mock_logger.assert_called()
 

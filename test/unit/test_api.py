@@ -4,21 +4,21 @@ from harvey.api import Api
 
 
 @patch('logging.Logger.info')
-@patch('harvey.pipelines.Pipeline.run_pipeline')
-def test_parse_github_webhook(mock_run_pipeline, mock_logger, mock_webhook_object):
+@patch('harvey.deployments.Deployment.run_deployment')
+def test_parse_github_webhook(mock_run_deployment, mock_logger, mock_webhook_object):
     webhook = Api.parse_github_webhook(mock_webhook_object)
 
     mock_logger.assert_called()
     assert webhook[0] == {
-        'message': 'Started pipeline for test_user/test-repo-name',
+        'message': 'Started deployment for test_user/test-repo-name',
         'success': True,
     }
     assert webhook[1] == 200
 
 
 @patch('logging.Logger.debug')
-@patch('harvey.pipelines.Pipeline.run_pipeline')
-def test_parse_github_webhook_bad_branch(mock_run_pipeline, mock_logger, mock_webhook_object):
+@patch('harvey.deployments.Deployment.run_deployment')
+def test_parse_github_webhook_bad_branch(mock_run_deployment, mock_logger, mock_webhook_object):
     webhook = Api.parse_github_webhook(mock_webhook_object(branch='bad_branch_name'))
 
     mock_logger.assert_called()
@@ -30,8 +30,8 @@ def test_parse_github_webhook_bad_branch(mock_run_pipeline, mock_logger, mock_we
 
 
 @patch('logging.Logger.debug')
-@patch('harvey.pipelines.Pipeline.run_pipeline')
-def test_parse_github_webhook_no_json(mock_run_pipeline, mock_logger):
+@patch('harvey.deployments.Deployment.run_deployment')
+def test_parse_github_webhook_no_json(mock_run_deployment, mock_logger):
     mock_webhook = MagicMock()
     mock_webhook.json = None
     webhook = Api.parse_github_webhook(mock_webhook)
@@ -47,8 +47,8 @@ def test_parse_github_webhook_no_json(mock_run_pipeline, mock_logger):
 @patch('logging.Logger.info')
 @patch('harvey.config.Config.webhook_secret', '123')
 @patch('harvey.webhooks.Webhook.validate_webhook_secret', return_value=False)
-@patch('harvey.pipelines.Pipeline.run_pipeline')
-def test_parse_github_webhook_bad_webhook_secret(mock_run_pipeline, mock_logger, mock_webhook_object):
+@patch('harvey.deployments.Deployment.run_deployment')
+def test_parse_github_webhook_bad_webhook_secret(mock_run_deployment, mock_logger, mock_webhook_object):
     webhook = Api.parse_github_webhook(mock_webhook_object)
 
     mock_logger.assert_called()

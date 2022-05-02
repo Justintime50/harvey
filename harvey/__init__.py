@@ -1,9 +1,9 @@
 from harvey.api import Api
 from harvey.config import Config
 from harvey.containers import Container
+from harvey.deployments import Deployment
 from harvey.git import Git
 from harvey.messages import Message
-from harvey.pipelines import Pipeline
 from harvey.utils import Utils
 from harvey.webhooks import Webhook
 
@@ -13,7 +13,7 @@ __all__ = [
     'Container',
     'Git',
     'Message',
-    'Pipeline',
+    'Deployment',
     'Utils',
     'Webhook',
 ]

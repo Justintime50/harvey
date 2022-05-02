@@ -9,7 +9,7 @@ import harvey
 # with open('examples/git_webhook.json', 'r') as file:
 #     data = json.load(file)
 #     request = requests.post(
-#         'http://127.0.0.1:5000/pipelines/start',
+#         'http://127.0.0.1:5000/deploy',
 #         json=data,
 #         headers={
 #             'Content-Type': 'application/json',
@@ -17,18 +17,18 @@ import harvey
 #     )
 #     print(request.json())
 
-# """Retrieve a Pipeline by ID"""
+# """Retrieve a Deployment by ID"""
 # request = requests.get(
-#     'http://127.0.0.1:5000/pipelines/justintime50-justinpaulhammond-1',
+#     'http://127.0.0.1:5000/deployments/justintime50-justinpaulhammond-1',
 #     headers={
 #         'Content-Type': 'application/json',
 #     },
 # )
 # print(request.json())
 
-# """Retrieve all pipelines"""
+# """Retrieve all deployments"""
 # request = requests.get(
-#     'http://127.0.0.1:5000/pipelines',
+#     'http://127.0.0.1:5000/deployments',
 #     headers={
 #         'Content-Type': 'application/json',
 #     },

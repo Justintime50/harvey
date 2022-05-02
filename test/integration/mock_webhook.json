@@ -19,7 +19,7 @@
     }
   ],
   "data": {
-    "pipeline": "deploy",
+    "deployment_type": "pull",
     "healthcheck": [
       "justinpaulhammond-justinpaulhammond-1"
     ]

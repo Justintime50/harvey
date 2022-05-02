@@ -42,7 +42,7 @@ install:
 
 ## integration_test - Test the project end-to-end
 integration_test:
-	venv/bin/python $(TEST_DIR)/integration/test_pipeline.py
+	venv/bin/python $(TEST_DIR)/integration/test_deployment.py
 
 ## isort - Sorts imports throughout the project
 isort:

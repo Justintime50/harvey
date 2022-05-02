@@ -11,8 +11,8 @@ from flask import abort, request
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
+from harvey.deployments import Deployment
 from harvey.locks import Lock
-from harvey.pipelines import Pipeline
 from harvey.webhooks import Webhook
 
 
@@ -26,7 +26,11 @@ class Api:
     @staticmethod
     def _page_size(request: flask.Request) -> int:
         """Return a sane page size based on the request."""
-        return int(request.args.get('page_size')) if request.args.get('page_size') else Config.pagination_limit
+        return (
+            int(request.args.get('page_size', Config.pagination_limit))
+            if request.args.get('page_size')
+            else Config.pagination_limit
+        )
 
     @staticmethod
     def check_api_key(func):
@@ -65,7 +69,7 @@ class Api:
         """Parse a webhook's data. Return success or error status.
 
         1. Check if the payload is valid JSON
-        2. Check if the branch is in the allowed set of branches to run a pipeline from
+        2. Check if the branch is in the allowed set of branches to run a deployment from
         3. Check if the webhook secret matches (optional)
         """
         logger = woodchips.get(Config.logger_name)
@@ -92,11 +96,11 @@ class Api:
                 Config.deploy_on_tag and tag_commit in payload_json['ref']
             ):
                 Thread(
-                    target=Pipeline.run_pipeline,
+                    target=Deployment.run_deployment,
                     args=(payload_json,),
                 ).start()
 
-                message = f'Started pipeline for {Webhook.repo_full_name(payload_json)}'
+                message = f'Started deployment for {Webhook.repo_full_name(payload_json)}'
                 status_code = 200
                 success = True
 
@@ -120,39 +124,39 @@ class Api:
         return response
 
     @staticmethod
-    def retrieve_pipeline(pipeline_id: str) -> Dict[str, Any]:
-        """Retrieve a pipeline's details from a given `pipeline_id`."""
-        with SqliteDict(Config.pipelines_store_path) as mydict:
+    def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
+        """Retrieve a deployment's details from a given `deployment_id`."""
+        with SqliteDict(Config.deployments_store_path) as mydict:
             for key, value in mydict.iteritems():
                 transformed_key = key.split('@')
-                if pipeline_id == f'{transformed_key[0]}-{transformed_key[1]}':
+                if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
                     return value
         raise Exception
 
     @staticmethod
-    def retrieve_pipelines(request: flask.Request) -> Dict[str, List[Any]]:
-        """Retrieve a list of pipelines until the pagination limit is reached."""
-        pipelines: Dict[str, List[Any]] = {'pipelines': []}
+    def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
+        """Retrieve a list of deployments until the pagination limit is reached."""
+        deployments: Dict[str, List[Any]] = {'deployments': []}
 
         page_size = Api._page_size(request)
         project_name = request.args.get('project')
 
-        with SqliteDict(Config.pipelines_store_path) as mydict:
+        with SqliteDict(Config.deployments_store_path) as mydict:
             for _, value in mydict.iteritems():
-                # If a project name is provided, only return pipelines for that project
+                # If a project name is provided, only return deployments for that project
                 if project_name and value['project'] == project_name:
-                    pipelines['pipelines'].append(value)
-                # This block is for a generic list of pipelines (all pipelines)
+                    deployments['deployments'].append(value)
+                # This block is for a generic list of deployments (all deployments)
                 elif not project_name:
-                    pipelines['pipelines'].append(value)
+                    deployments['deployments'].append(value)
                 # If a project name was specified but doesn't match, don't add to list
                 else:
                     pass
 
-        sorted_pipelines = sorted(pipelines['pipelines'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
-        pipelines['pipelines'] = sorted_pipelines
+        sorted_deployments = sorted(deployments['deployments'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
+        deployments['deployments'] = sorted_deployments
 
-        return pipelines
+        return deployments
 
     @staticmethod
     def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:

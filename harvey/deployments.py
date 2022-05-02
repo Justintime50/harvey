@@ -16,15 +16,15 @@ from harvey.utils import Utils
 from harvey.webhooks import Webhook
 
 
-class Pipeline:
+class Deployment:
     @staticmethod
-    def initialize_pipeline(webhook: Dict[str, Any]) -> Tuple[Dict[str, Any], str, datetime.datetime]:
-        """Initialize the setup for a pipeline by cloning or pulling the project
+    def initialize_deployment(webhook: Dict[str, Any]) -> Tuple[Dict[str, Any], str, datetime.datetime]:
+        """Initialize the setup for a deployment by cloning or pulling the project
         and setting up standard logging info.
         """
         logger = woodchips.get(Config.logger_name)
 
-        # Kill the pipeline if the project is locked
+        # Kill the deployment if the project is locked
         try:
             if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
                 Utils.kill(
@@ -38,7 +38,7 @@ class Pipeline:
         start_time = datetime.datetime.utcnow()
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=True)
-        Utils.store_pipeline_details(webhook)
+        Utils.store_deployment_details(webhook)
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)
 
@@ -46,31 +46,31 @@ class Pipeline:
         if webhook_data_key:
             logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from webhook...')
             config = webhook_data_key
-            pipeline = webhook_data_key.get('pipeline')
+            deployment = webhook_data_key.get('deployment_type', Config.default_deployment)
         else:
             logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from config file...')
-            config = Pipeline.open_project_config(webhook)
-            pipeline = config.get('pipeline')
+            config = Deployment.open_project_config(webhook)
+            deployment = config.get('deployment_type', Config.default_deployment)
 
-        if pipeline not in Config.supported_pipelines:
+        if deployment not in Config.supported_deployments:
             final_output = (
-                f'Harvey could not run for `{Webhook.repo_full_name(webhook)}`, there was no acceptable pipeline'
+                f'Harvey could not run for `{Webhook.repo_full_name(webhook)}`, there was no acceptable deployment'
                 ' specified.'
             )
             logger.error(final_output)
-            pipeline = Utils.kill(final_output, webhook)
+            deployment = Utils.kill(final_output, webhook)
 
-        pipeline_started_message = (
-            f'{Message.work_emoji} Harvey has started a `{config["pipeline"]}` pipeline for'
+        deployment_started_message = (
+            f'{Message.work_emoji} Harvey has started a `{deployment}` deployment for'
             f' `{Webhook.repo_full_name(webhook)}`.'
         )
         if Config.use_slack:
-            Message.send_slack_message(pipeline_started_message)
+            Message.send_slack_message(deployment_started_message)
 
         preamble = (
-            f'Harvey v{Config.harvey_version} ({config["pipeline"].title()} Pipeline)\n'
-            f'Pipeline Started: {start_time}\n'
-            f'Pipeline ID: {Webhook.repo_commit_id(webhook)}'
+            f'Harvey v{Config.harvey_version} ({deployment.title()} Deployment)\n'
+            f'Deployment Started: {start_time}\n'
+            f'Deployment ID: {Webhook.repo_commit_id(webhook)}'
         )
         logger.info(preamble)
 
@@ -88,17 +88,17 @@ class Pipeline:
         return config, output, start_time
 
     @staticmethod
-    def run_pipeline(webhook: Dict[str, Any]):
-        """After receiving a webhook, spin up a pipeline based on the config.
-        If a Pipeline fails, it fails early in the individual functions being called.
+    def run_deployment(webhook: Dict[str, Any]):
+        """After receiving a webhook, spin up a deployment based on the config.
+        If a Deployment fails, it fails early in the individual functions being called.
         """
         logger = woodchips.get(Config.logger_name)
 
-        webhook_config, webhook_output, start_time = Pipeline.initialize_pipeline(webhook)
-        pipeline = webhook_config['pipeline'].lower()
+        webhook_config, webhook_output, start_time = Deployment.initialize_deployment(webhook)
+        deployment = webhook_config.get('deployment_type', Config.default_deployment).lower()
 
-        if pipeline == 'deploy':
-            deploy_output = Pipeline.deploy(webhook_config, webhook, webhook_output)
+        if deployment == 'deploy':
+            deploy_output = Deployment.deploy(webhook_config, webhook, webhook_output)
 
             healthcheck = webhook_config.get('healthcheck')
             healthcheck_messages = 'Healthchecks:\n'
@@ -121,7 +121,7 @@ class Pipeline:
                 all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
             end_time = datetime.datetime.utcnow()
-            execution_time = f'Pipeline execution time: {end_time - start_time}'
+            execution_time = f'Deployment execution time: {end_time - start_time}'
             logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
             final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}\n'
 
@@ -129,7 +129,7 @@ class Pipeline:
                 Utils.success(final_output, webhook)
             else:
                 Utils.kill(final_output, webhook)
-        elif pipeline == 'pull':
+        elif deployment == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
             pull_success_message = (
                 f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}\n'
@@ -140,11 +140,11 @@ class Pipeline:
 
     @staticmethod
     def open_project_config(webhook: Dict[str, Any]):
-        """Open the project's config file to assign pipeline variables.
+        """Open the project's config file to assign deployment variables.
 
         Project configs look like the following:
         {
-            "pipeline": "deploy",
+            "deployment_type": "deploy",
             "prod_compose": true,
             "healthcheck": [
                 "container_name_1",
@@ -176,7 +176,7 @@ class Pipeline:
 
     @staticmethod
     def deploy(config: Dict[str, Any], webhook: Dict[str, Any], output: str) -> str:
-        """Build Stage, used for `deploy` pipelines.
+        """Build Stage, used for `deploy` deployments.
 
         This flow doesn't use the Docker API but instead runs `docker compose` commands.
         """
@@ -191,7 +191,7 @@ class Pipeline:
         docker_compose_prod_yml = 'docker-compose-prod.yml'
         docker_compose_prod_yaml = 'docker-compose-prod.yaml'
 
-        # Setup the `docker-compose.yml` file for all deployments
+        # Setup the `docker-compose.yml` file for all deployments based on file spelling
         if os.path.exists(os.path.join(repo_path, docker_compose_yml)):
             default_compose_filepath = os.path.join(repo_path, docker_compose_yml)
         elif os.path.exists(os.path.join(repo_path, docker_compose_yaml)):

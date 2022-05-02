@@ -58,6 +58,6 @@ class Webhook:
         return str(webhook['commits'][0]['message'])
 
     @staticmethod
-    def pipeline_id(webhook: Dict[str, Any]) -> str:
-        """Return the pipeline ID used for the SQLite stores."""
+    def deployment_id(webhook: Dict[str, Any]) -> str:
+        """Return the deployment ID used for the SQLite stores."""
         return f'{Webhook.repo_full_name(webhook).replace("/", "-")}@{Webhook.repo_commit_id(webhook)}'

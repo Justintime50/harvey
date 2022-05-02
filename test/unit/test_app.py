@@ -5,8 +5,8 @@ import pytest
     'route',
     [
         'health',
-        'pipelines',
-        'pipelines/mock-pipeline-id',
+        'deployments',
+        'deployments/mock-deployment-id',
         'projects',
         'locks',
         'locks/mock-project-name',
@@ -21,7 +21,7 @@ def test_routes_are_reachable_get(mock_client, route):
 @pytest.mark.parametrize(
     'route',
     [
-        'pipelines/start',
+        'deploy',
     ],
 )
 def test_routes_are_reachable_post(mock_client, route):

@@ -21,14 +21,15 @@ class Config:
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
     port = int(os.getenv('PORT', 5000))
-    harvey_version = '0.17.0'
-    supported_pipelines = {
+    harvey_version = '0.18.0'
+    supported_deployments = {
         'deploy',
         'pull',
     }
+    default_deployment = 'deploy'
     projects_path = os.path.join(harvey_path, 'projects')
     stores_path = os.path.join(harvey_path, 'stores')
-    pipelines_store_path = os.path.join(stores_path, 'pipelines.sqlite')
+    deployments_store_path = os.path.join(stores_path, 'deployments.sqlite')
     locks_store_path = os.path.join(stores_path, 'locks.sqlite')
     logger_name = 'harvey'
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()

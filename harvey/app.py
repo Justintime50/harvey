@@ -51,38 +51,39 @@ def harvey_healthcheck():
     return response
 
 
-@APP.route('/pipelines', methods=['GET'])
+@APP.route('/deployments', methods=['GET'])
 @Api.check_api_key
-def retrieve_pipelines():
-    """Retrieves pipelines from the Sqlite store.
+def retrieve_deployments():
+    """Retrieves deployments from the Sqlite store.
 
     - The keys will be `username-repo_name-commit_id`.
     - The user can optionally pass a URL param of `page_size` to limit how many results are returned
-    - The user can optionally pass a URL param of `project` to filter what pipelines get returned
+    - The user can optionally pass a URL param of `project` to filter what deployments get returned
     """
     try:
-        return Api.retrieve_pipelines(request)
+        return Api.retrieve_deployments(request)
     except Exception:
         raise
 
 
-@APP.route('/pipelines/<pipeline_id>', methods=['GET'])
+@APP.route('/deployments/<deployment_id>', methods=['GET'])
 @Api.check_api_key
-def retrieve_pipeline(pipeline_id: str):
-    """Retrieve a pipeline's details by ID.
+def retrieve_deployment(deployment_id: str):
+    """Retrieve a deployment's details by ID.
 
-    A `pipeline_id` will be `username-repo_name-commit_id`.
+    A `deployment_id` will be `username-repo_name-commit_id`.
     """
     try:
-        return Api.retrieve_pipeline(pipeline_id)
+        return Api.retrieve_deployment(deployment_id)
     except Exception:
         return abort(404)
 
 
 # Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
-@APP.route('/pipelines/start', methods=['POST'])
-def start_pipeline():
-    """Start a pipeline based on webhook data and the `docker-compose.yml` file.
+@APP.route('/deployments/start', methods=['POST'])  # TODO: Deprecated
+@APP.route('/deploy', methods=['POST'])
+def deploy_project():
+    """Deploy a project based on webhook data and the `docker-compose.yml` file.
 
     This is the main entrypoint for Harvey.
     """

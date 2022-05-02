@@ -2,16 +2,16 @@ import datetime
 import subprocess
 from unittest.mock import ANY, mock_open, patch
 
-from harvey.pipelines import Pipeline
+from harvey.deployments import Deployment
 from harvey.webhooks import Webhook
 
 MOCK_OUTPUT = 'mock output'
 MOCK_TIME = datetime.datetime.utcnow()
 
 
-def mock_config(pipeline='deploy', prod_compose=False):
+def mock_config(deployment_type='deploy', prod_compose=False):
     mock_config = {
-        'pipeline': pipeline,
+        'deployment': deployment_type,
         'prod_compose': prod_compose,
     }
 
@@ -20,19 +20,19 @@ def mock_config(pipeline='deploy', prod_compose=False):
 
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.git.Git.update_git_repo')
-@patch('harvey.pipelines.Pipeline.open_project_config', return_value=mock_config())
+@patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
 @patch('harvey.messages.Message.send_slack_message')
-def test_initialize_pipeline_slack(mock_slack_message, mock_open_project_config, mock_update_git_repo, mock_webhook):
-    _, _, _ = Pipeline.initialize_pipeline(mock_webhook)
+def test_initialize_deployment_slack(mock_slack_message, mock_open_project_config, mock_update_git_repo, mock_webhook):
+    _, _, _ = Deployment.initialize_deployment(mock_webhook)
 
     mock_slack_message.assert_called_once()
 
 
 @patch('harvey.locks.Lock.lookup_project_lock', return_value=False)
 @patch('harvey.git.Git.update_git_repo')
-@patch('harvey.pipelines.Pipeline.open_project_config', return_value=mock_config())
-def test_initialize_pipeline(mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_webhook):
-    _, _, _ = Pipeline.initialize_pipeline(mock_webhook)
+@patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
+def test_initialize_deployment(mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_webhook):
+    _, _, _ = Deployment.initialize_deployment(mock_webhook)
 
     mock_open_project_config.assert_called_once_with(mock_webhook)
     mock_update_git_repo.assert_called_once_with(mock_webhook)
@@ -57,7 +57,7 @@ def test_open_project_config(mock_json, mock_isfile):
         ],
     }
     with patch('builtins.open', mock_open()):
-        config = Pipeline.open_project_config(mock_webhook)
+        config = Deployment.open_project_config(mock_webhook)
 
         assert config == {'mock': 'json'}
 
@@ -66,46 +66,49 @@ def test_open_project_config(mock_json, mock_isfile):
 def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
     with patch('builtins.open', mock_open()) as mock_file:
         mock_file.side_effect = FileNotFoundError
-        _ = Pipeline.open_project_config(mock_webhook)
+        _ = Deployment.open_project_config(mock_webhook)
 
         mock_utils_kill.assert_called_once_with(
             f'Harvey could not find a ".harvey.yml" file in {Webhook.repo_full_name(mock_webhook)}.', mock_webhook
         )
 
 
+@patch('sys.exit')
+@patch('os.path.exists', return_value=True)
 @patch('harvey.utils.Utils.success')
 @patch(
-    'harvey.pipelines.Pipeline.initialize_pipeline', return_value=[mock_config(pipeline='pull'), MOCK_OUTPUT, MOCK_TIME]
+    'harvey.deployments.Deployment.initialize_deployment',
+    return_value=[mock_config(deployment_type='pull'), MOCK_OUTPUT, MOCK_TIME],
 )
-def test_run_pipeline_pull(mock_initialize_pipeline, mock_utils_success, mock_webhook):
-    _ = Pipeline.run_pipeline(mock_webhook)
+def test_run_deployment_pull(mock_initialize_deployment, mock_utils_success, mock_path_exists, mock_exit, mock_webhook):
+    _ = Deployment.run_deployment(mock_webhook)
 
-    mock_initialize_pipeline.assert_called_once_with(mock_webhook)
+    mock_initialize_deployment.assert_called_once_with(mock_webhook)
     mock_utils_success.assert_called_once()
 
 
 @patch('harvey.utils.Utils.success')
-@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
-@patch('harvey.pipelines.Pipeline.deploy', return_value='mock-output')
+@patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
 @patch(
-    'harvey.pipelines.Pipeline.initialize_pipeline',
-    return_value=[mock_config(pipeline='deploy'), MOCK_OUTPUT, MOCK_TIME],
+    'harvey.deployments.Deployment.initialize_deployment',
+    return_value=[mock_config(deployment_type='deploy'), MOCK_OUTPUT, MOCK_TIME],
 )
-def test_run_pipeline_deploy(
-    mock_initialize_pipeline, mock_deploy_pipeline, mock_healthcheck, mock_utils_success, mock_webhook
+def test_run_deployment_deploy(
+    mock_initialize_deployment, mock_deploy_deployment, mock_healthcheck, mock_utils_success, mock_webhook
 ):
-    _ = Pipeline.run_pipeline(mock_webhook)
+    _ = Deployment.run_deployment(mock_webhook)
 
-    mock_initialize_pipeline.assert_called_once_with(mock_webhook)
-    mock_deploy_pipeline.assert_called_once_with(mock_config('deploy'), mock_webhook, MOCK_OUTPUT)
+    mock_initialize_deployment.assert_called_once_with(mock_webhook)
+    mock_deploy_deployment.assert_called_once_with(mock_config(deployment_type='deploy'), mock_webhook, MOCK_OUTPUT)
     mock_utils_success.assert_called_once()
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('subprocess.check_output')
 def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exists, mock_webhook):
-    _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
+    _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_subprocess.assert_called_once_with(
         ['docker', 'compose', '-f', ANY, 'up', '-d', '--build', '--quiet-pull'],
@@ -119,7 +122,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
 @patch('harvey.utils.Utils.kill')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):
-    _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
+    _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_utils_kill.assert_called_once()
 
@@ -130,18 +133,18 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )
 def test_deploy_stage_process_error(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):  # noqa
-    _ = Pipeline.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
+    _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_utils_kill.assert_called_once()
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.pipelines.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('subprocess.check_output')
 def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mock_path_exists, mock_webhook):
     """This test simulates using the `prod_compose` flag and succeeding."""
     config = mock_config('deploy', prod_compose=True)
-    _ = Pipeline.deploy(config, dict(mock_webhook), MOCK_OUTPUT)
+    _ = Deployment.deploy(config, dict(mock_webhook), MOCK_OUTPUT)
 
     mock_subprocess.assert_called_once_with(
         [
