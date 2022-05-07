@@ -28,9 +28,8 @@ class Config:
     }
     default_deployment = 'deploy'
     projects_path = os.path.join(harvey_path, 'projects')
-    stores_path = os.path.join(harvey_path, 'stores')
-    deployments_store_path = os.path.join(stores_path, 'deployments.sqlite')
-    locks_store_path = os.path.join(stores_path, 'locks.sqlite')
+    database_path = os.path.join(harvey_path, 'databases', 'database.sqlite')
+    database_file = os.path.join(database_path, 'database.sqlite')
     logger_name = 'harvey'
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
     log_location = os.path.join(harvey_path, 'logs')

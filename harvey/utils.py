@@ -10,6 +10,8 @@ from harvey.locks import Lock
 from harvey.messages import Message
 from harvey.webhooks import Webhook
 
+DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
+
 
 class Utils:
     @staticmethod
@@ -73,7 +75,7 @@ class Utils:
 
         logger.debug(f'Storing deployment details for {Webhook.repo_full_name(webhook)}...')
 
-        with SqliteDict(Config.deployments_store_path) as mydict:
+        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
             # Naively check the logs for an indicator of the status being success
             if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
                 deployment_status = 'Success'
@@ -82,7 +84,7 @@ class Utils:
             else:
                 deployment_status = 'Failure'
 
-            mydict[Webhook.deployment_id(webhook)] = {
+            database_table[Webhook.deployment_id(webhook)] = {
                 'project': Webhook.repo_full_name(webhook).replace("/", "-"),
                 'commit': Webhook.repo_commit_id(webhook),
                 'log': final_output,
@@ -90,7 +92,7 @@ class Utils:
                 'timestamp': str(datetime.datetime.utcnow()),
             }
 
-            mydict.commit()
+            database_table.commit()
 
 
 def setup_logger():

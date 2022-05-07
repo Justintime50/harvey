@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+- Consolidates all sqlite database tables into a single database file for better performance and disk savings
+
 ## v0.18.0 (2022-05-01)
 
 ### Breaking Changes

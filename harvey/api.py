@@ -15,6 +15,9 @@ from harvey.deployments import Deployment
 from harvey.locks import Lock
 from harvey.webhooks import Webhook
 
+LOCKS_DATABASE_TABLE_NAME = 'locks'
+DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
+
 
 class Api:
     """The Api class contains all the actions accessible via an API endpoint.
@@ -126,8 +129,8 @@ class Api:
     @staticmethod
     def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
         """Retrieve a deployment's details from a given `deployment_id`."""
-        with SqliteDict(Config.deployments_store_path) as mydict:
-            for key, value in mydict.iteritems():
+        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
+            for key, value in database_table.iteritems():
                 transformed_key = key.split('@')
                 if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
                     return value
@@ -141,8 +144,8 @@ class Api:
         page_size = Api._page_size(request)
         project_name = request.args.get('project')
 
-        with SqliteDict(Config.deployments_store_path) as mydict:
-            for _, value in mydict.iteritems():
+        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
+            for _, value in database_table.iteritems():
                 # If a project name is provided, only return deployments for that project
                 if project_name and value['project'] == project_name:
                     deployments['deployments'].append(value)
@@ -162,10 +165,9 @@ class Api:
     def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
         """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
         projects: Dict[str, List[str]] = {'projects': []}
-
+        project_owners = os.listdir(Config.projects_path)
         page_size = Api._page_size(request)
 
-        project_owners = os.listdir(Config.projects_path)
         if '.DS_Store' in project_owners:
             project_owners.remove('.DS_Store')
         for project_owner in project_owners:
@@ -187,8 +189,8 @@ class Api:
 
         page_size = Api._page_size(request)
 
-        with SqliteDict(Config.locks_store_path) as mydict:
-            for key, values in mydict.iteritems():
+        with SqliteDict(filename=Config.database_file, tablename=LOCKS_DATABASE_TABLE_NAME) as database_table:
+            for key, values in database_table.iteritems():
                 locks['locks'].append(
                     {
                         'project': key,

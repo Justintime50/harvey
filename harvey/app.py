@@ -80,7 +80,6 @@ def retrieve_deployment(deployment_id: str):
 
 
 # Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
-@APP.route('/deployments/start', methods=['POST'])  # TODO: Deprecated
 @APP.route('/deploy', methods=['POST'])
 def deploy_project():
     """Deploy a project based on webhook data and the `docker-compose.yml` file.
@@ -171,8 +170,8 @@ def bootstrap(debug_mode):
         )
 
     # Setup the directory for the SQLite databases
-    if not os.path.exists(Config.stores_path):
-        os.makedirs(Config.stores_path)
+    if not os.path.exists(Config.database_path):
+        os.makedirs(Config.database_path)
 
     # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()

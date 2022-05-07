@@ -3,6 +3,8 @@ from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 
+DATABASE_TABLE_NAME = 'locks'
+
 
 class Lock:
     @staticmethod
@@ -19,12 +21,12 @@ class Lock:
         logger.info(f'{locked_string} deployments for {project_name}...')
         corrected_project_name = project_name.replace("/", "-")
 
-        with SqliteDict(Config.locks_store_path) as mydict:
-            mydict[corrected_project_name.replace("/", "-")] = {
+        with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
+            database_table[corrected_project_name.replace("/", "-")] = {
                 'locked': locked,
             }
 
-            mydict.commit()
+            database_table.commit()
 
         return locked
 
@@ -34,8 +36,8 @@ class Lock:
         locked_value = False
         corrected_project_name = project_name.replace("/", "-")
 
-        with SqliteDict(Config.locks_store_path) as mydict:
-            for key, value in mydict.iteritems():
+        with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
+            for key, value in database_table.iteritems():
                 if key == corrected_project_name:
                     locked_value = value['locked']
                     return locked_value
