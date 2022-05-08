@@ -2,7 +2,7 @@
 
 ## NEXT RELEASE
 
-- Consolidates all sqlite database tables into a single database file for better performance and disk savings
+- Consolidates all sqlite database tables into a single database file for better performance and disk savings (to properly migrate to using this new database structure, please run the `utils/consolidate_sqlite_databases.py` script which will migrate and consolidate the old database(s) content to the single unified file)
 
 ## v0.18.0 (2022-05-01)
 
