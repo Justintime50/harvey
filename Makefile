@@ -22,7 +22,7 @@ build:
 
 ## clean - Remove the virtual environment and clear out .pyc files
 clean:
-	rm -rf $(VIRTUAL_ENV) dist build *.egg-info .coverage
+	rm -rf $(VIRTUAL_ENV) dist *.egg-info .coverage
 	find . -name '*.pyc' -delete
 
 ## coverage - Test the project and generate an HTML coverage report
