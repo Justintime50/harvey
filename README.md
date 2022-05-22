@@ -6,7 +6,7 @@ The lightweight Docker Compose deployment platform.
 
 [![Build Status](https://github.com/Justintime50/harvey/workflows/build/badge.svg)](https://github.com/Justintime50/harvey/actions)
 [![Coverage Status](https://coveralls.io/repos/github/Justintime50/harvey/badge.svg?branch=main)](https://coveralls.io/github/Justintime50/harvey?branch=main)
-[![PyPi](https://img.shields.io/pypi/v/harvey-ci)](https://pypi.org/project/harvey-ci/)
+[![PyPi](https://img.shields.io/pypi/v/harvey-cd)](https://pypi.org/project/harvey-cd/)
 [![Licence](https://img.shields.io/github/license/justintime50/harvey)](LICENSE)
 
 <img src="https://raw.githubusercontent.com/justintime50/assets/main/src/harvey/showcase.png" alt="Showcase">

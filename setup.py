@@ -33,8 +33,8 @@ DEV_REQUIREMENTS = [
 ]
 
 setuptools.setup(
-    name='harvey-ci',
-    version='0.18.0',
+    name='harvey-cd',
+    version='0.19.0',
     description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
@@ -62,7 +62,7 @@ setuptools.setup(
         'dev': DEV_REQUIREMENTS,
     },
     entry_points={
-        'console_scripts': ['harvey-ci=harvey.app:main'],
+        'console_scripts': ['harvey=harvey.app:main'],
     },
     python_requires='>=3.7, <4',
 )

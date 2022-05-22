@@ -21,7 +21,7 @@ class Config:
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
     port = int(os.getenv('PORT', 5000))
-    harvey_version = '0.18.0'
+    harvey_version = '0.19.0'
     supported_deployments = {
         'deploy',
         'pull',
