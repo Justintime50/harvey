@@ -6,7 +6,6 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'docker == 5.0.*',
     'flask == 2.*',
-    'gevent == 21.*',
     'python-dotenv == 0.20.*',
     'pyyaml == 6.*',
     'requests == 2.*',
