@@ -29,6 +29,7 @@ DEV_REQUIREMENTS = [
     'twine == 4.*',
     'types-PyYAML',
     'types-requests',
+    'wheel == 0.37.*',
 ]
 
 setuptools.setup(
