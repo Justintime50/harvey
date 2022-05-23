@@ -6,8 +6,6 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'docker == 5.0.*',
     'flask == 2.*',
-    'gevent == 21.*',
-    'gunicorn == 20.1.*',
     'python-dotenv == 0.20.*',
     'pyyaml == 6.*',
     'requests == 2.*',
@@ -15,6 +13,7 @@ REQUIREMENTS = [
     'sentry-sdk == 1.5.*',
     'slackclient == 2.*',
     'sqlitedict == 1.7.*',
+    'uwsgi == 2.0.20',  # TODO: v2.0.20 is unsupported on Python 3.10
     'woodchips == 0.2.*',
 ]
 
@@ -30,6 +29,7 @@ DEV_REQUIREMENTS = [
     'twine == 4.*',
     'types-PyYAML',
     'types-requests',
+    'wheel == 0.37.*',
 ]
 
 setuptools.setup(
@@ -64,5 +64,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['harvey=harvey.app:main'],
     },
-    python_requires='>=3.7, <4',
+    python_requires='>=3.7, <3.10',  # TODO: Bumps the max to `<4` when uwsgi is compatible with 3.10 again
 )
