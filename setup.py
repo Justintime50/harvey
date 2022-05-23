@@ -7,7 +7,6 @@ REQUIREMENTS = [
     'docker == 5.0.*',
     'flask == 2.*',
     'gevent == 21.*',
-    'gunicorn == 20.1.*',
     'python-dotenv == 0.20.*',
     'pyyaml == 6.*',
     'requests == 2.*',
@@ -15,6 +14,7 @@ REQUIREMENTS = [
     'sentry-sdk == 1.5.*',
     'slackclient == 2.*',
     'sqlitedict == 1.7.*',
+    'uwsgi == 2.0.20',
     'woodchips == 0.2.*',
 ]
 

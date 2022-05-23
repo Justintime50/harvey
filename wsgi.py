@@ -1,4 +1,6 @@
-from harvey.app import APP
+# flake8: noqa
+from gevent import monkey
 
-if __name__ == '__main__':
-    APP.run()
+monkey.patch_all()
+
+from harvey.app import APP
