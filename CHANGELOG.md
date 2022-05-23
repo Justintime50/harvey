@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+- Swaps `gunicorn` for `uwsgi` for better performance. This switch also fixes the concurrency deadlock in production
+
 ## v0.19.0 (2022-05-22)
 
 - Changes name of the PyPI project from `harvey-ci` to `harvey-cd` to better match the nature of the application
