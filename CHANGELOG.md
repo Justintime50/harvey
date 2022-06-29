@@ -3,6 +3,7 @@
 ## NEXT RELEASE
 
 - Swaps `gunicorn` for `uwsgi` for better performance. This switch also fixes the concurrency deadlock in production
+- Harvey now runs as a daemon which should drastically improve performance
 
 ## v0.19.0 (2022-05-22)
 
