@@ -9,21 +9,21 @@ REQUIREMENTS = [
     'python-dotenv == 0.20.*',
     'pyyaml == 6.*',
     'requests == 2.*',
-    'requests_unixsocket == 0.2.*',
-    'sentry-sdk == 1.5.*',
+    'requests_unixsocket == 0.3.*',
+    'sentry-sdk == 1.7.*',
     'slackclient == 2.*',
-    'sqlitedict == 1.7.*',
+    'sqlitedict == 2.0.*',
     'uwsgi == 2.0.20',  # TODO: v2.0.20 is unsupported on Python 3.10
     'woodchips == 0.2.*',
 ]
 
 DEV_REQUIREMENTS = [
     'black == 22.*',
-    'build == 0.7.*',
+    'build == 0.8.*',
     'coveralls == 3.*',
     'flake8 == 4.*',
     'isort == 5.*',
-    'mypy == 0.942',
+    'mypy == 0.961',
     'pytest == 7.*',
     'pytest-cov == 3.*',
     'twine == 4.*',
