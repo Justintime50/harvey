@@ -81,6 +81,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
     return_value=[mock_config(deployment_type='pull'), MOCK_OUTPUT, MOCK_TIME],
 )
 def test_run_deployment_pull(mock_initialize_deployment, mock_utils_success, mock_path_exists, mock_exit, mock_webhook):
+    # TODO: This test requires the Docker daemon to be running, refactor so it can run without
     _ = Deployment.run_deployment(mock_webhook)
 
     mock_initialize_deployment.assert_called_once_with(mock_webhook)
@@ -97,6 +98,7 @@ def test_run_deployment_pull(mock_initialize_deployment, mock_utils_success, moc
 def test_run_deployment_deploy(
     mock_initialize_deployment, mock_deploy_deployment, mock_healthcheck, mock_utils_success, mock_webhook
 ):
+    # TODO: This test requires the Docker daemon to be running, refactor so it can run without
     _ = Deployment.run_deployment(mock_webhook)
 
     mock_initialize_deployment.assert_called_once_with(mock_webhook)

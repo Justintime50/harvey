@@ -137,6 +137,8 @@ class Deployment:
             logger.info(pull_success_message)
             final_output = f'{webhook_output}\n{pull_success_message}'
             Utils.success(final_output, webhook)
+        else:
+            Utils.kill(f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook)
 
     @staticmethod
     def open_project_config(webhook: Dict[str, Any]):
