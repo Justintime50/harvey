@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.21.0 (2022-07-26)
+## v0.20.1 (2022-07-26)
 
 - Switches from `sha1` webhook secrets from GitHub to `sha256` for increased security and finally adds unit tests for the `validate_webhook_secret` function
 
