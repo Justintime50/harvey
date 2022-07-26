@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v0.21.0 (2022-07-26)
+
+- Switches from `sha1` webhook secrets from GitHub to `sha256` for increased security and finally adds unit tests for the `validate_webhook_secret` function
+
 ## v0.20.0 (2022-07-11)
 
 - Swaps `gunicorn` for `uwsgi` for better performance. This switch also fixes the concurrency deadlock in production

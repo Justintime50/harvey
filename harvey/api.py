@@ -82,7 +82,7 @@ class Api:
         status_code = 500
         payload_json = request.json
         payload_data = request.data  # We need this to properly decode the webhook secret
-        signature = request.headers.get('X-Hub-Signature')
+        signature = request.headers.get('X-Hub-Signature-256')
 
         if payload_json:
             logger.debug(f'{Webhook.repo_full_name(payload_json)} webhook: {payload_json}')

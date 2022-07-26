@@ -1,21 +1,33 @@
-import hashlib
+import json
 from unittest.mock import patch
-
-import pytest
 
 from harvey.webhooks import Webhook
 
 
-@patch('logging.Logger.info')
 @patch('harvey.config.Config.webhook_secret', '123')
-@pytest.mark.skip('Security is hard, revisit later - this logic has been proven in prod')
-def test_validate_webhook_secret(mock_webhook, mock_logger):
-    mock_webhook_secret = bytes('123', 'UTF-8')
-    mock_signature = hashlib.sha1(mock_webhook_secret)
-    validated_webhook_secret = Webhook.validate_webhook_secret(mock_webhook, mock_signature)
+@patch('logging.Logger.debug')
+def test_validate_webhook_secret(mock_logger, mock_webhook):
+    expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
+    validated_webhook_secret = Webhook.validate_webhook_secret(
+        json.dumps(mock_webhook).encode(),  # TODO: This doesn't perfectly match the `bytes` object of a response
+        expected_signature,
+    )
 
     mock_logger.assert_called()
     assert validated_webhook_secret is True
+
+
+@patch('harvey.config.Config.webhook_secret', 'invalid_secret')
+@patch('logging.Logger.debug')
+def test_validate_webhook_secret_mismatch(mock_logger, mock_webhook):
+    expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
+    validated_webhook_secret = Webhook.validate_webhook_secret(
+        json.dumps(mock_webhook).encode(),  # TODO: This doesn't perfectly match the `bytes` object of a response
+        expected_signature,
+    )
+
+    mock_logger.assert_called()
+    assert validated_webhook_secret is False
 
 
 @patch('harvey.config.Config.webhook_secret', '123')

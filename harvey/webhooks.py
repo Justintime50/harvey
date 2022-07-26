@@ -9,7 +9,7 @@ from harvey.config import Config
 
 class Webhook:
     @staticmethod
-    def validate_webhook_secret(data: Any, signature: str) -> bool:
+    def validate_webhook_secret(webhook_body: bytes, signature: str) -> bool:
         """Decode and validate a webhook's secret key."""
         logger = woodchips.get(Config.logger_name)
 
@@ -17,8 +17,12 @@ class Webhook:
 
         if signature:
             secret = bytes(Config.webhook_secret, 'utf-8')
-            expected_signature = hmac.new(secret, msg=data, digestmod=hashlib.sha1)
-            digest = 'sha1=' + expected_signature.hexdigest()
+            expected_signature = hmac.new(
+                key=secret,
+                msg=webhook_body,
+                digestmod=hashlib.sha256,
+            )
+            digest = f'sha256={expected_signature.hexdigest()}'
 
             if hmac.compare_digest(digest, signature):
                 secret_validated = True
