@@ -8,9 +8,10 @@ from harvey.webhooks import Webhook
 @patch('logging.Logger.debug')
 def test_validate_webhook_secret(mock_logger, mock_webhook):
     expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
+    encoded_webhook = json.dumps(mock_webhook).encode()
     validated_webhook_secret = Webhook.validate_webhook_secret(
-        json.dumps(mock_webhook).encode(),  # TODO: This doesn't perfectly match the `bytes` object of a response
-        expected_signature,
+        webhook_body=encoded_webhook,
+        signature=expected_signature,
     )
 
     mock_logger.assert_called()
@@ -21,9 +22,10 @@ def test_validate_webhook_secret(mock_logger, mock_webhook):
 @patch('logging.Logger.debug')
 def test_validate_webhook_secret_mismatch(mock_logger, mock_webhook):
     expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
+    encoded_webhook = json.dumps(mock_webhook).encode()
     validated_webhook_secret = Webhook.validate_webhook_secret(
-        json.dumps(mock_webhook).encode(),  # TODO: This doesn't perfectly match the `bytes` object of a response
-        expected_signature,
+        webhook_body=encoded_webhook,
+        signature=expected_signature,
     )
 
     mock_logger.assert_called()
