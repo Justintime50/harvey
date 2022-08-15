@@ -32,5 +32,5 @@ class Config:
     database_file = os.path.join(database_path, 'database.sqlite')
     logger_name = 'harvey'
     log_level = os.getenv('LOG_LEVEL', 'INFO').upper()
-    log_location = os.path.join(harvey_path, 'logs')
+    log_location = os.path.join(harvey_path, 'logs', 'harvey')
     sentry_url = os.getenv('SENTRY_URL')
