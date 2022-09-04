@@ -2,6 +2,6 @@ version: "3.8"
 services:
   harvey-nginx:
     labels:
-      - "traefik.http.routers.harveyapi.rule=Host(`harveyapi.justinpaulhammond.com`) || Host(`www.harveyapi.justinpaulhammond.com`)"
+      - "traefik.http.routers.harveyapi.rule=Host(`harveyapi.justinpaulhammond.com`, `www.harveyapi.justinpaulhammond.com`)"
       - "traefik.http.routers.harveyapi.tls=true"
       - "traefik.http.routers.harveyapi.tls.certresolver=letsencrypt"
