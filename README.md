@@ -195,3 +195,8 @@ make help
 
 1. Update the version in `Config.harvey_version`
 1. Update the version in `setup.py`
+
+
+### Infrastructure model
+
+![Infrastructure model](.infragenie/infrastructure_model.png)
