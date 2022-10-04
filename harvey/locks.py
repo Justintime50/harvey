@@ -3,6 +3,7 @@ from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 
+
 DATABASE_TABLE_NAME = 'locks'
 
 

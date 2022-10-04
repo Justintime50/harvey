@@ -1,6 +1,9 @@
 import hashlib
 import hmac
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict,
+)
 
 import woodchips
 

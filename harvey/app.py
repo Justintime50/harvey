@@ -1,14 +1,19 @@
 import os
-import subprocess
+import subprocess  # nosec
 
 import requests_unixsocket  # type: ignore
 import sentry_sdk
 from dotenv import load_dotenv
-from flask import Flask, abort, request
+from flask import (
+    Flask,
+    abort,
+    request,
+)
 
 from harvey.api import Api
 from harvey.config import Config
 from harvey.utils import setup_logger
+
 
 load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
@@ -151,7 +156,7 @@ def bootstrap(debug_mode):
 
     # Ensure the correct Docker Compose version is available
     try:
-        docker_compose_version = subprocess.check_output(
+        docker_compose_version = subprocess.check_output(  # nosec
             ['docker-compose', '--version'],
             stdin=None,
             stderr=None,

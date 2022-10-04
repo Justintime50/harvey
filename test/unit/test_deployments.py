@@ -1,9 +1,14 @@
 import datetime
 import subprocess
-from unittest.mock import ANY, mock_open, patch
+from unittest.mock import (
+    ANY,
+    mock_open,
+    patch,
+)
 
 from harvey.deployments import Deployment
 from harvey.webhooks import Webhook
+
 
 MOCK_OUTPUT = 'mock output'
 MOCK_TIME = datetime.datetime.utcnow()

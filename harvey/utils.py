@@ -1,6 +1,9 @@
 import datetime
 import sys
-from typing import Any, Dict
+from typing import (
+    Any,
+    Dict,
+)
 
 import woodchips
 from sqlitedict import SqliteDict  # type: ignore
@@ -9,6 +12,7 @@ from harvey.config import Config
 from harvey.locks import Lock
 from harvey.messages import Message
 from harvey.webhooks import Webhook
+
 
 DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
 

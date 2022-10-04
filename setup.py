@@ -18,6 +18,7 @@ REQUIREMENTS = [
 ]
 
 DEV_REQUIREMENTS = [
+    'bandit == 1.7.*',
     'black == 22.*',
     'build == 0.8.*',
     'coveralls == 3.*',

@@ -1,6 +1,10 @@
 import os
-import subprocess
-from typing import Any, Dict, List
+import subprocess  # nosec
+from typing import (
+    Any,
+    Dict,
+    List,
+)
 
 import woodchips
 
@@ -85,7 +89,7 @@ class Git:
     @staticmethod
     def _git_subprocess(command: List[str]) -> bytes:
         """Runs a git command via subprocess."""
-        command_output = subprocess.check_output(
+        command_output = subprocess.check_output(  # nosec
             command,
             stdin=None,
             stderr=None,

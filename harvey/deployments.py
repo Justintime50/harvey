@@ -1,8 +1,12 @@
 import datetime
 import json
 import os
-import subprocess
-from typing import Any, Dict, Tuple
+import subprocess  # nosec
+from typing import (
+    Any,
+    Dict,
+    Tuple,
+)
 
 import woodchips
 import yaml
@@ -241,7 +245,7 @@ class Deployment:
             # fmt: on
 
         try:
-            compose_output = subprocess.check_output(
+            compose_output = subprocess.check_output(  # nosec
                 compose_command,
                 stdin=None,
                 stderr=None,

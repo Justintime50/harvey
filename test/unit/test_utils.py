@@ -1,6 +1,12 @@
-from unittest.mock import mock_open, patch
+from unittest.mock import (
+    mock_open,
+    patch,
+)
 
-from harvey.utils import Utils, setup_logger
+from harvey.utils import (
+    Utils,
+    setup_logger,
+)
 
 
 @patch('sys.exit')

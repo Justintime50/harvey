@@ -2,18 +2,27 @@ import base64
 import os
 from functools import wraps
 from threading import Thread
-from typing import Any, Dict, List, Tuple
+from typing import (
+    Any,
+    Dict,
+    List,
+    Tuple,
+)
 
 import flask
 import requests
 import woodchips
-from flask import abort, request
+from flask import (
+    abort,
+    request,
+)
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 from harvey.deployments import Deployment
 from harvey.locks import Lock
 from harvey.webhooks import Webhook
+
 
 LOCKS_DATABASE_TABLE_NAME = 'locks'
 DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
