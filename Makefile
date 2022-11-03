@@ -27,7 +27,7 @@ clean:
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
-	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=term-missing
+	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
 
 ## format - Runs all formatting tools against the project
 format: black isort lint mypy
