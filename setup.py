@@ -14,7 +14,7 @@ REQUIREMENTS = [
     'sentry-sdk == 1.7.*',
     'slackclient == 2.*',
     'sqlitedict == 2.0.*',
-    'uwsgi == 2.0.20',
+    'uwsgi == 2.0.21',
     'woodchips == 0.2.*',
 ]
 
