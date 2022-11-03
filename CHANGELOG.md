@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+- Bumps `uwsgi` from `2.0.20` to `2.0.21` unlocking Python 3.10 and 3.11 support
+
 ## v0.20.1 (2022-07-26)
 
 - Switches from `sha1` webhook secrets from GitHub to `sha256` for increased security and finally adds unit tests for the `validate_webhook_secret` function
