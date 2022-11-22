@@ -148,7 +148,7 @@ class Api:
     @staticmethod
     def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
         """Retrieve a list of deployments until the pagination limit is reached."""
-        deployments: Dict[str, List[Any]] = {'deployments': []}
+        deployments: Dict[str, Any] = {'deployments': []}
 
         page_size = Api._page_size(request)
         project_name = request.args.get('project')
@@ -166,6 +166,7 @@ class Api:
                     pass
 
         sorted_deployments = sorted(deployments['deployments'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
+        deployments['total_count'] = len(deployments['deployments'])
         deployments['deployments'] = sorted_deployments
 
         return deployments
@@ -173,7 +174,7 @@ class Api:
     @staticmethod
     def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
         """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
-        projects: Dict[str, List[str]] = {'projects': []}
+        projects: Dict[str, Any] = {'projects': []}
         project_owners = os.listdir(Config.projects_path)
         page_size = Api._page_size(request)
 
@@ -190,11 +191,13 @@ class Api:
             if len(projects['projects']) > page_size:
                 break
 
+        projects['total_count'] = len(projects['projects'])
+
         return projects
 
     @staticmethod
     def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
-        locks: Dict[str, List[Any]] = {'locks': []}
+        locks: Dict[str, Any] = {'locks': []}
 
         page_size = Api._page_size(request)
 
@@ -208,6 +211,7 @@ class Api:
                 )
 
         sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])[:page_size]
+        locks['total_count'] = len(locks['locks'])
         locks['locks'] = sorted_locks
 
         return locks
