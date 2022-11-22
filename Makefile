@@ -59,7 +59,7 @@ lint:
 ## prod - Run the service in production
 prod:
 	docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --build
-	venv/bin/uwsgi --ini uwsgi.ini
+	venv/bin/uwsgi --ini uwsgi.ini --virtualenv venv
 
 ## run - Run the service locally
 run:
