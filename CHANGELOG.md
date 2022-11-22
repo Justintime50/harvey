@@ -1,10 +1,11 @@
 # CHANGELOG
 
-## NEXT RELEASE
+## v0.21.0 (2022-11-21)
 
 - Bumps `uwsgi` from `2.0.20` to `2.0.21` unlocking Python 3.10 and 3.11 support
+- Bumps nginx version
 - Changes from process/threads concurrency to dynamic worker concurrency with uwsgi
-- Added timeouts and worker kill commands so Harvey will canabolize itself instead of the OS
+- Added timeouts and worker kill commands so Harvey will canabolize itself instead of the OS in the case of long running workers or too many requests
 - Adds `total_count` to collection responses
 
 ## v0.20.1 (2022-07-26)
