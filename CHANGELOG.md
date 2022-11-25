@@ -3,6 +3,7 @@
 ## NEXT RELEASE
 
 - If a project's lock status cannot be determined, we now kill the process instead of continuing and logging only
+- Wraps `store_deployment_details` in a try/except to log out errors with saving details to the DB
 
 ## v0.21.0 (2022-11-21)
 

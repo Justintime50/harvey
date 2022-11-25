@@ -23,7 +23,7 @@ class Utils:
         """Log output, send message, and cleanup on deployment failure."""
         logger = woodchips.get(Config.logger_name)
 
-        # TODO: Send the error message (param) all the way to the end here and so we can log it before ending
+        # TODO: Use the `final_output` here to log an error, remove all other loggers right before `kill` is called
         failure_message = f'{Webhook.repo_full_name(webhook)} deployment failed!'
         logger.warning(failure_message)
 
@@ -80,24 +80,29 @@ class Utils:
 
         logger.debug(f'Storing deployment details for {Webhook.repo_full_name(webhook)}...')
 
-        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
-            # Naively check the logs for an indicator of the status being success
-            if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
-                deployment_status = 'Success'
-            elif final_output == 'NA':
-                deployment_status = 'In-Progress'
-            else:
-                deployment_status = 'Failure'
+        try:
+            with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
+                # Naively check the logs for an indicator of the status being success
+                if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
+                    deployment_status = 'Success'
+                elif final_output == 'NA':
+                    deployment_status = 'In-Progress'
+                else:
+                    deployment_status = 'Failure'
 
-            database_table[Webhook.deployment_id(webhook)] = {
-                'project': Webhook.repo_full_name(webhook).replace("/", "-"),
-                'commit': Webhook.repo_commit_id(webhook),
-                'log': final_output,
-                'status': deployment_status,
-                'timestamp': str(datetime.datetime.utcnow()),
-            }
+                database_table[Webhook.deployment_id(webhook)] = {
+                    'project': Webhook.repo_full_name(webhook).replace("/", "-"),
+                    'commit': Webhook.repo_commit_id(webhook),
+                    'log': final_output,
+                    'status': deployment_status,
+                    'timestamp': str(datetime.datetime.utcnow()),
+                }
 
-            database_table.commit()
+                database_table.commit()
+        except Exception as error:
+            error_message = f'Could not store deployment details to database: {error}'
+            logger.error(error_message)
+            Utils.kill(error_message, webhook)
 
 
 def setup_logger():
