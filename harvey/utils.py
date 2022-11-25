@@ -23,6 +23,7 @@ class Utils:
         """Log output, send message, and cleanup on deployment failure."""
         logger = woodchips.get(Config.logger_name)
 
+        # TODO: Send the error message (param) all the way to the end here and so we can log it before ending
         failure_message = f'{Webhook.repo_full_name(webhook)} deployment failed!'
         logger.warning(failure_message)
 

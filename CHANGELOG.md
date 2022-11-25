@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## NEXT RELEASE
+
+- If a project's lock status cannot be determined, we now kill the process instead of continuing and logging only
+
 ## v0.21.0 (2022-11-21)
 
 - Bumps `uwsgi` from `2.0.20` to `2.0.21` unlocking Python 3.10 and 3.11 support

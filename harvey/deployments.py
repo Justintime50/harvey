@@ -37,7 +37,9 @@ class Deployment:
                     webhook,
                 )
         except Exception:
-            logger.warning(f'Could not determine project lock for {Webhook.repo_full_name(webhook)}.')
+            error_message = f'Could not determine project lock for {Webhook.repo_full_name(webhook)}.'
+            logger.warning(error_message)
+            Utils.kill(error_message, webhook)
 
         start_time = datetime.datetime.utcnow()
 
