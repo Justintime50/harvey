@@ -20,6 +20,7 @@ from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 from harvey.deployments import Deployment
+from harvey.errors import HarveyError
 from harvey.locks import Lock
 from harvey.webhooks import Webhook
 
@@ -59,12 +60,9 @@ class Api:
                     split_auth = auth_header.strip().split(' ')
 
                     if len(split_auth) == 2:
-                        try:
-                            password, _ = base64.b64decode(split_auth[1]).decode().split(':', 1)
-                        except Exception:
-                            raise
+                        password, _ = base64.b64decode(split_auth[1]).decode().split(':', 1)
                     else:
-                        raise Exception
+                        raise HarveyError('Auth header misconfigured!')
 
                     if password == Config.webhook_secret:
                         return func(*args, **kwargs)
@@ -118,15 +116,18 @@ class Api:
 
                 logger.info(message)
             else:
-                message = 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.'
+                message = (
+                    'Harvey received a webhook event for a branch that is not included in the'
+                    f' ALLOWED_BRANCHES for {Webhook.repo_full_name(payload_json)}.'
+                )
                 status_code = 422
 
-                logger.debug(message)
+                logger.error(message)
         else:
             message = 'Malformed or missing JSON data in webhook.'
             status_code = 422
 
-            logger.debug(message)
+            logger.error(message)
 
         response = {
             'success': success,
@@ -143,7 +144,7 @@ class Api:
                 transformed_key = key.split('@')
                 if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
                     return value
-        raise Exception
+        raise HarveyError(f'Could not retrieve deployment\'s details for {deployment_id}!')
 
     @staticmethod
     def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
@@ -219,29 +220,20 @@ class Api:
     @staticmethod
     def retrieve_lock(project_name: str) -> Dict[str, bool]:
         """Retrieve the `lock` status of a project via its fully-qualified repo name."""
-        try:
-            lock_status = Lock.lookup_project_lock(project_name)
+        lock_status = Lock.lookup_project_lock(project_name)
 
-            return {'locked': lock_status}
-        except Exception:
-            raise
+        return {'locked': lock_status}
 
     @staticmethod
     def lock_project(project_name: str):
         """Locks the deployments of a project."""
-        try:
-            lock_status = Lock.update_project_lock(project_name=project_name, locked=True)
+        lock_status = Lock.update_project_lock(project_name=project_name, locked=True)
 
-            return {'locked': lock_status}
-        except Exception:
-            raise
+        return {'locked': lock_status}
 
     @staticmethod
     def unlock_project(project_name: str):
         """Unlocks the deployments of a project."""
-        try:
-            lock_status = Lock.update_project_lock(project_name=project_name, locked=False)
+        lock_status = Lock.update_project_lock(project_name=project_name, locked=False)
 
-            return {'locked': lock_status}
-        except Exception:
-            raise
+        return {'locked': lock_status}

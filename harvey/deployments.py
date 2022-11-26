@@ -28,18 +28,20 @@ class Deployment:
         """
         logger = woodchips.get(Config.logger_name)
 
-        # Kill the deployment if the project is locked
         try:
+            # Kill the deployment if the project is locked
             if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
-                Utils.kill(
+                Utils.kill_deployment(
                     f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
                     ' deployments.',
                     webhook,
                 )
         except Exception:
-            error_message = f'Could not determine project lock for {Webhook.repo_full_name(webhook)}.'
-            logger.warning(error_message)
-            Utils.kill(error_message, webhook)
+            Utils.kill_deployment(
+                message='Could not determine project lock status!',
+                webhook=webhook,
+                raise_error=True,
+            )
 
         start_time = datetime.datetime.utcnow()
 
@@ -59,12 +61,10 @@ class Deployment:
             deployment = config.get('deployment_type', Config.default_deployment)
 
         if deployment not in Config.supported_deployments:
-            final_output = (
-                f'Harvey could not run for `{Webhook.repo_full_name(webhook)}`, there was no acceptable deployment'
-                ' specified.'
+            deployment = Utils.kill_deployment(
+                message='Harvey could not run since there was no acceptable deployment specified.',
+                webhook=webhook,
             )
-            logger.error(final_output)
-            deployment = Utils.kill(final_output, webhook)
 
         deployment_started_message = (
             f'{Message.work_emoji} Harvey has started a `{deployment}` deployment for'
@@ -132,9 +132,12 @@ class Deployment:
             final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}\n'
 
             if all_healthchecks_passed or not healthcheck:
-                Utils.success(final_output, webhook)
+                Utils.succeed_deployment(final_output, webhook)
             else:
-                Utils.kill(final_output, webhook)
+                Utils.kill_deployment(
+                    message=final_output,
+                    webhook=webhook,
+                )
         elif deployment == 'pull':
             # We simply assign the final message because if we got this far, the repo has already been pulled
             pull_success_message = (
@@ -142,9 +145,9 @@ class Deployment:
             )
             logger.info(pull_success_message)
             final_output = f'{webhook_output}\n{pull_success_message}'
-            Utils.success(final_output, webhook)
+            Utils.succeed_deployment(final_output, webhook)
         else:
-            Utils.kill(f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook)
+            Utils.kill_deployment(f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook)
 
     @staticmethod
     def open_project_config(webhook: Dict[str, Any]):
@@ -178,9 +181,10 @@ class Deployment:
                 logger.debug(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
-            final_output = f'Harvey could not find a ".harvey.yml" file in {Webhook.repo_full_name(webhook)}.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            Utils.kill_deployment(
+                message='Harvey could not find a ".harvey.yaml" file!',
+                webhook=webhook,
+            )
 
     @staticmethod
     def deploy(config: Dict[str, Any], webhook: Dict[str, Any], output: str) -> str:
@@ -205,9 +209,10 @@ class Deployment:
         elif os.path.exists(os.path.join(repo_path, docker_compose_yaml)):
             default_compose_filepath = os.path.join(repo_path, docker_compose_yaml)
         else:
-            final_output = f'Harvey could not find a "docker-compose.yml" file in {Webhook.repo_full_name(webhook)}.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            Utils.kill_deployment(
+                message='Harvey could not find a "docker-compose.yaml" file!',
+                webhook=webhook,
+            )
 
         if config.get('prod_compose'):
             # If this is a prod deployment, setup the `docker-compose-prod.yml` file
@@ -217,11 +222,10 @@ class Deployment:
             elif os.path.exists(os.path.join(repo_path, docker_compose_prod_yaml)):
                 prod_compose_filepath = os.path.join(repo_path, docker_compose_prod_yaml)
             else:
-                final_output = (
-                    f'Harvey could not find a "docker-compose-prod.yml" file in {Webhook.repo_full_name(webhook)}.'
+                Utils.kill_deployment(
+                    message='Harvey could not find a "docker-compose-prod.yml" file!',
+                    webhook=webhook,
                 )
-                logger.error(final_output)
-                Utils.kill(final_output, webhook)
 
             # fmt: off
             compose_command = [
@@ -258,12 +262,17 @@ class Deployment:
             final_output = f'{decoded_output}\n{execution_time}'
             logger.info(final_output)
         except subprocess.TimeoutExpired:
-            final_output = f'Harvey timed out deploying {Webhook.repo_full_name(webhook)}.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            final_output = 'Harvey timed out deploying!'
+            Utils.kill_deployment(
+                message=final_output,
+                webhook=webhook,
+            )
         except subprocess.CalledProcessError as error:
             final_output = f'{output}\nHarvey could not finish the deploy: {error}'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            Utils.kill_deployment(
+                message=final_output,
+                webhook=webhook,
+                raise_error=True,
+            )
 
         return final_output

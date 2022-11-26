@@ -1,0 +1,2 @@
+class HarveyError(Exception):
+    pass

@@ -13,7 +13,7 @@ from harvey.utils import (
 @patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
 def test_kill(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_webhook):
-    Utils.kill(mock_output, mock_webhook)
+    Utils.kill_deployment(mock_output, mock_webhook)
 
     mock_generate_logs.assert_called_once()
     mock_exit.assert_called_once()
@@ -23,9 +23,9 @@ def test_kill(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_webh
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
 @patch('harvey.utils.Utils.store_deployment_details')
-@patch('logging.Logger.warning')
+@patch('logging.Logger.error')
 def test_kill_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_exit, mock_output, mock_webhook):
-    Utils.kill(mock_output, mock_webhook)
+    Utils.kill_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()
@@ -37,7 +37,7 @@ def test_kill_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_exit,
 @patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
 def test_success(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_webhook):
-    Utils.success(mock_output, mock_webhook)
+    Utils.succeed_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()
@@ -50,7 +50,7 @@ def test_success(mock_logger, mock_generate_logs, mock_exit, mock_output, mock_w
 @patch('harvey.utils.Utils.store_deployment_details')
 @patch('logging.Logger.info')
 def test_success_with_slack(mock_logger, mock_generate_logs, mock_slack, mock_exit, mock_output, mock_webhook):
-    Utils.success(mock_output, mock_webhook)
+    Utils.succeed_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_generate_logs.assert_called_once()

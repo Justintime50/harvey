@@ -1,5 +1,10 @@
 import os
 import subprocess  # nosec
+from typing import (
+    Any,
+    Dict,
+    Optional,
+)
 
 import requests_unixsocket  # type: ignore
 import sentry_sdk
@@ -20,40 +25,52 @@ APP = Flask(__name__)
 REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 
 
+def create_response_dict(message: str, success: Optional[bool] = False, status_code: Optional[int] = 500):
+    """Response object that all Harvey responses return."""
+    return {
+        'message': message,
+        'success': success,
+    }, status_code
+
+
 @APP.errorhandler(401)
 def not_authorized(e):
     """Return a 401 if the request is not authorized."""
-    status_code = 401
-    response = {
-        'success': False,
-        'message': 'You are not authorized to access this endpoint. Please check your credentials and try again.',
-    }, status_code
-
-    return response
+    return create_response_dict(
+        message='You are not authorized to access this endpoint. Please check your credentials and try again.',
+        success=False,
+        status_code=401,
+    )
 
 
 @APP.errorhandler(404)
-def not_found(e):
+def not_found(e) -> Dict[str, Any]:
     """Return a 404 if the route is not found."""
-    status_code = 404
-    response = {
-        'success': False,
-        'message': 'The endpoint you hit is either not valid or the record was not found.',
-    }, status_code
+    return create_response_dict(
+        message='The endpoint you hit is either not valid or the record was not found.',
+        success=False,
+        status_code=404,
+    )
 
-    return response
+
+@APP.errorhandler(500)
+def server_error(e) -> Dict[str, Any]:
+    """Return a 500 if there is a problem with Harvey."""
+    return create_response_dict(
+        message='An error has occured due to something on our end.',
+        success=False,
+        status_code=500,
+    )
 
 
 @APP.route('/health', methods=['GET'])
 def harvey_healthcheck():
     """Return a 200 if Harvey is running."""
-    status_code = 200
-    response = {
-        'success': True,
-        'message': 'Ok',
-    }, status_code
-
-    return response
+    return create_response_dict(
+        message='Ok',
+        success=True,
+        status_code=200,
+    )
 
 
 @APP.route('/deployments', methods=['GET'])
@@ -68,7 +85,7 @@ def retrieve_deployments():
     try:
         return Api.retrieve_deployments(request)
     except Exception:
-        raise
+        return abort(500)
 
 
 @APP.route('/deployments/<deployment_id>', methods=['GET'])
@@ -81,7 +98,7 @@ def retrieve_deployment(deployment_id: str):
     try:
         return Api.retrieve_deployment(deployment_id)
     except Exception:
-        return abort(404)
+        return abort(500)
 
 
 # Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
@@ -94,7 +111,7 @@ def deploy_project():
     try:
         return Api.parse_github_webhook(request)
     except Exception:
-        raise
+        return abort(500)
 
 
 @APP.route('/projects', methods=['GET'])
@@ -104,7 +121,7 @@ def retrieve_projects():
     try:
         return Api.retrieve_projects(request)
     except Exception:
-        raise
+        return abort(500)
 
 
 @APP.route('/locks', methods=['GET'])
@@ -114,7 +131,7 @@ def retrieve_locks():
     try:
         return Api.retrieve_locks(request)
     except Exception:
-        raise
+        return abort(500)
 
 
 @APP.route('/locks/<project_name>', methods=['GET'])
@@ -134,7 +151,7 @@ def lock_project(project_name: str):
     try:
         return Api.lock_project(project_name)
     except Exception:
-        raise
+        return abort(500)
 
 
 @APP.route('/projects/<project_name>/unlock', methods=['PUT'])
@@ -144,7 +161,7 @@ def unlock_project(project_name: str):
     try:
         return Api.unlock_project(project_name)
     except Exception:
-        raise
+        return abort(500)
 
 
 def bootstrap(debug_mode):
@@ -155,17 +172,14 @@ def bootstrap(debug_mode):
     setup_logger()
 
     # Ensure the correct Docker Compose version is available
-    try:
-        docker_compose_version = subprocess.check_output(  # nosec
-            ['docker-compose', '--version'],
-            stdin=None,
-            stderr=None,
-            timeout=3,
-        ).decode('UTF-8')
-        if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
-            raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
-    except Exception:
-        raise
+    docker_compose_version = subprocess.check_output(  # nosec
+        ['docker-compose', '--version'],
+        stdin=None,
+        stderr=None,
+        timeout=3,
+    ).decode('UTF-8')
+    if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
+        raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
 
     # Setup Sentry
     if Config.sentry_url:

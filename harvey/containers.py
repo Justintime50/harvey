@@ -10,6 +10,7 @@ import docker  # type: ignore
 import woodchips
 
 from harvey.config import Config
+from harvey.errors import HarveyError
 from harvey.utils import Utils
 
 
@@ -33,7 +34,11 @@ class Container:
 
         try:
             container = client.containers.get(container_id)
-        except (docker.errors.NotFound, docker.errors.APIError):
+        except docker.errors.APIError:
+            error_message = 'Could not communicate with Docker!'
+            logger.critical(error_message)
+            raise HarveyError(error_message)
+        except docker.errors.NotFound:
             # If the Docker API errors or the image doesn't exist, fail gracefully by returning `None`
             container = None
 
@@ -52,8 +57,9 @@ class Container:
         try:
             containers = client.containers.list(limit=100)
         except docker.errors.APIError:
-            # If the Docker API errors, fail gracefully with an empty list
-            containers = []
+            error_message = 'Could not communicate with Docker!'
+            logger.critical(error_message)
+            raise HarveyError(error_message)
 
         return containers
 
@@ -83,8 +89,8 @@ class Container:
                     f'Harvey could not get container details for {container_name} during Healthcheck.'
                     ' As such, Harvey could not determine if the deployment was successful or not.'
                 )
-                logger.warning(message)
-                Utils.kill(message, webhook)
+                logger.error(message)
+                Utils.kill_deployment(message, webhook)
             elif container.status.lower() == 'running':
                 container_healthy = True
                 logger.info(f'{container_name} healthcheck passed!')

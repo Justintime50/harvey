@@ -2,6 +2,8 @@
 
 ## NEXT RELEASE
 
+- API has more unified error handling for 5xx error types
+- Introduced new HarveyError and cleaned up various error handling throughout the app. All messages should now properly get logged when a deployment gets killed, errors raised when Sentries need to be triggered, and various log levels were corrected
 - If a project's lock status cannot be determined, we now kill the process instead of continuing and logging only
 - Wraps `store_deployment_details` in a try/except to log out errors with saving details to the DB
 

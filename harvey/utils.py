@@ -3,6 +3,7 @@ import sys
 from typing import (
     Any,
     Dict,
+    Optional,
 )
 
 import woodchips
@@ -19,35 +20,31 @@ DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
 
 class Utils:
     @staticmethod
-    def kill(final_output: str, webhook: Dict[str, Any]):
+    def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional[bool] = False):
         """Log output, send message, and cleanup on deployment failure."""
         logger = woodchips.get(Config.logger_name)
 
-        # TODO: Use the `final_output` here to log an error, remove all other loggers right before `kill` is called
-        failure_message = f'{Webhook.repo_full_name(webhook)} deployment failed!'
-        logger.warning(failure_message)
+        error_message = f'{Webhook.repo_full_name(webhook)} deployment failed: {message}'
+        logger.error(error_message)
 
-        deployment_logs = final_output + failure_message
-        Utils.store_deployment_details(webhook, Utils._strip_emojis_from_logs(deployment_logs))
+        Utils.store_deployment_details(webhook, Utils._strip_emojis_from_logs(error_message))
 
         if Config.use_slack:
-            Message.send_slack_message(deployment_logs)
+            Message.send_slack_message(error_message)
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
-        # Exit the thread safely to ensure we don't continue executing
-        # TODO: This raises an error which we don't want
         sys.exit(1)
 
     @staticmethod
-    def success(final_output: str, webhook: Dict[str, Any]):
+    def succeed_deployment(message: str, webhook: Dict[str, Any]):
         """Log output, send message, and cleanup on deployment success."""
         logger = woodchips.get(Config.logger_name)
 
         success_message = f'{Webhook.repo_full_name(webhook)} deployment succeeded!'
         logger.info(success_message)
 
-        deployment_logs = final_output + success_message
+        deployment_logs = message + success_message
         Utils.store_deployment_details(webhook, Utils._strip_emojis_from_logs(deployment_logs))
 
         if Config.use_slack:
@@ -55,8 +52,6 @@ class Utils:
 
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
-        # Exit the thread safely to ensure we don't continue executing
-        # TODO: This raises an error which we don't want
         sys.exit(1)
 
     @staticmethod
@@ -100,9 +95,11 @@ class Utils:
 
                 database_table.commit()
         except Exception as error:
-            error_message = f'Could not store deployment details to database: {error}'
-            logger.error(error_message)
-            Utils.kill(error_message, webhook)
+            Utils.kill_deployment(
+                message=f'Could not store deployment details to database: {error}',
+                webhook=webhook,
+                raise_error=True,
+            )
 
 
 def setup_logger():

@@ -19,20 +19,21 @@ def test_parse_github_webhook(mock_run_deployment, mock_logger, mock_webhook_obj
     assert webhook[1] == 200
 
 
-@patch('logging.Logger.debug')
+@patch('logging.Logger.error')
 @patch('harvey.deployments.Deployment.run_deployment')
 def test_parse_github_webhook_bad_branch(mock_run_deployment, mock_logger, mock_webhook_object):
     webhook = Api.parse_github_webhook(mock_webhook_object(branch='bad_branch_name'))
 
     mock_logger.assert_called()
-    assert webhook[0] == {
-        'message': 'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES.',
-        'success': False,
-    }
+    assert (
+        'Harvey received a webhook event for a branch that is not included in the ALLOWED_BRANCHES'
+        in webhook[0]['message']
+    )
+    assert webhook[0]['success'] is False
     assert webhook[1] == 422
 
 
-@patch('logging.Logger.debug')
+@patch('logging.Logger.error')
 @patch('harvey.deployments.Deployment.run_deployment')
 def test_parse_github_webhook_no_json(mock_run_deployment, mock_logger):
     mock_webhook = MagicMock()

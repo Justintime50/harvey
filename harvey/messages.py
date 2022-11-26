@@ -1,9 +1,8 @@
-import sys
-
 import slack
 import woodchips
 
 from harvey.config import Config
+from harvey.errors import HarveyError
 
 
 class Message:
@@ -26,6 +25,6 @@ class Message:
             )
             logger.debug('Slack message sent!')
         except slack.errors.SlackApiError:
-            final_output = 'Harvey could not send the Slack message.'
-            logger.error(final_output)
-            sys.exit()
+            error_message = 'Harvey could not send the Slack message.'
+            logger.error(error_message)
+            raise HarveyError(error_message)

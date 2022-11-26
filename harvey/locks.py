@@ -2,6 +2,7 @@ import woodchips
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
+from harvey.errors import HarveyError
 
 
 DATABASE_TABLE_NAME = 'locks'
@@ -42,5 +43,4 @@ class Lock:
                 if key == corrected_project_name:
                     locked_value = value['locked']
                     return locked_value
-
-        raise ValueError('Lock does not exist!')
+        raise HarveyError('Lock does not exist!')

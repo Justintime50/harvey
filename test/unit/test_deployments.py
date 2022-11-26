@@ -7,7 +7,6 @@ from unittest.mock import (
 )
 
 from harvey.deployments import Deployment
-from harvey.webhooks import Webhook
 
 
 MOCK_OUTPUT = 'mock output'
@@ -67,20 +66,21 @@ def test_open_project_config(mock_json, mock_isfile):
         assert config == {'mock': 'json'}
 
 
-@patch('harvey.utils.Utils.kill')
+@patch('harvey.utils.Utils.kill_deployment')
 def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
     with patch('builtins.open', mock_open()) as mock_file:
         mock_file.side_effect = FileNotFoundError
         _ = Deployment.open_project_config(mock_webhook)
 
         mock_utils_kill.assert_called_once_with(
-            f'Harvey could not find a ".harvey.yml" file in {Webhook.repo_full_name(mock_webhook)}.', mock_webhook
+            message='Harvey could not find a ".harvey.yaml" file!',
+            webhook=mock_webhook,
         )
 
 
 @patch('sys.exit')
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.success')
+@patch('harvey.utils.Utils.succeed_deployment')
 @patch(
     'harvey.deployments.Deployment.initialize_deployment',
     return_value=[mock_config(deployment_type='pull'), MOCK_OUTPUT, MOCK_TIME],
@@ -93,7 +93,7 @@ def test_run_deployment_pull(mock_initialize_deployment, mock_utils_success, moc
     mock_utils_success.assert_called_once()
 
 
-@patch('harvey.utils.Utils.success')
+@patch('harvey.utils.Utils.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
 @patch(
@@ -126,7 +126,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.kill')
+@patch('harvey.utils.Utils.kill_deployment')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
@@ -135,7 +135,7 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.kill')
+@patch('harvey.utils.Utils.kill_deployment')
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )

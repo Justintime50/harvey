@@ -1,7 +1,9 @@
 from unittest.mock import patch
 
+import pytest
 import slack
 
+from harvey.errors import HarveyError
 from harvey.messages import Message
 
 
@@ -18,7 +20,6 @@ def test_send_slack_message_success(mock_slack, mock_logger):
 
 
 @patch('logging.Logger.error')
-@patch('sys.exit')
 @patch(
     'slack.WebClient.chat_postMessage',
     side_effect=slack.errors.SlackApiError(
@@ -29,9 +30,11 @@ def test_send_slack_message_success(mock_slack, mock_logger):
         },
     ),
 )
-def test_send_slack_message_exception(mock_slack, mock_sys_exit, mock_logger):
+def test_send_slack_message_exception(mock_slack, mock_logger):
     message = 'mock message'
-    Message.send_slack_message(message)
 
+    with pytest.raises(HarveyError) as error:
+        Message.send_slack_message(message)
+
+    assert str(error.value) == 'Harvey could not send the Slack message.'
     mock_logger.assert_called()
-    mock_sys_exit.assert_called_once()

@@ -38,13 +38,17 @@ class Git:
             decoded_output = command_output.decode()
             logger.debug(decoded_output)
         except subprocess.TimeoutExpired:
-            final_output = 'Harvey timed out during git clone operation.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
-        except subprocess.CalledProcessError:
-            final_output = f'Harvey could not clone {Webhook.repo_full_name(webhook)}.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            Utils.kill_deployment(
+                message='Harvey timed out during git clone operation.',
+                webhook=webhook,
+            )
+        except subprocess.CalledProcessError as error:
+            final_output = f'Harvey could not clone due to error: {error} {Webhook.repo_full_name(webhook)}.'
+            Utils.kill_deployment(
+                message=final_output,
+                webhook=webhook,
+                raise_error=True,
+            )
 
         return decoded_output
 
@@ -60,11 +64,12 @@ class Git:
             decoded_output = command_output.decode()
             logger.debug(f'{decoded_output}')
         except subprocess.TimeoutExpired:
-            final_output = 'Harvey timed out during git pull operation.'
-            logger.error(final_output)
-            Utils.kill(final_output, webhook)
+            Utils.kill_deployment(
+                message='Harvey timed out during git pull operation.',
+                webhook=webhook,
+            )
         except subprocess.CalledProcessError:
-            # The biggest offender of this action failing is local, uncommitted changes.
+            # The biggest offender of this operation failing is local, uncommitted changes.
             # Try stashing and retry again before failing.
             logger.error(f'Harvey could not pull {Webhook.repo_full_name(webhook)}.')
             logger.info(f'Attempting to stash {Webhook.repo_full_name(webhook)} before pulling again...')
@@ -75,11 +80,14 @@ class Git:
                 decoded_output = command_output.decode()
                 logger.debug(f'{decoded_output}')
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-                final_output = f'Harvey could not stash {Webhook.repo_full_name(webhook)}.'
-                logger.error(final_output)
-                Utils.kill(final_output, webhook)
+                Utils.kill_deployment(
+                    message='Harvey could not stash local changes!',
+                    webhook=webhook,
+                    raise_error=True,
+                )
 
-            # Recursively call this function again so we can try pulling after a stash when we fail the first time
+            # Recursively call this function again so we can try pulling after a stash when we fail the first time.
+            # Must use an int here vs bool so we don't have an infinite loop.
             if pull_attempt == 1:
                 pull_attempt += 1
                 decoded_output = Git.pull_repo(project_path, webhook, pull_attempt)
