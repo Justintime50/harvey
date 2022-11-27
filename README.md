@@ -66,6 +66,7 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 - Harvey will timeout deploys after 30 minutes
 - Harvey will shallow clone your project to the most recent commit
 - Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
+- Harvey will rotate internal logs automatically and cleanup; however, uWSGI logs will rotate but do not currently clean themselves up and could balloon with a lot of traffic to the API
 
 ### Harvey Configuration
 
@@ -76,7 +77,7 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 - This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 - Optional: `prod_compose: true` json can be passed to instruct Harvey to use a prod `docker-compose` file in addition to the base compose file. This will run the equivelant of the following when deploying: `docker-compose -f docker-compose.yml -f docker-compose-prod.yml`.
 
-**.harvey.yml Example**
+**.harvey.yaml Example**
 
 ```yml
 deployment_type: deploy
