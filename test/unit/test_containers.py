@@ -1,9 +1,13 @@
+import datetime
 from unittest.mock import (
     Mock,
     patch,
 )
 
 from harvey.containers import Container
+
+
+MOCK_RFC_3339_TIME = datetime.datetime.now(datetime.timezone.utc).isoformat()[:-4]
 
 
 @patch('logging.Logger.debug')
@@ -38,7 +42,7 @@ def test_list_containers(mock_client, mock_logger, mock_tag):
 @patch('time.sleep', return_value=None)
 @patch(
     'harvey.containers.Container.get_container',
-    return_value=Mock(status='running', attrs={'State': {'StartedAt': '2022-11-27T06:51:40.311647704Z'}}),
+    return_value=Mock(status='running', attrs={'State': {'StartedAt': MOCK_RFC_3339_TIME}}),
 )
 @patch('docker.from_env')
 def test_run_container_healthcheck_success(
