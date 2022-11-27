@@ -36,7 +36,10 @@ def test_list_containers(mock_client, mock_logger, mock_tag):
 
 @patch('logging.Logger.info')
 @patch('time.sleep', return_value=None)
-@patch('harvey.containers.Container.get_container', return_value=Mock(status='running'))
+@patch(
+    'harvey.containers.Container.get_container',
+    return_value=Mock(status='running', attrs={'State': {'StartedAt': '2022-11-27T06:51:40.311647704Z'}}),
+)
 @patch('docker.from_env')
 def test_run_container_healthcheck_success(
     mock_client, mock_container, mock_sleep, mock_logger, mock_container_name, mock_webhook

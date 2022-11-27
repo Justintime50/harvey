@@ -19,9 +19,7 @@
     }
   ],
   "data": {
-    "deployment_type": "pull",
-    "healthcheck": [
-      "justinpaulhammond-justinpaulhammond-1"
-    ]
+    "deployment_type": "deploy",
+    "healthcheck": ["justinpaulhammond-justinpaulhammond-1"]
   }
 }

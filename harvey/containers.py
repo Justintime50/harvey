@@ -1,3 +1,4 @@
+import datetime
 import time
 from typing import (
     Any,
@@ -80,23 +81,43 @@ class Container:
         for attempt in range(1, max_retries + 1):
             logger.info(f'Running healthcheck attempt #{attempt} for {container_name}...')
 
-            # TODO: This function should check if the container uptime is under say 30 seconds to ensure
-            # it got restarted instead of failing silently and remaining on the old deploy
             container = Container.get_container(docker_client, container_name)
 
             if container is None:
-                message = (
-                    f'Harvey could not get container details for {container_name} during Healthcheck.'
-                    ' As such, Harvey could not determine if the deployment was successful or not.'
-                )
+                message = f'Harvey did not get container details from Docker for {container_name} during Healthcheck.'
                 logger.error(message)
                 Utils.kill_deployment(message, webhook)
-            elif container.status.lower() == 'running':
+            elif container.status.lower() == 'running' and Container.container_recently_restarted(container.__dict__):
                 container_healthy = True
                 logger.info(f'{container_name} healthcheck passed!')
                 break
-            else:
-                logger.warning(f'{container_name} healthcheck failed, retrying...')
+            elif container.status.lower() != 'running':
+                logger.warning(f'{container_name} healthcheck failed due to current container status, retrying...')
                 time.sleep(retry_delay_seconds)
+            elif container.status.lower() == 'running' and not Container.container_recently_restarted(
+                container.__dict__
+            ):
+                message = f'{container_name} healthcheck failed due to container not restarting on deploy.'
+                logger.error(message)
+                Utils.kill_deployment(
+                    message=message,
+                    webhook=webhook,
+                    raise_error=True,
+                )
 
         return container_healthy
+
+    @staticmethod
+    def container_recently_restarted(container_dictionary: Dict[str, Any]):
+        """Determines if the container was recently restarted or not within the last minute.
+
+        Docker appears to store dates in RFC 3339 Nano time so we chop off the ending digits and convert
+        to a Python datetime here for comparison.
+        """
+        container_start_datetime = datetime.datetime.strptime(
+            container_dictionary['attrs']['State'].get('StartedAt', '')[:-4], '%Y-%m-%dT%H:%M:%S.%f'
+        )
+        grace_period_datetime = container_start_datetime + datetime.timedelta(minutes=-1)
+        now = datetime.datetime.now()
+
+        return now < grace_period_datetime

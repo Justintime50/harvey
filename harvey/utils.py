@@ -10,6 +10,7 @@ import woodchips
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
+from harvey.errors import HarveyError
 from harvey.locks import Lock
 from harvey.messages import Message
 from harvey.webhooks import Webhook
@@ -32,7 +33,14 @@ class Utils:
         if Config.use_slack:
             Message.send_slack_message(error_message)
 
+        # TODO: We need to distinguish between a user defined lock and a system defined lock. Users may want to ensure
+        # something can't get deployed and should always stay locked whereas the system may lock this during a deploy
+        # but on a failure, we should unlock to allow a new deployment to go through. Currently, all deployments get
+        # unlocked which may not be ideal if a deployment fails.
         _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+
+        if raise_error:
+            raise HarveyError(error_message)
 
         sys.exit(1)
 
