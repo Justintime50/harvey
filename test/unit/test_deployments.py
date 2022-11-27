@@ -14,9 +14,11 @@ MOCK_TIME = datetime.datetime.utcnow()
 
 
 def mock_config(deployment_type='deploy', prod_compose=False):
+    """A mock configuration object similar to what would be stored in `harvey.yaml`."""
     mock_config = {
         'deployment': deployment_type,
         'prod_compose': prod_compose,
+        'healthcheck': ['mock_container_name'],
     }
 
     return mock_config
@@ -78,36 +80,57 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
         )
 
 
-@patch('sys.exit')
 @patch('os.path.exists', return_value=True)
 @patch('harvey.utils.Utils.succeed_deployment')
+@patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.containers.Container.create_client')
+@patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
 @patch(
     'harvey.deployments.Deployment.initialize_deployment',
     return_value=[mock_config(deployment_type='pull'), MOCK_OUTPUT, MOCK_TIME],
 )
-def test_run_deployment_pull(mock_initialize_deployment, mock_utils_success, mock_path_exists, mock_exit, mock_webhook):
-    # TODO: This test requires the Docker daemon to be running, refactor so it can run without
+def test_run_deployment_pull(
+    mock_initialize_deployment,
+    mock_deploy_deployment,
+    mock_client,
+    mock_healthcheck,
+    mock_utils_success,
+    mock_path_exists,
+    mock_webhook,
+):
     _ = Deployment.run_deployment(mock_webhook)
 
     mock_initialize_deployment.assert_called_once_with(mock_webhook)
+    mock_deploy_deployment.assert_called_once()
+    mock_client.assert_called_once()
+    mock_healthcheck.assert_called_once()
     mock_utils_success.assert_called_once()
 
 
+@patch('os.path.exists', return_value=True)
 @patch('harvey.utils.Utils.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
+@patch('harvey.containers.Container.create_client')
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
 @patch(
     'harvey.deployments.Deployment.initialize_deployment',
     return_value=[mock_config(deployment_type='deploy'), MOCK_OUTPUT, MOCK_TIME],
 )
 def test_run_deployment_deploy(
-    mock_initialize_deployment, mock_deploy_deployment, mock_healthcheck, mock_utils_success, mock_webhook
+    mock_initialize_deployment,
+    mock_deploy_deployment,
+    mock_client,
+    mock_healthcheck,
+    mock_utils_success,
+    mock_path_exists,
+    mock_webhook,
 ):
-    # TODO: This test requires the Docker daemon to be running, refactor so it can run without
     _ = Deployment.run_deployment(mock_webhook)
 
     mock_initialize_deployment.assert_called_once_with(mock_webhook)
     mock_deploy_deployment.assert_called_once_with(mock_config(deployment_type='deploy'), mock_webhook, MOCK_OUTPUT)
+    mock_client.assert_called_once()
+    mock_healthcheck.assert_called_once()
     mock_utils_success.assert_called_once()
 
 
