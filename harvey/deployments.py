@@ -235,6 +235,7 @@ class Deployment:
                 '-f', prod_compose_filepath,
                 'up', '-d',
                 '--build',
+                '--force-recreate',
                 '--quiet-pull',
             ]
             # fmt: on
@@ -246,6 +247,7 @@ class Deployment:
                 '-f', default_compose_filepath,
                 'up', '-d',
                 '--build',
+                '--force-recreate',
                 '--quiet-pull',
             ]
             # fmt: on

@@ -35,13 +35,13 @@ class Container:
 
         try:
             container = client.containers.get(container_id)
-        except docker.errors.APIError:
-            error_message = 'Could not communicate with Docker!'
-            logger.critical(error_message)
-            raise HarveyError(error_message)
         except docker.errors.NotFound:
             # If the Docker API errors or the image doesn't exist, fail gracefully by returning `None`
             container = None
+        except (docker.errors.APIError, Exception):
+            error_message = 'Could not communicate with Docker!'
+            logger.critical(error_message)
+            raise HarveyError(error_message)
 
         return container
 
@@ -57,7 +57,7 @@ class Container:
 
         try:
             containers = client.containers.list(limit=100)
-        except docker.errors.APIError:
+        except (docker.errors.APIError, Exception):
             error_message = 'Could not communicate with Docker!'
             logger.critical(error_message)
             raise HarveyError(error_message)
@@ -109,15 +109,20 @@ class Container:
 
     @staticmethod
     def container_recently_restarted(container_dictionary: Dict[str, Any]):
-        """Determines if the container was recently restarted or not within the last minute.
+        """Determines if the container was recently restarted or not within the last minute by getting the
+        difference of datetimes between now and the container's start time. If it's greater than 60 seconds,
+        we know the container didn't restart with this deploy.
 
-        Docker appears to store dates in RFC 3339 Nano time so we chop off the ending digits and convert
-        to a Python datetime here for comparison.
+        Docker appears to store dates in RFC 3339 Nano and UTC time so we chop off the ending digits and
+        convert to a Python datetime here for comparison.
         """
+        now = datetime.datetime.now(datetime.timezone.utc)
         container_start_datetime = datetime.datetime.strptime(
             container_dictionary['attrs']['State'].get('StartedAt', '')[:-4], '%Y-%m-%dT%H:%M:%S.%f'
-        )
-        grace_period_datetime = container_start_datetime + datetime.timedelta(minutes=-1)
-        now = datetime.datetime.now()
+        ).replace(tzinfo=datetime.timezone.utc)
+        container_age_difference = now - container_start_datetime
 
-        return now < grace_period_datetime
+        grace_period_seconds = 60.0
+        container_restarted_recently = container_age_difference.total_seconds() <= grace_period_seconds
+
+        return container_restarted_recently
