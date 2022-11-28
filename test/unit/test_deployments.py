@@ -144,7 +144,17 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_subprocess.assert_called_once_with(
-        ['docker', 'compose', '-f', ANY, 'up', '-d', '--build', '--quiet-pull'],
+        [
+            'docker',
+            'compose',
+            '-f',
+            ANY,
+            'up',
+            '-d',
+            '--build',
+            '--force-recreate',
+            '--quiet-pull',
+        ],
         stdin=None,
         stderr=None,
         timeout=1800,
@@ -190,6 +200,7 @@ def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mo
             'up',
             '-d',
             '--build',
+            '--force-recreate',
             '--quiet-pull',
         ],
         stdin=None,
