@@ -33,11 +33,10 @@ class Utils:
         if Config.use_slack:
             Message.send_slack_message(error_message)
 
-        # TODO: We need to distinguish between a user defined lock and a system defined lock. Users may want to ensure
-        # something can't get deployed and should always stay locked whereas the system may lock this during a deploy
-        # but on a failure, we should unlock to allow a new deployment to go through. Currently, all deployments get
-        # unlocked which may not be ideal if a deployment fails.
-        _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+        # Only unlock deployments that were locked by the system and not a user to preserve their preferences
+        deployment_lock = Lock.lookup_project_lock(project_name=Webhook.repo_full_name(webhook))
+        if deployment_lock['system_lock']:
+            _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
         if raise_error:
             raise HarveyError(error_message)

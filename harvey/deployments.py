@@ -30,7 +30,7 @@ class Deployment:
 
         try:
             # Kill the deployment if the project is locked
-            if Lock.lookup_project_lock(Webhook.repo_full_name(webhook)) is True:
+            if Lock.lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
                 Utils.kill_deployment(
                     f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
                     ' deployments.',
@@ -45,7 +45,11 @@ class Deployment:
 
         start_time = datetime.datetime.utcnow()
 
-        _ = Lock.update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=True)
+        _ = Lock.update_project_lock(
+            project_name=Webhook.repo_full_name(webhook),
+            locked=True,
+            system_lock=True,
+        )
         Utils.store_deployment_details(webhook)
         # Run git operation first to ensure the config is present and up-to-date
         git = Git.update_git_repo(webhook)

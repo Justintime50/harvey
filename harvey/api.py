@@ -222,12 +222,16 @@ class Api:
         """Retrieve the `lock` status of a project via its fully-qualified repo name."""
         lock_status = Lock.lookup_project_lock(project_name)
 
-        return {'locked': lock_status}
+        return {'locked': lock_status['locked']}
 
     @staticmethod
     def lock_project(project_name: str):
-        """Locks the deployments of a project."""
-        lock_status = Lock.update_project_lock(project_name=project_name, locked=True)
+        """Locks the deployments of a project via user request."""
+        lock_status = Lock.update_project_lock(
+            project_name=project_name,
+            locked=True,
+            system_lock=False,
+        )
 
         return {'locked': lock_status}
 

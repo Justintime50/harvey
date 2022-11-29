@@ -7,6 +7,7 @@
 - Healthchecks of containers now check when the container was started to ensure that not only are they running, but that they restarted within the last 60 seconds as a part of the deploy
   - Fixed a bug where containers may not properly recreate when their configs or images don't differ from the last deploy
 - If a project's lock status cannot be determined, we now kill the process instead of continuing and logging only
+- Harvey can now distinguish between a system lock and a user lock allowing for user-locked deployments to stay that way even if a deployment fails
 - Wraps `store_deployment_details` in a try/except to log out errors with saving details to the DB
 
 ## v0.21.0 (2022-11-21)
