@@ -9,7 +9,7 @@ load_dotenv()  # Must remain at the top of this file
 class Config:
     # User configurable settings
     allowed_branches = [branch.strip().lower() for branch in os.getenv('ALLOWED_BRANCHES', 'main,master').split(',')]
-    deploy_timeout = int(os.getenv('DEPLOY_TIMEOUT', 1800))  # Default is 30 minutes
+    deploy_timeout = int(os.getenv('DEPLOY_TIMEOUT', 600))  # Default is 10 minutes
     git_timeout = int(os.getenv('GIT_TIMEOUT', 300))  # Default is 5 minutes
     pagination_limit = int(os.getenv('PAGINATION_LIMIT', 20))
     deploy_on_tag = os.getenv('DEPLOY_ON_TAG', True)  # Whether a tag pushed will trigger a deploy or not
@@ -22,7 +22,7 @@ class Config:
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
     port = int(os.getenv('PORT', 5000))
-    harvey_version = '0.21.0'
+    harvey_version = '0.22.0'
     supported_deployments = {
         'deploy',
         'pull',
