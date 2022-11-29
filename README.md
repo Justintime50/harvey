@@ -52,7 +52,7 @@ make install
 # Run locally for development (runs via Flask)
 make run
 
-# Run in production (runs via Gunicorn)
+# Run in production (runs via uWSGI)
 make prod
 
 # Spin up the optional reverse proxy (adjust the URLs in the docker-compose files)
