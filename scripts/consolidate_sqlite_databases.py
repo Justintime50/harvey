@@ -5,6 +5,7 @@ from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 
+
 # This script consolidates the multiple `locks` and `pipeline` database files into a single
 # sqlite database file and places them in their respective tables.
 

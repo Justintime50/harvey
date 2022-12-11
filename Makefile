@@ -3,6 +3,7 @@ VIRTUAL_ENV := venv
 VIRTUAL_BIN := $(VIRTUAL_ENV)/bin
 PROJECT_NAME := harvey
 TEST_DIR := test
+SCRIPTS_DIR := scripts
 
 ## help - Display help about make targets for this Makefile
 help:
@@ -10,11 +11,11 @@ help:
 
 ## black - Runs the Black Python formatter against the project
 black:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/
 
 ## black-check - Checks if the project is formatted correctly against the Black rules
 black-check:
-	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ --check
+	$(VIRTUAL_BIN)/black $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/ --check
 
 ## build - Builds the project in preparation for release
 build:
@@ -46,15 +47,15 @@ integration_test:
 
 ## isort - Sorts imports throughout the project
 isort:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/
 
 ## isort-check - Checks that imports throughout the project are sorted correctly
 isort-check:
-	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/ --check-only
+	$(VIRTUAL_BIN)/isort $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/ --check-only
 
 ## lint - Lint the project
 lint:
-	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/flake8 $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/
 
 ## prod - Run the service in production
 prod:
@@ -68,7 +69,7 @@ run:
 
 ## mypy - Run mypy type checking on the project
 mypy:
-	$(VIRTUAL_BIN)/mypy $(PROJECT_NAME)/ $(TEST_DIR)/
+	$(VIRTUAL_BIN)/mypy $(PROJECT_NAME)/ $(TEST_DIR)/ $(SCRIPTS_DIR)/
 
 ## scan - Scans the project for security vulnerabilities
 scan:
