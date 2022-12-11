@@ -24,7 +24,7 @@ def mock_config(deployment_type='deploy', prod_compose=False):
     return mock_config
 
 
-@patch('harvey.locks.Lock.lookup_project_lock', return_value={'locked': False})
+@patch('harvey.repos.locks.lookup_project_lock', return_value={'locked': False})
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
@@ -37,14 +37,18 @@ def test_initialize_deployment_slack(
     mock_slack_message.assert_called_once()
 
 
-@patch('harvey.locks.Lock.lookup_project_lock', return_value={'locked': False})
+@patch('sys.exit')
+@patch('harvey.repos.locks.lookup_project_lock', return_value={'locked': False})
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
-def test_initialize_deployment(mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_webhook):
+def test_initialize_deployment(
+    mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_sys_exit, mock_webhook
+):
     _, _, _ = Deployment.initialize_deployment(mock_webhook)
 
     mock_open_project_config.assert_called_once_with(mock_webhook)
     mock_update_git_repo.assert_called_once_with(mock_webhook)
+    mock_sys_exit.assert_called_once()
 
 
 @patch('os.path.isfile')
@@ -71,7 +75,7 @@ def test_open_project_config(mock_json, mock_isfile):
         assert config == {'mock': 'json'}
 
 
-@patch('harvey.utils.Utils.kill_deployment')
+@patch('harvey.utils.utils.Utils.kill_deployment')
 def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
     with patch('builtins.open', mock_open()) as mock_file:
         mock_file.side_effect = FileNotFoundError
@@ -84,7 +88,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.succeed_deployment')
+@patch('harvey.utils.utils.Utils.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('harvey.containers.Container.create_client')
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
@@ -111,7 +115,7 @@ def test_run_deployment_pull(
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.succeed_deployment')
+@patch('harvey.utils.utils.Utils.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('harvey.containers.Container.create_client')
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
@@ -162,7 +166,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.kill_deployment')
+@patch('harvey.utils.utils.Utils.kill_deployment')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
@@ -171,7 +175,7 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.Utils.kill_deployment')
+@patch('harvey.utils.utils.Utils.kill_deployment')
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )

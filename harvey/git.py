@@ -9,7 +9,7 @@ from typing import (
 import woodchips
 
 from harvey.config import Config
-from harvey.utils import Utils
+from harvey.utils.utils import Utils
 from harvey.webhooks import Webhook
 
 

@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Adds a try/catch block to the spawned thread in an attempt to kill off failed deployments
+
 ## v0.22.0 (2022-11-28)
 
 - API has more unified error handling for 5xx error types

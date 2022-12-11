@@ -12,7 +12,7 @@ import woodchips
 
 from harvey.config import Config
 from harvey.errors import HarveyError
-from harvey.utils import Utils
+from harvey.utils.utils import Utils
 
 
 class Container:

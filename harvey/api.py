@@ -1,32 +1,22 @@
 import base64
-import os
 from functools import wraps
 from threading import Thread
 from typing import (
-    Any,
     Dict,
-    List,
     Tuple,
 )
 
-import flask
 import requests
 import woodchips
 from flask import (
     abort,
     request,
 )
-from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 from harvey.deployments import Deployment
 from harvey.errors import HarveyError
-from harvey.locks import Lock
 from harvey.webhooks import Webhook
-
-
-LOCKS_DATABASE_TABLE_NAME = 'locks'
-DEPLOYMENTS_DATABASE_TABLE_NAME = 'deployments'
 
 
 class Api:
@@ -35,15 +25,6 @@ class Api:
     These functions may call out to other modules in Harvey and ultimately serve as the "glue"
     that pulls the entire action together prior to returning whatever the result is to the user via API.
     """
-
-    @staticmethod
-    def _page_size(request: flask.Request) -> int:
-        """Return a sane page size based on the request."""
-        return (
-            int(request.args.get('page_size', Config.pagination_limit))
-            if request.args.get('page_size')
-            else Config.pagination_limit
-        )
 
     @staticmethod
     def check_api_key(func):
@@ -135,109 +116,3 @@ class Api:
         }, status_code
 
         return response
-
-    @staticmethod
-    def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
-        """Retrieve a deployment's details from a given `deployment_id`."""
-        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
-            for key, value in database_table.iteritems():
-                transformed_key = key.split('@')
-                if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
-                    return value
-        raise HarveyError(f'Could not retrieve deployment\'s details for {deployment_id}!')
-
-    @staticmethod
-    def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
-        """Retrieve a list of deployments until the pagination limit is reached."""
-        deployments: Dict[str, Any] = {'deployments': []}
-
-        page_size = Api._page_size(request)
-        project_name = request.args.get('project')
-
-        with SqliteDict(filename=Config.database_file, tablename=DEPLOYMENTS_DATABASE_TABLE_NAME) as database_table:
-            for _, value in database_table.iteritems():
-                # If a project name is provided, only return deployments for that project
-                if project_name and value['project'] == project_name:
-                    deployments['deployments'].append(value)
-                # This block is for a generic list of deployments (all deployments)
-                elif not project_name:
-                    deployments['deployments'].append(value)
-                # If a project name was specified but doesn't match, don't add to list
-                else:
-                    pass
-
-        sorted_deployments = sorted(deployments['deployments'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
-        deployments['total_count'] = len(deployments['deployments'])
-        deployments['deployments'] = sorted_deployments
-
-        return deployments
-
-    @staticmethod
-    def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
-        """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
-        projects: Dict[str, Any] = {'projects': []}
-        project_owners = os.listdir(Config.projects_path)
-        page_size = Api._page_size(request)
-
-        if '.DS_Store' in project_owners:
-            project_owners.remove('.DS_Store')
-        for project_owner in project_owners:
-            project_names = os.listdir(os.path.join(Config.projects_path, project_owner))
-            if '.DS_Store' in project_names:
-                project_names.remove('.DS_Store')
-            for project_name in project_names:
-                final_project_name = f'{project_owner}-{project_name}'
-                projects['projects'].append(final_project_name)
-
-            if len(projects['projects']) > page_size:
-                break
-
-        projects['total_count'] = len(projects['projects'])
-
-        return projects
-
-    @staticmethod
-    def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
-        locks: Dict[str, Any] = {'locks': []}
-
-        page_size = Api._page_size(request)
-
-        with SqliteDict(filename=Config.database_file, tablename=LOCKS_DATABASE_TABLE_NAME) as database_table:
-            for key, values in database_table.iteritems():
-                locks['locks'].append(
-                    {
-                        'project': key,
-                        'locked': values['locked'],
-                    }
-                )
-
-        sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])[:page_size]
-        locks['total_count'] = len(locks['locks'])
-        locks['locks'] = sorted_locks
-
-        return locks
-
-    @staticmethod
-    def retrieve_lock(project_name: str) -> Dict[str, bool]:
-        """Retrieve the `lock` status of a project via its fully-qualified repo name."""
-        lock_status = Lock.lookup_project_lock(project_name)
-
-        return {'locked': lock_status['locked']}
-
-    @staticmethod
-    def lock_project(project_name: str):
-        """Locks the deployments of a project via user request."""
-        lock_status = Lock.update_project_lock(
-            project_name=project_name,
-            locked=True,
-            system_lock=False,
-        )
-
-        return {'locked': lock_status}
-
-    @staticmethod
-    def unlock_project(project_name: str):
-        """Unlocks the deployments of a project."""
-        lock_status = Lock.update_project_lock(project_name=project_name, locked=False)
-
-        return {'locked': lock_status}

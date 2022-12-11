@@ -17,7 +17,16 @@ from flask import (
 
 from harvey.api import Api
 from harvey.config import Config
-from harvey.utils import setup_logger
+from harvey.errors import HarveyError
+from harvey.locks import (
+    lock_project,
+    retrieve_lock,
+    unlock_project,
+)
+from harvey.repos.deployments import retrieve_deployment
+from harvey.repos.locks import retrieve_locks
+from harvey.repos.projects import retrieve_projects
+from harvey.utils.utils import setup_logger
 
 
 load_dotenv()  # Must remain at the top of this file
@@ -64,7 +73,7 @@ def server_error(e) -> Dict[str, Any]:
 
 
 @APP.route('/health', methods=['GET'])
-def harvey_healthcheck():
+def harvey_healthcheck_endpoint():
     """Return a 200 if Harvey is running."""
     return create_response_dict(
         message='Ok',
@@ -75,7 +84,7 @@ def harvey_healthcheck():
 
 @APP.route('/deployments', methods=['GET'])
 @Api.check_api_key
-def retrieve_deployments():
+def retrieve_deployments_endpoint():
     """Retrieves deployments from the Sqlite store.
 
     - The keys will be `username-repo_name-commit_id`.
@@ -90,20 +99,20 @@ def retrieve_deployments():
 
 @APP.route('/deployments/<deployment_id>', methods=['GET'])
 @Api.check_api_key
-def retrieve_deployment(deployment_id: str):
+def retrieve_deployment_endpoint(deployment_id: str):
     """Retrieve a deployment's details by ID.
 
     A `deployment_id` will be `username-repo_name-commit_id`.
     """
     try:
-        return Api.retrieve_deployment(deployment_id)
+        return retrieve_deployment(deployment_id)
     except Exception:
         return abort(500)
 
 
 # Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
 @APP.route('/deploy', methods=['POST'])
-def deploy_project():
+def deploy_project_endpoint():
     """Deploy a project based on webhook data and the `docker-compose.yml` file.
 
     This is the main entrypoint for Harvey.
@@ -116,50 +125,50 @@ def deploy_project():
 
 @APP.route('/projects', methods=['GET'])
 @Api.check_api_key
-def retrieve_projects():
+def retrieve_projects_endpoint():
     """Retrieves a list of project names from the git repos stored in Harvey."""
     try:
-        return Api.retrieve_projects(request)
+        return retrieve_projects(request)
     except Exception:
         return abort(500)
 
 
 @APP.route('/locks', methods=['GET'])
 @Api.check_api_key
-def retrieve_locks():
+def retrieve_locks_endpoint():
     """Retrieves the list of locks"""
     try:
-        return Api.retrieve_locks(request)
+        return retrieve_locks(request)
     except Exception:
         return abort(500)
 
 
 @APP.route('/locks/<project_name>', methods=['GET'])
 @Api.check_api_key
-def retrieve_lock(project_name: str):
+def retrieve_lock_endpoint(project_name: str):
     """Retrieves the lock status of a project by its name."""
     try:
-        return Api.retrieve_lock(project_name)
+        return retrieve_lock(project_name)
     except Exception:
         return abort(404)
 
 
 @APP.route('/projects/<project_name>/lock', methods=['PUT'])
 @Api.check_api_key
-def lock_project(project_name: str):
+def lock_project_endpoint(project_name: str):
     """Enables the deployment lock for a project."""
     try:
-        return Api.lock_project(project_name)
+        return lock_project(project_name)
     except Exception:
         return abort(500)
 
 
 @APP.route('/projects/<project_name>/unlock', methods=['PUT'])
 @Api.check_api_key
-def unlock_project(project_name: str):
+def unlock_project_endpoint(project_name: str):
     """Disables the deployment lock for a project."""
     try:
-        return Api.unlock_project(project_name)
+        return unlock_project(project_name)
     except Exception:
         return abort(500)
 
@@ -179,7 +188,7 @@ def bootstrap(debug_mode):
         timeout=3,
     ).decode('UTF-8')
     if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
-        raise Exception(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
+        raise HarveyError(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
 
     # Setup Sentry
     if Config.sentry_url:
@@ -205,6 +214,6 @@ if __name__ == '__main__':
 
 
 if __name__ != '__main__':
-    # These tasks take place when run via Gunicorn, the remaining config can be found in `wsgi.py`
+    # These tasks take place when run via uWSGI, the remaining config can be found in `wsgi.py`
     debug_mode = Config.log_level == 'DEBUG'
     bootstrap(debug_mode)
