@@ -14,7 +14,7 @@ def main():
     with SqliteDict(filename=DATABASE_LOCATION, tablename=DEPLOYMENTS_TABLE_NAME) as deployments_table:
         for key, data in deployments_table.iteritems():
             if data['status'] == 'In-Progress':
-                data['status'] = 'Failure'
+                deployments_table[key]['status'] = 'Failure'
                 print(f'{key} status updated from "In-Progress" to "Failure"!')
 
         deployments_table.commit()

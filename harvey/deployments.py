@@ -32,8 +32,10 @@ class Deployment:
             # Kill the deployment if the project is locked
             if Lock.lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
                 Utils.kill_deployment(
-                    f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
-                    ' deployments.',
+                    (
+                        f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                        ' deployments.'
+                    ),
                     webhook,
                 )
         except Exception:
