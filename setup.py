@@ -13,7 +13,7 @@ REQUIREMENTS = [
     'requests_unixsocket == 0.3.*',
     'sentry-sdk == 1.7.*',
     'slackclient == 2.*',
-    'sqlitedict == 2.0.*',
+    'sqlitedict == 2.1.*',
     'uwsgi == 2.0.21',
     'woodchips == 0.2.*',
 ]

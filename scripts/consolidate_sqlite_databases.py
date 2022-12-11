@@ -29,7 +29,7 @@ def main():
     # Locks
     with SqliteDict(filename=NEW_SINGLE_DATABASE_LOCATION, tablename=LOCKS_TABLE_NAME) as locks_table:
         with SqliteDict(filename=LOCKS_DATABASE_LOCATION) as old_locks_file:
-            for key, value in old_locks_file.iteritems():
+            for key, value in old_locks_file.items():
                 locks_table[key] = value
 
         locks_table.commit()
@@ -39,7 +39,7 @@ def main():
     # Deployments
     with SqliteDict(filename=NEW_SINGLE_DATABASE_LOCATION, tablename=DEPLOYMENTS_TABLE_NAME) as deployments_table:
         with SqliteDict(filename=PIPELINE_DATABASE_LOCATION) as old_pipeline_file:
-            for key, value in old_pipeline_file.iteritems():
+            for key, value in old_pipeline_file.items():
                 deployments_table[key] = value
 
         deployments_table.commit()
@@ -49,10 +49,10 @@ def main():
     # Validation
     print('\nThe following are the contents of the new datbase file:\n')
     with SqliteDict(filename=NEW_SINGLE_DATABASE_LOCATION, tablename=LOCKS_TABLE_NAME) as table:
-        for key, value in table.iteritems():
+        for key, value in table.items():
             print(key, value)
     with SqliteDict(filename=NEW_SINGLE_DATABASE_LOCATION, tablename=DEPLOYMENTS_TABLE_NAME) as table:
-        for key, value in table.iteritems():
+        for key, value in table.items():
             print(key, value)
     print('\nPlease manually remove the "stores" directory once you are happy with the migration results.')
 
