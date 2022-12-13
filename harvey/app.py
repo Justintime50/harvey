@@ -43,6 +43,12 @@ def create_response_dict(message: str, success: Optional[bool] = False, status_c
     }, status_code
 
 
+def log_error(error):
+    """Logs an error with Woodchips."""
+    logger = woodchips.get(Config.logger_name)
+    logger.error(error)
+
+
 @APP.errorhandler(401)
 def not_authorized(error):
     """Return a 401 if the request is not authorized."""
@@ -66,9 +72,6 @@ def not_found(error) -> Dict[str, Any]:
 @APP.errorhandler(500)
 def server_error(error) -> Dict[str, Any]:
     """Return a 500 if there is a problem with Harvey."""
-    logger = woodchips.get(Config.logger_name)
-    logger.error(error)
-
     return create_response_dict(
         message='An error has occured due to something on our end.',
         success=False,
@@ -97,7 +100,8 @@ def retrieve_deployments_endpoint():
     """
     try:
         return Api.retrieve_deployments(request)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -110,7 +114,8 @@ def retrieve_deployment_endpoint(deployment_id: str):
     """
     try:
         return retrieve_deployment(deployment_id)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -123,7 +128,8 @@ def deploy_project_endpoint():
     """
     try:
         return Api.parse_github_webhook(request)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -133,7 +139,8 @@ def retrieve_projects_endpoint():
     """Retrieves a list of project names from the git repos stored in Harvey."""
     try:
         return retrieve_projects(request)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -143,7 +150,8 @@ def retrieve_locks_endpoint():
     """Retrieves the list of locks"""
     try:
         return retrieve_locks(request)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -153,7 +161,8 @@ def retrieve_lock_endpoint(project_name: str):
     """Retrieves the lock status of a project by its name."""
     try:
         return retrieve_lock(project_name)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(404)
 
 
@@ -163,7 +172,8 @@ def lock_project_endpoint(project_name: str):
     """Enables the deployment lock for a project."""
     try:
         return lock_project(project_name)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
@@ -173,7 +183,8 @@ def unlock_project_endpoint(project_name: str):
     """Disables the deployment lock for a project."""
     try:
         return unlock_project(project_name)
-    except Exception:
+    except Exception as error:
+        log_error(error)
         return abort(500)
 
 
