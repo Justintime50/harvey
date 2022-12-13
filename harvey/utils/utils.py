@@ -34,7 +34,7 @@ class Utils:
 
         # Only unlock deployments that were locked by the system and not a user to preserve their preferences
         deployment_lock = lookup_project_lock(project_name=Webhook.repo_full_name(webhook))
-        if deployment_lock['system_lock']:
+        if deployment_lock.get('system_lock'):
             _ = update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
         if raise_error:

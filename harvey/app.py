@@ -8,6 +8,7 @@ from typing import (
 
 import requests_unixsocket  # type: ignore
 import sentry_sdk
+import woodchips
 from dotenv import load_dotenv
 from flask import (
     Flask,
@@ -43,7 +44,7 @@ def create_response_dict(message: str, success: Optional[bool] = False, status_c
 
 
 @APP.errorhandler(401)
-def not_authorized(e):
+def not_authorized(error):
     """Return a 401 if the request is not authorized."""
     return create_response_dict(
         message='You are not authorized to access this endpoint. Please check your credentials and try again.',
@@ -53,7 +54,7 @@ def not_authorized(e):
 
 
 @APP.errorhandler(404)
-def not_found(e) -> Dict[str, Any]:
+def not_found(error) -> Dict[str, Any]:
     """Return a 404 if the route is not found."""
     return create_response_dict(
         message='The endpoint you hit is either not valid or the record was not found.',
@@ -63,8 +64,11 @@ def not_found(e) -> Dict[str, Any]:
 
 
 @APP.errorhandler(500)
-def server_error(e) -> Dict[str, Any]:
+def server_error(error) -> Dict[str, Any]:
     """Return a 500 if there is a problem with Harvey."""
+    logger = woodchips.get(Config.logger_name)
+    logger.error(error)
+
     return create_response_dict(
         message='An error has occured due to something on our end.',
         success=False,

@@ -36,10 +36,8 @@ class Deployment:
             # Kill the deployment if the project is locked
             if lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
                 Utils.kill_deployment(
-                    (
-                        f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
-                        ' deployments.'
-                    ),
+                    f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                    ' deployments.',
                     webhook,
                 )
         except Exception:
@@ -64,27 +62,27 @@ class Deployment:
         if webhook_data_key:
             logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from webhook...')
             config = webhook_data_key
-            deployment = webhook_data_key.get('deployment_type', Config.default_deployment)
         else:
             logger.debug(f'Pulling Harvey config for {Webhook.repo_full_name(webhook)} from config file...')
             config = Deployment.open_project_config(webhook)
-            deployment = config.get('deployment_type', Config.default_deployment)
 
-        if deployment not in Config.supported_deployments:
-            deployment = Utils.kill_deployment(
+        deployment_type = config.get('deployment_type', Config.default_deployment)
+
+        if deployment_type not in Config.supported_deployments:
+            Utils.kill_deployment(
                 message='Harvey could not run since there was no acceptable deployment specified.',
                 webhook=webhook,
             )
 
         deployment_started_message = (
-            f'{Message.work_emoji} Harvey has started a `{deployment}` deployment for'
+            f'{Message.work_emoji} Harvey has started a deployment ({deployment_type}) for'
             f' `{Webhook.repo_full_name(webhook)}`.'
         )
         if Config.use_slack:
             Message.send_slack_message(deployment_started_message)
 
         preamble = (
-            f'Harvey v{Config.harvey_version} ({deployment.title()} Deployment)\n'
+            f'Harvey v{Config.harvey_version} ({deployment_type.title()} Deployment)\n'
             f'Deployment Started: {start_time}\n'
             f'Deployment ID: {Webhook.repo_commit_id(webhook)}'
         )
