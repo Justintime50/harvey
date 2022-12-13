@@ -73,6 +73,8 @@ class Api:
         signature = request.headers.get('X-Hub-Signature-256')
 
         if payload_json:
+            logger.debug(f'Webhook received for: {Webhook.repo_full_name(payload_json)}')
+
             # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
             # slash to get the branch name and check against the user-allowed list of branches.
             branch_name = payload_json['ref'].rsplit('/', 1)[-1]
