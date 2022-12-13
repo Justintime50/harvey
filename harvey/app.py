@@ -24,7 +24,10 @@ from harvey.locks import (
     retrieve_lock,
     unlock_project,
 )
-from harvey.repos.deployments import retrieve_deployment
+from harvey.repos.deployments import (
+    retrieve_deployment,
+    retrieve_deployments,
+)
 from harvey.repos.locks import retrieve_locks
 from harvey.repos.projects import retrieve_projects
 from harvey.utils.utils import setup_logger
@@ -99,7 +102,7 @@ def retrieve_deployments_endpoint():
     - The user can optionally pass a URL param of `project` to filter what deployments get returned
     """
     try:
-        return Api.retrieve_deployments(request)
+        return retrieve_deployments(request)
     except Exception as error:
         log_error(error)
         return abort(500)
