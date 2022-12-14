@@ -24,7 +24,7 @@ def mock_config(deployment_type='deploy', prod_compose=False):
     return mock_config
 
 
-@patch('harvey.locks.lookup_project_lock', return_value={'locked': False})
+@patch('harvey.repos.locks.lookup_project_lock')
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
@@ -38,7 +38,7 @@ def test_initialize_deployment_slack(
 
 
 @patch('sys.exit')
-@patch('harvey.locks.lookup_project_lock', return_value={'locked': False})
+@patch('harvey.repos.locks.lookup_project_lock')
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
 def test_initialize_deployment(
