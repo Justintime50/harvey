@@ -28,7 +28,7 @@ clean:
 
 ## coverage - Test the project and generate an HTML coverage report
 coverage:
-	$(VIRTUAL_BIN)/pytest --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
+	$(VIRTUAL_BIN)/pytest $(TEST_DIR)/unit --cov=$(PROJECT_NAME) --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
 
 ## format - Runs all formatting tools against the project
 format: black isort lint mypy
@@ -41,8 +41,8 @@ install:
 	$(PYTHON_BINARY) -m venv $(VIRTUAL_ENV)
 	$(VIRTUAL_BIN)/pip install -e ."[dev]"
 
-## integration_test - Test the project end-to-end
-integration_test:
+## integration - Test the project end-to-end
+integration:
 	venv/bin/python $(TEST_DIR)/integration/test_deployment.py
 
 ## isort - Sorts imports throughout the project
@@ -77,6 +77,6 @@ scan:
 
 ## test - Test the project
 test:
-	$(VIRTUAL_BIN)/pytest
+	$(VIRTUAL_BIN)/pytest $(TEST_DIR)/unit
 
-.PHONY: help build coverage clean black black-check format format-check install integration_test isort isort-check lint prod run mypy scan test
+.PHONY: help build coverage clean black black-check format format-check install integration isort isort-check lint prod run mypy scan test
