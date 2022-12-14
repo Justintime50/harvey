@@ -24,7 +24,7 @@ def mock_config(deployment_type='deploy', prod_compose=False):
     return mock_config
 
 
-@patch('harvey.repos.locks.lookup_project_lock')
+@patch('harvey.deployments.lookup_project_lock')
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
@@ -37,18 +37,14 @@ def test_initialize_deployment_slack(
     mock_slack_message.assert_called_once()
 
 
-@patch('sys.exit')
-@patch('harvey.repos.locks.lookup_project_lock')
+@patch('harvey.deployments.lookup_project_lock')
 @patch('harvey.git.Git.update_git_repo')
 @patch('harvey.deployments.Deployment.open_project_config', return_value=mock_config())
-def test_initialize_deployment(
-    mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_sys_exit, mock_webhook
-):
+def test_initialize_deployment(mock_open_project_config, mock_update_git_repo, mock_project_lock, mock_webhook):
     _, _, _ = Deployment.initialize_deployment(mock_webhook)
 
     mock_open_project_config.assert_called_once_with(mock_webhook)
     mock_update_git_repo.assert_called_once_with(mock_webhook)
-    mock_sys_exit.assert_called_once()
 
 
 @patch('os.path.isfile')
