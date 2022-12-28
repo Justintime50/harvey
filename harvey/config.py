@@ -13,7 +13,7 @@ class Config:
     git_timeout = int(os.getenv('GIT_TIMEOUT', 300))  # Default is 5 minutes
     pagination_limit = int(os.getenv('PAGINATION_LIMIT', 20))
     deploy_on_tag = os.getenv('DEPLOY_ON_TAG', True)  # Whether a tag pushed will trigger a deploy or not
-    use_slack = os.getenv('USE_SLACK')
+    use_slack = bool(os.getenv('USE_SLACK'))
     webhook_secret = os.getenv('WEBHOOK_SECRET', '')
     slack_bot_token = os.getenv('SLACK_BOT_TOKEN')
     slack_channel = os.getenv('SLACK_CHANNEL', 'general')

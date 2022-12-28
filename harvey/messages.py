@@ -6,17 +6,9 @@ from harvey.errors import HarveyError
 
 
 class Message:
-    @property
-    def work_emoji(self):
-        return ':hammer_and_wrench:' if Config.use_slack else ''
-
-    @property
-    def success_emoji(self):
-        return ':white_check_mark:' if Config.use_slack else 'Success!'
-
-    @property
-    def failure_emoji(self):
-        return ':skull_and_crossbones:' if Config.use_slack else 'Failure!'
+    work_emoji = ':hammer_and_wrench:' if Config.use_slack else ''
+    success_emoji = ':white_check_mark:' if Config.use_slack else 'Success!'
+    failure_emoji = ':skull_and_crossbones:' if Config.use_slack else 'Failure!'
 
     @staticmethod
     def send_slack_message(message: str):
