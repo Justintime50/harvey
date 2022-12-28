@@ -64,9 +64,9 @@ class Utils:
     def _strip_emojis_from_logs(output: str) -> str:
         """Replace the emojis for logs since they won't render properly there."""
         logs_without_emoji = (
-            output.replace(Message.success_emoji, 'Success!')
-            .replace(Message.failure_emoji, 'Failure!')
-            .replace(Message.work_emoji, '')
+            output.replace(str(Message.success_emoji), 'Success!')
+            .replace(str(Message.failure_emoji), 'Failure!')
+            .replace(str(Message.work_emoji), '')
         )
 
         return logs_without_emoji
