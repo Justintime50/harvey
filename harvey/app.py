@@ -1,4 +1,3 @@
-import json
 import os
 import subprocess  # nosec
 from threading import Thread
@@ -173,7 +172,7 @@ def retrieve_project_webhook_endpoint(project_name):
     """Retrieves the locally stored webhook of a project."""
     try:
         webhook = retrieve_webhook(project_name)
-        return create_response_dict(json.dumps(webhook), success=True, status_code=200)
+        return create_response_dict(webhook, success=True, status_code=200)
     except Exception as error:
         log_error(error)
         return abort(500)
