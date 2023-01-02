@@ -48,7 +48,7 @@ def lookup_project_lock(project_name: str) -> Dict[str, Any]:
     formatted_project_name = project_name.replace("/", "-")
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
-        for key, value in database_table.iteritems():
+        for key, value in database_table.items():
             if key == formatted_project_name:
                 return value
 
@@ -61,7 +61,7 @@ def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
     page_size = get_page_size(request)
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
-        for key, values in database_table.iteritems():
+        for key, values in database_table.items():
             locks['locks'].append(
                 {
                     'project': key,

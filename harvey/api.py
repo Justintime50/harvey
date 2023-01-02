@@ -16,6 +16,7 @@ from flask import (
 from harvey.config import Config
 from harvey.deployments import Deployment
 from harvey.errors import HarveyError
+from harvey.repos.webhooks import update_webhook
 from harvey.webhooks import Webhook
 
 
@@ -62,6 +63,7 @@ class Api:
         1. Check if the payload is valid JSON
         2. Check if the branch is in the allowed set of branches to run a deployment from
         3. Check if the webhook secret matches (optional)
+        4. Store the webhook to the database so we can reuse it later
         """
         logger = woodchips.get(Config.logger_name)
 
@@ -114,5 +116,10 @@ class Api:
             'success': success,
             'message': message,
         }, status_code
+
+        update_webhook(
+            project_name=Webhook.repo_full_name(payload_json),
+            webhook=payload_json,
+        )
 
         return response

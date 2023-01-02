@@ -50,7 +50,7 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
 def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
     """Retrieve a deployment's details from a given `deployment_id`."""
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
-        for key, value in database_table.iteritems():
+        for key, value in database_table.items():
             transformed_key = key.split('@')
             if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
                 return value
@@ -66,7 +66,7 @@ def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
     project_name = request.args.get('project')
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
-        for _, value in database_table.iteritems():
+        for _, value in database_table.items():
             # If a project name is provided, only return deployments for that project
             if project_name and value['project'] == project_name:
                 deployments['deployments'].append(value)

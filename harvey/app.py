@@ -1,5 +1,6 @@
 import os
 import subprocess  # nosec
+from threading import Thread
 from typing import (
     Any,
     Dict,
@@ -18,6 +19,7 @@ from flask import (
 
 from harvey.api import Api
 from harvey.config import Config
+from harvey.deployments import Deployment
 from harvey.errors import HarveyError
 from harvey.locks import (
     lock_project,
@@ -30,6 +32,7 @@ from harvey.repos.deployments import (
 )
 from harvey.repos.locks import retrieve_locks
 from harvey.repos.projects import retrieve_projects
+from harvey.repos.webhooks import retrieve_webhook
 from harvey.utils.utils import setup_logger
 
 
@@ -147,26 +150,20 @@ def retrieve_projects_endpoint():
         return abort(500)
 
 
-@APP.route('/locks', methods=['GET'])
+@APP.route('/projects/<project_name>/redeploy', methods=['POST'])
 @Api.check_api_key
-def retrieve_locks_endpoint():
-    """Retrieves the list of locks"""
+def redeploy_project_endpoint(project_name):
+    """Redeploy a project based on local webhook data stored in the database from a previous deploy."""
     try:
-        return retrieve_locks(request)
+        webhook = retrieve_webhook(project_name)
+        Thread(
+            target=Deployment.run_deployment,
+            args=(webhook,),
+        ).start()
+        return create_response_dict(f'Redeploying {project_name}...', success=True, status_code=200)
     except Exception as error:
         log_error(error)
         return abort(500)
-
-
-@APP.route('/locks/<project_name>', methods=['GET'])
-@Api.check_api_key
-def retrieve_lock_endpoint(project_name: str):
-    """Retrieves the lock status of a project by its name."""
-    try:
-        return retrieve_lock(project_name)
-    except Exception as error:
-        log_error(error)
-        return abort(404)
 
 
 @APP.route('/projects/<project_name>/lock', methods=['PUT'])
@@ -189,6 +186,28 @@ def unlock_project_endpoint(project_name: str):
     except Exception as error:
         log_error(error)
         return abort(500)
+
+
+@APP.route('/locks', methods=['GET'])
+@Api.check_api_key
+def retrieve_locks_endpoint():
+    """Retrieves the list of locks"""
+    try:
+        return retrieve_locks(request)
+    except Exception as error:
+        log_error(error)
+        return abort(500)
+
+
+@APP.route('/locks/<project_name>', methods=['GET'])
+@Api.check_api_key
+def retrieve_lock_endpoint(project_name: str):
+    """Retrieves the lock status of a project by its name."""
+    try:
+        return retrieve_lock(project_name)
+    except Exception as error:
+        log_error(error)
+        return abort(404)
 
 
 def bootstrap(debug_mode):
