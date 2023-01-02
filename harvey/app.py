@@ -1,3 +1,4 @@
+import json
 import os
 import subprocess  # nosec
 from threading import Thread
@@ -161,6 +162,18 @@ def redeploy_project_endpoint(project_name):
             args=(webhook,),
         ).start()
         return create_response_dict(f'Redeploying {project_name}...', success=True, status_code=200)
+    except Exception as error:
+        log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects/<project_name>/webhook', methods=['GET'])
+@Api.check_api_key
+def retrieve_project_webhook_endpoint(project_name):
+    """Retrieves the locally stored webhook of a project."""
+    try:
+        webhook = retrieve_webhook(project_name)
+        return create_response_dict(json.dumps(webhook), success=True, status_code=200)
     except Exception as error:
         log_error(error)
         return abort(500)
