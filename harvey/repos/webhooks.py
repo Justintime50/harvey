@@ -38,6 +38,6 @@ def retrieve_webhook(project_name: str) -> Dict[str, Any]:
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         for key, value in database_table.items():
             if key == formatted_project_name:
-                return value
+                return value['webhook']
 
     raise HarveyError(f'Webhook does not exist for {project_name}!')
