@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Don't forcibly kill off workers, wait till they are done processing in an attempt to keep spawned threads (deployments) alive (see #72)
+
 ## v0.22.1 (2023-01-01)
 
 - Adds a try/catch block to the spawned thread in an attempt to kill off failed deployments
