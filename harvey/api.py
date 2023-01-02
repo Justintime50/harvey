@@ -98,6 +98,11 @@ class Api:
                 success = True
 
                 logger.info(message)
+
+                update_webhook(
+                    project_name=Webhook.repo_full_name(payload_json),
+                    webhook=payload_json,
+                )
             else:
                 message = (
                     'Harvey received a webhook event for a branch that is not included in the'
@@ -116,10 +121,5 @@ class Api:
             'success': success,
             'message': message,
         }, status_code
-
-        update_webhook(
-            project_name=Webhook.repo_full_name(payload_json),
-            webhook=payload_json,
-        )
 
         return response
