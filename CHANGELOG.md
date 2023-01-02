@@ -1,12 +1,13 @@
 # CHANGELOG
 
-## Next Release
+## v0.22.1 (2022-12-01)
 
 - Adds a try/catch block to the spawned thread in an attempt to kill off failed deployments
 - Moves database logic to adopt the `repos` pattern to separate their logic from the rest of the service
 - Adds a script to fail `In-Progress` deployments
 - Changes the verbose webhook body debug logger to an info logger that only says which repos the webhook originated from
 - Log 500 error messages correctly when an endpoint is hit (previously some errors weren't ever bubbling up and were suppressed or lost)
+- Don't throw an error when a lock cannot be looked up for a project, log instead (allows for first-time deploys)
 - Various other bug fixes and improvements
 
 ## v0.22.0 (2022-11-28)

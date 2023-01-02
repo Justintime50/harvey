@@ -43,11 +43,7 @@ class Deployment:
                     webhook,
                 )
         except Exception:
-            Utils.kill_deployment(
-                message='Could not determine project lock status!',
-                webhook=webhook,
-                raise_error=True,
-            )
+            logger.error('Could not determine project lock status!')
 
         start_time = datetime.datetime.utcnow()
 
