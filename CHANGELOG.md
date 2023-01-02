@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## v0.22.1 (2022-12-01)
+## v0.22.1 (2023-01-01)
 
 - Adds a try/catch block to the spawned thread in an attempt to kill off failed deployments
 - Moves database logic to adopt the `repos` pattern to separate their logic from the rest of the service
