@@ -71,7 +71,7 @@ def test_open_project_config(mock_json, mock_isfile):
         assert config == {'mock': 'json'}
 
 
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.deployments.kill_deployment')
 def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
     with patch('builtins.open', mock_open()) as mock_file:
         mock_file.side_effect = FileNotFoundError
@@ -84,7 +84,7 @@ def test_open_project_config_not_found(mock_utils_kill, mock_webhook):
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.utils.Utils.succeed_deployment')
+@patch('harvey.deployments.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('harvey.containers.Container.create_client')
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
@@ -111,7 +111,7 @@ def test_run_deployment_pull(
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.utils.Utils.succeed_deployment')
+@patch('harvey.deployments.succeed_deployment')
 @patch('harvey.deployments.Container.run_container_healthcheck', return_value=True)
 @patch('harvey.containers.Container.create_client')
 @patch('harvey.deployments.Deployment.deploy', return_value='mock-output')
@@ -162,7 +162,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.deployments.kill_deployment')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
@@ -171,11 +171,11 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
 
 
 @patch('os.path.exists', return_value=True)
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.deployments.kill_deployment')
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )
-def test_deploy_stage_process_error(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):  # noqa
+def test_deploy_stage_subprocess_error(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):  # noqa
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
 
     mock_utils_kill.assert_called_once()

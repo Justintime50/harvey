@@ -9,7 +9,7 @@ from typing import (
 import woodchips
 
 from harvey.config import Config
-from harvey.utils.utils import Utils
+from harvey.utils.deployments import kill_deployment
 from harvey.webhooks import Webhook
 
 
@@ -38,13 +38,13 @@ class Git:
             decoded_output = command_output.decode()
             logger.debug(decoded_output)
         except subprocess.TimeoutExpired:
-            Utils.kill_deployment(
+            kill_deployment(
                 message='Harvey timed out during git clone operation.',
                 webhook=webhook,
             )
         except subprocess.CalledProcessError as error:
             final_output = f'Harvey could not clone due to error: {error} {Webhook.repo_full_name(webhook)}.'
-            Utils.kill_deployment(
+            kill_deployment(
                 message=final_output,
                 webhook=webhook,
                 raise_error=True,
@@ -64,7 +64,7 @@ class Git:
             decoded_output = command_output.decode()
             logger.debug(f'{decoded_output}')
         except subprocess.TimeoutExpired:
-            Utils.kill_deployment(
+            kill_deployment(
                 message='Harvey timed out during git pull operation.',
                 webhook=webhook,
             )
@@ -80,7 +80,7 @@ class Git:
                 decoded_output = command_output.decode()
                 logger.debug(f'{decoded_output}')
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
-                Utils.kill_deployment(
+                kill_deployment(
                     message='Harvey could not stash local changes!',
                     webhook=webhook,
                     raise_error=True,

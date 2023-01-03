@@ -35,7 +35,7 @@ def test_clone_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhoo
     )
 
 
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.git.kill_deployment')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_clone_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
     Git.clone_repo(mock_project_path, mock_webhook)
@@ -43,7 +43,7 @@ def test_clone_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_pr
     mock_utils_kill.assert_called_once()
 
 
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.git.kill_deployment')
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )
@@ -67,7 +67,7 @@ def test_pull_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhook
     )
 
 
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.git.kill_deployment')
 @patch('subprocess.check_output', side_effect=subprocess.TimeoutExpired(cmd='subprocess.check_output', timeout=0.1))
 def test_pull_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
     Git.pull_repo(mock_project_path, mock_webhook)
@@ -75,7 +75,7 @@ def test_pull_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_pro
     mock_utils_kill.assert_called_once()
 
 
-@patch('harvey.utils.utils.Utils.kill_deployment')
+@patch('harvey.git.kill_deployment')
 @patch(
     'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
 )

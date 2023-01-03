@@ -12,6 +12,7 @@ from sqlitedict import SqliteDict  # type: ignore
 from harvey.config import Config
 from harvey.errors import HarveyError
 from harvey.utils.api_utils import get_page_size
+from harvey.utils.utils import format_project_name
 
 
 DATABASE_TABLE_NAME = 'locks'
@@ -29,7 +30,7 @@ def update_project_lock(project_name: str, locked: bool = False, system_lock: Op
 
     locked_string = 'Locking' if locked is True else 'Unlocking'
     logger.info(f'{locked_string} deployments for {project_name}...')
-    formatted_project_name = project_name.replace("/", "-")
+    formatted_project_name = format_project_name(project_name)
     system_lock_value = None if locked is False else system_lock  # Don't allow this to be set if unlocking
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
@@ -45,7 +46,7 @@ def update_project_lock(project_name: str, locked: bool = False, system_lock: Op
 
 def lookup_project_lock(project_name: str) -> Dict[str, Any]:
     """Looks up a project's lock object by its full name."""
-    formatted_project_name = project_name.replace("/", "-")
+    formatted_project_name = format_project_name(project_name)
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         for key, value in database_table.items():

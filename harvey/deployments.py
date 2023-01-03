@@ -20,7 +20,10 @@ from harvey.repos.locks import (
     lookup_project_lock,
     update_project_lock,
 )
-from harvey.utils.utils import Utils
+from harvey.utils.deployments import (
+    kill_deployment,
+    succeed_deployment,
+)
 from harvey.webhooks import Webhook
 
 
@@ -35,7 +38,7 @@ class Deployment:
         try:
             # Kill the deployment if the project is locked
             if lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
-                Utils.kill_deployment(
+                kill_deployment(
                     (
                         f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
                         ' deployments.'
@@ -67,7 +70,7 @@ class Deployment:
         deployment_type = config.get('deployment_type', Config.default_deployment)
 
         if deployment_type not in Config.supported_deployments:
-            Utils.kill_deployment(
+            kill_deployment(
                 message='Harvey could not run since there was no acceptable deployment specified.',
                 webhook=webhook,
             )
@@ -139,9 +142,9 @@ class Deployment:
                 final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}\n'
 
                 if all_healthchecks_passed or not healthcheck:
-                    Utils.succeed_deployment(final_output, webhook)
+                    succeed_deployment(final_output, webhook)
                 else:
-                    Utils.kill_deployment(
+                    kill_deployment(
                         message=final_output,
                         webhook=webhook,
                     )
@@ -152,16 +155,14 @@ class Deployment:
                 )
                 logger.info(pull_success_message)
                 final_output = f'{webhook_output}\n{pull_success_message}'
-                Utils.succeed_deployment(final_output, webhook)
+                succeed_deployment(final_output, webhook)
             else:
-                Utils.kill_deployment(
-                    f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook
-                )
+                kill_deployment(f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook)
         except Exception as error:
             # We wrap this entire block in a try/catch in an attempt to catch anything that bubbles to the
             # top before hitting sentry as this function is the top-level function called when a thread has
             # been spawned.
-            Utils.kill_deployment(f'Deployment failed: {error}.', webhook)
+            kill_deployment(f'Deployment failed: {error}.', webhook)
 
     @staticmethod
     def open_project_config(webhook: Dict[str, Any]):
@@ -195,7 +196,7 @@ class Deployment:
                 logger.debug(json.dumps(config, indent=4))
             return config
         except FileNotFoundError:
-            Utils.kill_deployment(
+            kill_deployment(
                 message='Harvey could not find a ".harvey.yaml" file!',
                 webhook=webhook,
             )
@@ -223,7 +224,7 @@ class Deployment:
         elif os.path.exists(os.path.join(repo_path, docker_compose_yaml)):
             default_compose_filepath = os.path.join(repo_path, docker_compose_yaml)
         else:
-            Utils.kill_deployment(
+            kill_deployment(
                 message='Harvey could not find a "docker-compose.yaml" file!',
                 webhook=webhook,
             )
@@ -236,7 +237,7 @@ class Deployment:
             elif os.path.exists(os.path.join(repo_path, docker_compose_prod_yaml)):
                 prod_compose_filepath = os.path.join(repo_path, docker_compose_prod_yaml)
             else:
-                Utils.kill_deployment(
+                kill_deployment(
                     message='Harvey could not find a "docker-compose-prod.yml" file!',
                     webhook=webhook,
                 )
@@ -279,13 +280,13 @@ class Deployment:
             logger.info(final_output)
         except subprocess.TimeoutExpired:
             final_output = 'Harvey timed out deploying!'
-            Utils.kill_deployment(
+            kill_deployment(
                 message=final_output,
                 webhook=webhook,
             )
         except subprocess.CalledProcessError as error:
             final_output = f'{output}\nHarvey could not finish the deploy: {error}'
-            Utils.kill_deployment(
+            kill_deployment(
                 message=final_output,
                 webhook=webhook,
                 raise_error=True,

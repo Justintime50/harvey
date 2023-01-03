@@ -8,6 +8,7 @@ from typing import (
 import woodchips
 
 from harvey.config import Config
+from harvey.utils.utils import format_project_name
 
 
 class Webhook:
@@ -67,4 +68,4 @@ class Webhook:
     @staticmethod
     def deployment_id(webhook: Dict[str, Any]) -> str:
         """Return the deployment ID used for the SQLite stores."""
-        return f'{Webhook.repo_full_name(webhook).replace("/", "-")}@{Webhook.repo_commit_id(webhook)}'
+        return f'{format_project_name(Webhook.repo_full_name(webhook))}@{Webhook.repo_commit_id(webhook)}'

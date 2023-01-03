@@ -8,6 +8,7 @@ from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
 from harvey.errors import HarveyError
+from harvey.utils.utils import format_project_name
 
 
 DATABASE_TABLE_NAME = 'webhooks'
@@ -21,7 +22,7 @@ def update_webhook(project_name: str, webhook: Dict[str, Any]):
     logger = woodchips.get(Config.logger_name)
     logger.debug('Updating local webhook...')
 
-    formatted_project_name = project_name.replace("/", "-")
+    formatted_project_name = format_project_name(project_name)
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         database_table[formatted_project_name] = {
@@ -33,7 +34,7 @@ def update_webhook(project_name: str, webhook: Dict[str, Any]):
 
 def retrieve_webhook(project_name: str) -> Dict[str, Any]:
     """Retrieves a webhook previously received from GitHub stored locally in the database of a project."""
-    formatted_project_name = project_name.replace("/", "-")
+    formatted_project_name = format_project_name(project_name)
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         for key, value in database_table.items():

@@ -4,7 +4,6 @@ from harvey.containers import Container
 from harvey.deployments import Deployment
 from harvey.git import Git
 from harvey.messages import Message
-from harvey.utils.utils import Utils
 from harvey.webhooks import Webhook
 
 
@@ -15,6 +14,5 @@ __all__ = [
     'Git',
     'Message',
     'Deployment',
-    'Utils',
     'Webhook',
 ]

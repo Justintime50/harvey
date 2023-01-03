@@ -12,7 +12,7 @@ import woodchips
 
 from harvey.config import Config
 from harvey.errors import HarveyError
-from harvey.utils.utils import Utils
+from harvey.utils.deployments import kill_deployment
 
 
 class Container:
@@ -86,7 +86,7 @@ class Container:
             if container is None:
                 message = f'Harvey did not get container details from Docker for {container_name} during Healthcheck.'
                 logger.error(message)
-                Utils.kill_deployment(message, webhook)
+                kill_deployment(message, webhook)
             elif container.status.lower() == 'running' and Container.container_recently_restarted(container.__dict__):
                 container_healthy = True
                 logger.info(f'{container_name} healthcheck passed!')
@@ -99,7 +99,7 @@ class Container:
             ):
                 message = f'{container_name} healthcheck failed due to container not restarting on deploy.'
                 logger.error(message)
-                Utils.kill_deployment(
+                kill_deployment(
                     message=message,
                     webhook=webhook,
                     raise_error=True,
