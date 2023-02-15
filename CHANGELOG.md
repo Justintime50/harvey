@@ -4,7 +4,7 @@
 
 - Stores webhooks to the database so we can use them later for things like redeploying or reference
 - Adds a new `/projects/<project_name>/redeploy` endpoint that allows you to redeploy a project with the local webhook data
-- Don't forcibly kill off workers, wait till they are done processing in an attempt to keep spawned threads (deployments) alive (see #72)
+- Simplifies the uwsgi worker config greatly in the hopes to fix thread locking issues (closes #72)
 
 ## v0.22.1 (2023-01-01)
 
