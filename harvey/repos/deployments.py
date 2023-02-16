@@ -36,12 +36,35 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
         else:
             deployment_status = 'Failure'
 
+        now = str(datetime.datetime.utcnow())
+
+        attempt: Dict[str, Any] = {
+            'log': final_output,
+            'status': deployment_status,
+            'timestamp': now,
+        }
+
+        if database_table.get(Webhook.deployment_id(webhook)):
+            attempts = database_table[Webhook.deployment_id(webhook)].get('attempts', [])
+        else:
+            attempts = []
+
+        if deployment_status == 'In-Progress':
+            attempt_number = len(attempts) + 1
+            attempt['attempt'] = attempt_number
+            attempts.append(attempt)
+        else:
+            # If we get here, we failed or succeeded, take the previous "In-Progress entry and update it"
+            attempt_number = len(attempts)
+            attempt['attempt'] = attempt_number
+            attempts[-1] = attempt
+
         database_table[Webhook.deployment_id(webhook)] = {
             'project': Webhook.repo_full_name(webhook).replace("/", "-"),
             'commit': Webhook.repo_commit_id(webhook),
-            'log': final_output,
-            'status': deployment_status,
-            'timestamp': str(datetime.datetime.utcnow()),
+            # This timestamp will be the most recent attempt's timestamp, important to have at the root for sorting
+            'timestamp': now,
+            'attempts': attempts,
         }
 
         database_table.commit()
@@ -55,7 +78,7 @@ def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
             if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
                 return value
 
-    raise HarveyError(f'Could not retrieve deployment\'s details for {deployment_id}!')
+    raise HarveyError(f'Could not retrieve deployment details for {deployment_id}!')
 
 
 def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
@@ -78,7 +101,9 @@ def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
                 pass
 
     sorted_deployments = sorted(deployments['deployments'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
-    deployments['total_count'] = len(deployments['deployments'])
+    deployments['total_count'] = len(
+        [attempt for deployment in deployments['deployments'] for attempt in deployment['attempts']]
+    )
     deployments['deployments'] = sorted_deployments
 
     return deployments
