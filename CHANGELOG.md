@@ -5,6 +5,7 @@
 - Stores webhooks to the database so we can use them later for things like redeploying or reference
 - Adds a new `/projects/<project_name>/redeploy` endpoint that allows you to redeploy a project with the local webhook data
 - Simplifies the uwsgi worker config greatly in the hopes to fix thread locking issues (closes #72)
+  - Adds Nginx read and connect timeouts of 300 seconds
 - Deployments now store the `log`, `timestamp` and `status` keys inside an `attempts` array allowing for multiple saved records of each attempt of a deploy. This is helpful when a commit is redeployed later ensuring that the information from every attempt at deploying a specific commit are retained. Previously, you would only have the most recent details available because the log, status, and timestamp were overridden on each new deploy of the same commit. There is still a `timestamp` at the roo level of deployments that will update to the most recent attempts timestamp (closes #74)
 
 ## v0.22.1 (2023-01-01)
