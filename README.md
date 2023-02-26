@@ -165,6 +165,7 @@ The following endpoints are available to interact with Harvey:
 - `/projects` (GET) - Retrieve a list of projects
 - `/projects/{project_name}/lock` (PUT) - Locks the deployments of a project
 - `/projects/{project_name}/unlock` (PUT) - Unlocks the deployments of a project
+- `/projects/{project_name}/webhook` (GET) - Retrieves the current webhook of a project
 - `/locks` (GET) - Retrieve a list of locks
 - `/locks/{project_name}` (GET) - Retrieve the lock status of a project
 
