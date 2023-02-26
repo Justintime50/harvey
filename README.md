@@ -13,25 +13,25 @@ The lightweight Docker Compose deployment platform.
 
 </div>
 
-**NOTE:** Harvey is unstable and rapidly changing. Although used in the wild, it's not completely documented and interfaces are changing frequently. Keep an eye on the project as it continues to mature.
+> Harvey is unstable and rapidly changing. Although used in the wild, it's not completely documented and interfaces are changing frequently. Keep an eye on the project as it continues to mature.
 
 ## Why Docker Compose Deployments
 
-I've long been a fan of the simplicity of a `docker-compose` file and its usage. Deploying with systems such as Rancher or a self-hosted GitLab seemed too daunting with uneccessary overhead for simple projects. Why can't I use the same setup in production for spinning up projects as I do during development? Skip the environment variable injection, key stores, and references by having a system such as Harvey spin up my project by simply [using docker-compose in production](https://docs.docker.com/compose/production/).
+I've long been a fan of the simplicity of a `docker-compose` file and its usage. Deploying with systems such as Rancher or a self-hosted GitLab seemed too daunting with uneccessary overhead for simple projects. Why can't I use the same setup in production for spinning up projects as I do during development? Skip the environment variable injection and key stores, configuring production machines, and separate workflow configuration by having Harvey spin up my project by  [using Docker Compose in production](https://docs.docker.com/compose/production/), just like I do locally.
 
 ## How it Works
 
-Harvey receives a webhook from GitHub, pulls in the changes, and deploys them. If you have Slack enabled, Harvey can send you the deployment summary.
+Harvey receives a webhook from GitHub, pulls in the changes, and deploys them. If you have Slack enabled, Harvey can send you the deployment summary along with running healthchecks to ensure the deployment was successful.
 
 1. GitHub webhook fires and is received by Harvey stating that a new commit hit an enabled repo on an allowed branch to be deployed
-1. Harvey pulls in your changes and builds your docker image locally
-1. Next, Harvey spins up the new docker container and tears down the old one once it's up and running
-1. Harvey will then run a container healthcheck to ensure your container is up and running
-1. Finally, (if enabled) Harvey can shoot off a message via Slack to notify users the build was a success or not
+2. Harvey pulls in your changes and builds your Docker image locally
+3. Next, Harvey spins up the new Docker container and tears down the old one once it's up and running
+4. (Optional) Harvey will then run a container healthcheck to ensure your container is up and running
+5. (Optional) Harvey can send a message via Slack to notify users the status of the deployment
 
 ## Install
 
-Because of the way Harvey was built with Docker (using sockets) this project that builds and orchestrates Docker images and containers cannot itself run in Docker and must be run on your bare-metal OS.
+Because Harvey interacts directly with the Docker daemon (using sockets), to build and orchestrate Docker images and containers, Harvey cannot run in a Docker container itself and must be run on your bare-metal OS.
 
 ```bash
 # Install Harvey via GitHub
@@ -62,23 +62,22 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 
 ### Things to Know
 
-- Harvey will timeout git clone/pull after 300 seconds
-- Harvey will timeout deploys after 30 minutes
 - Harvey will shallow clone your project to the most recent commit
 - Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
 - Harvey will rotate internal logs automatically and cleanup; however, uWSGI logs will rotate but do not currently clean themselves up and could balloon with a lot of traffic to the API
 - Harvey does not handle renamed or transferred repos for you. If you rename a repo, you may need to intervene manually to shut down the old container, remove it from Harvey, and startup the new one initially on your own
+- Initial deployments are not gracefully handled. Because Harvey requires no configuration for a project, it assumes everything is already setup on the server. This means that on an initial deploy, you will need to set environment variables on your server, migrate databases, and whatever else may be required, at which point you may need to redeploy the project for the changes to take affect
 
 ### Harvey Configuration
 
-**Configuration Criteria**
+#### Configuration Criteria
 
 - Each repo either needs a `.harvey.yml` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `.harvey.yml` file if there is no `data` key present)
 - You can specify one of `deploy` or `pull` as the `deployment_type` to run (`deploy` is the default)
 - This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 - Optional: `prod_compose: true` json can be passed to instruct Harvey to use a prod `docker-compose` file in addition to the base compose file. This will run the equivelant of the following when deploying: `docker-compose -f docker-compose.yml -f docker-compose-prod.yml`.
 
-**.harvey.yaml Example**
+#### .harvey.yaml Example
 
 ```yml
 deployment_type: deploy
@@ -88,7 +87,7 @@ healthcheck:
   - container_name_2
 ```
 
-**GitHub Action Example**
+#### GitHub Action Example
 
 ```yml
 deploy:
@@ -105,7 +104,7 @@ deploy:
             data: '{ "deployment_type": "deploy", "prod_compose" : true, "healthcheck": ["container_name_1", "container_name_2"] }'
 ```
 
-Harvey's entrypoint (eg: `127.0.0.1:5000/deploy`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
+Harvey's entrypoint (eg: `http://127.0.0.1:5000/deploy`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
 
 ```json
 {
@@ -169,15 +168,7 @@ The following endpoints are available to interact with Harvey:
 - `/locks` (GET) - Retrieve a list of locks
 - `/locks/{project_name}` (GET) - Retrieve the lock status of a project
 
-### Example Python Functions
-
-See `examples.py` for all available methods of each class. Almost every usage example is contained in this file.
-
-```bash
-venv/bin/python examples/examples.py
-```
-
-**Example API Calls**
+#### Example API Calls
 
 ```bash
 # Retrieve a list of deployments

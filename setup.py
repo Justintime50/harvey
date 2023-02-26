@@ -44,7 +44,6 @@ setuptools.setup(
     license='MIT',
     packages=setuptools.find_packages(
         exclude=[
-            'examples',
             'test',
         ]
     ),
