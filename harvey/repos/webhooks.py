@@ -1,13 +1,13 @@
 from typing import (
     Any,
     Dict,
+    Optional,
 )
 
 import woodchips
 from sqlitedict import SqliteDict  # type: ignore
 
 from harvey.config import Config
-from harvey.errors import HarveyError
 from harvey.utils.utils import format_project_name
 
 
@@ -32,7 +32,7 @@ def update_webhook(project_name: str, webhook: Dict[str, Any]):
         database_table.commit()
 
 
-def retrieve_webhook(project_name: str) -> Dict[str, Any]:
+def retrieve_webhook(project_name: str) -> Optional[Dict[str, Any]]:
     """Retrieves a webhook previously received from GitHub stored locally in the database of a project."""
     formatted_project_name = format_project_name(project_name)
 
@@ -41,4 +41,4 @@ def retrieve_webhook(project_name: str) -> Dict[str, Any]:
             if key == formatted_project_name:
                 return value['webhook']
 
-    raise HarveyError(f'Webhook does not exist for {project_name}!')
+    return None

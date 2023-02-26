@@ -9,6 +9,7 @@ from typing import (
 
 import requests_unixsocket  # type: ignore
 import sentry_sdk
+import werkzeug
 import woodchips
 from dotenv import load_dotenv
 from flask import (
@@ -156,15 +157,18 @@ def redeploy_project_endpoint(project_name):
     """Redeploy a project based on local webhook data stored in the database from a previous deploy."""
     try:
         webhook = retrieve_webhook(project_name)
-        Thread(
-            target=Deployment.run_deployment,
-            args=(webhook,),
-        ).start()
-        return create_response_dict(
-            f'Redeploying {project_name}...',
-            success=True,
-            status_code=200,
-        )
+        if not webhook:
+            raise HarveyError(f'Webhook does not exist for {project_name}')
+        else:
+            Thread(
+                target=Deployment.run_deployment,
+                args=(webhook,),
+            ).start()
+            return create_response_dict(
+                f'Redeploying {project_name}...',
+                success=True,
+                status_code=200,
+            )
     except Exception as error:
         log_error(error)
         return abort(500)
@@ -176,11 +180,16 @@ def retrieve_project_webhook_endpoint(project_name):
     """Retrieves the locally stored webhook of a project."""
     try:
         webhook = retrieve_webhook(project_name)
-        return create_response_dict(
-            webhook,
-            success=True,
-            status_code=200,
-        )
+        if not webhook:
+            return abort(404)  # This will throw an exception in the except block below
+        else:
+            return create_response_dict(
+                webhook,
+                success=True,
+                status_code=200,
+            )
+    except werkzeug.exceptions.NotFound:
+        raise
     except Exception as error:
         log_error(error)
         return abort(500)
