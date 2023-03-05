@@ -145,8 +145,7 @@ Environment Variables:
     LOG_LEVEL         The logging level used for the entire application. Default: INFO
     ALLOWED_BRANCHES  A comma separated list of branch names that are allowed to trigger deployments from a webhook event. Default: "main,master"
     PAGINATION_LIMIT  The number of records to return via API. Default: 20
-    DEPLOY_TIMEOUT    The number of seconds any given deploy can take before timing out. Default: 600
-    GIT_TIMEOUT       The number of seconds any given git operation can take before timing out. Default: 300
+    OPERATION_TIMEOUT The number of seconds any given operation (git command, deploy pipeline) can take before timing out. Default: 300
     DEPLOY_ON_TAG     A boolean specifying if a tag pushed will trigger a deploy. Default: True
     HARVEY_PATH       The path where Harvey will store projects, logs, and the SQLite databases. Default: ~/harvey
     SENTRY_URL        The URL authorized to receive sentry alerts.

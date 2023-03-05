@@ -272,7 +272,7 @@ class Deployment:
                 compose_command,
                 stdin=None,
                 stderr=None,
-                timeout=Config.deploy_timeout,
+                timeout=Config.operation_timeout,
             )
             decoded_output = compose_output.decode('UTF-8')
             execution_time = f'Deploy stage execution time: {datetime.datetime.utcnow() - start_time}'

@@ -157,7 +157,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
         ],
         stdin=None,
         stderr=None,
-        timeout=600,
+        timeout=300,
     )
 
 
@@ -205,5 +205,5 @@ def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mo
         ],
         stdin=None,
         stderr=None,
-        timeout=600,
+        timeout=300,
     )

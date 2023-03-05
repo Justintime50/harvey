@@ -22,7 +22,7 @@ class Container:
         logger = woodchips.get(Config.logger_name)
 
         logger.debug('Setting up Docker client...')
-        client = docker.from_env(timeout=30)
+        client = docker.from_env(timeout=10)
 
         return client
 

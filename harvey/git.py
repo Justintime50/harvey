@@ -101,7 +101,7 @@ class Git:
             command,
             stdin=None,
             stderr=None,
-            timeout=Config.git_timeout,
+            timeout=Config.operation_timeout,
         )
 
         return command_output
