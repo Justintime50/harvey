@@ -88,10 +88,12 @@ class Api:
             elif (branch_name in Config.allowed_branches) or (
                 Config.deploy_on_tag and tag_commit in payload_json['ref']
             ):
-                Thread(
+                thread = Thread(
                     target=Deployment.run_deployment,
                     args=(payload_json,),
-                ).start()
+                )
+                thread.daemon = True
+                thread.start()
 
                 message = f'Started deployment for {Webhook.repo_full_name(payload_json)}'
                 status_code = 200
