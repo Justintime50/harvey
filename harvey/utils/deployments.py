@@ -1,3 +1,4 @@
+import sys
 from typing import (
     Any,
     Dict,
@@ -37,6 +38,8 @@ def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional
     if raise_error:
         raise HarveyError(error_message)
 
+    sys.exit(1)
+
 
 def succeed_deployment(message: str, webhook: Dict[str, Any]):
     """Log output, send message, and cleanup on deployment success."""
@@ -52,6 +55,8 @@ def succeed_deployment(message: str, webhook: Dict[str, Any]):
         Message.send_slack_message(deployment_logs)
 
     _ = update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+
+    sys.exit(1)
 
 
 def _strip_emojis_from_logs(output: str) -> str:

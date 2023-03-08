@@ -8,7 +8,6 @@
 - Fixes connections getting refused after ~24 hours of uptime due to using the http socket instead of the uwsgi socket
 - Unifies `git_timeout` and `deploy_timeout` to new `operation_timeout` with a default of 300 seconds. Uwsgi and nginx timeouts now also match at 300 seconds
   - Lowers Docker API timeout from 30 seconds to 10 seconds
-- Makes threads daemonized and removes `sys.exit` calls in threads in an attempt to better facilitate Docker operations outside the main uwsgi context
 - Deployments now store the `log`, `timestamp` and `status` keys inside an `attempts` array allowing for multiple saved records of each attempt of a deploy. This is helpful when a commit is redeployed later ensuring that the information from every attempt at deploying a specific commit are retained. Previously, you would only have the most recent details available because the log, status, and timestamp were overridden on each new deploy of the same commit. There is still a `timestamp` at the roo level of deployments that will update to the most recent attempts timestamp (closes #74)
 
 ## v0.22.1 (2023-01-01)
