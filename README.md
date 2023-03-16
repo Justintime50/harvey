@@ -64,7 +64,6 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 
 - Harvey will shallow clone your project to the most recent commit
 - Harvey expects the container name to match the GitHub repository name exactly, otherwise the healthcheck will fail
-- Harvey will rotate internal logs automatically and cleanup; however, uWSGI logs will rotate but do not currently clean themselves up and could balloon with a lot of traffic to the API
 - Harvey does not handle renamed or transferred repos for you. If you rename a repo, you may need to intervene manually to shut down the old container, remove it from Harvey, and startup the new one initially on your own
 - Initial deployments are not gracefully handled. Because Harvey requires no configuration for a project, it assumes everything is already setup on the server. This means that on an initial deploy, you will need to set environment variables on your server, migrate databases, and whatever else may be required, at which point you may need to redeploy the project for the changes to take affect
 
