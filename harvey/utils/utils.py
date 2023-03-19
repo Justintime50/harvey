@@ -18,4 +18,4 @@ def setup_logger():
         name=Config.logger_name,
         level=Config.log_level,
     )
-    logger.log_to_console()
+    logger.log_to_console(formatter='%(asctime)s - %(module)s.%(funcName)s - %(levelname)s - %(message)s')
