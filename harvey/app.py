@@ -41,6 +41,12 @@ load_dotenv()  # Must remain at the top of this file
 APP = Flask(__name__)
 REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 
+# Fixes segfaults on macOS, see the following for more details:
+# - https://bugs.python.org/issue30385
+# - https://github.com/unbit/uwsgi/issues/1722
+# - https://github.com/Justintime50/harvey/issues/72
+os.environ["no_proxy"] = "*"
+
 
 def create_response_dict(message: str, success: Optional[bool] = False, status_code: Optional[int] = 500):
     """Response object that all Harvey responses return."""
