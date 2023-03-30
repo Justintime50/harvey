@@ -29,8 +29,8 @@ def test_clone_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhoo
     mock_logger.assert_called()
     mock_subprocess.assert_called_once_with(
         ['git', 'clone', '--depth=1', 'https://test-url.com', 'harvey/projects/test_user/test-repo-name'],
-        stdin=None,
-        stderr=None,
+        stderr=-2,
+        text=True,
         timeout=300,
     )
 
@@ -45,7 +45,7 @@ def test_clone_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_pr
 
 @patch('harvey.git.kill_deployment')
 @patch(
-    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(cmd='subprocess.check_output', returncode=1)
 )
 def test_clone_repo_process_error(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
     Git.clone_repo(mock_project_path, mock_webhook)
@@ -61,8 +61,8 @@ def test_pull_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhook
     mock_logger.assert_called()
     mock_subprocess.assert_called_once_with(
         ['git', '-C', 'harvey/projects/test_user/test-repo-name', 'pull', '--rebase'],
-        stdin=None,
-        stderr=None,
+        stderr=-2,
+        text=True,
         timeout=300,
     )
 
@@ -77,7 +77,7 @@ def test_pull_repo_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_pro
 
 @patch('harvey.git.kill_deployment')
 @patch(
-    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(cmd='subprocess.check_output', returncode=1)
 )
 def test_pull_repo_process_error(mock_subprocess, mock_utils_kill, mock_project_path, mock_webhook):
     # TODO: We need to test here that the `stash` command gets called, unsure how to do this since

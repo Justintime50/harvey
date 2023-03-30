@@ -30,39 +30,37 @@ class Git:
     def clone_repo(project_path: str, webhook: Dict[str, Any]) -> str:
         """Clone a repo into the Harvey projects folder."""
         logger = woodchips.get(Config.logger_name)
-        decoded_output = ''
+        command_output = ''
 
         try:
             command = ['git', 'clone', '--depth=1', Webhook.repo_url(webhook), project_path]
             command_output = Git._git_subprocess(command)
-            decoded_output = command_output.decode()
-            logger.debug(decoded_output)
+            logger.debug(command_output)
         except subprocess.TimeoutExpired:
             kill_deployment(
                 message='Harvey timed out during git clone operation.',
                 webhook=webhook,
             )
         except subprocess.CalledProcessError as error:
-            final_output = f'Harvey could not clone due to error: {error} {Webhook.repo_full_name(webhook)}.'
+            final_output = f'Harvey could not clone due to error: {error.output} {Webhook.repo_full_name(webhook)}.'
             kill_deployment(
                 message=final_output,
                 webhook=webhook,
                 raise_error=True,
             )
 
-        return decoded_output
+        return command_output
 
     @staticmethod
     def pull_repo(project_path: str, webhook: Dict[str, Any], pull_attempt: int = 1) -> str:
         """Pull updates for a repo in the Harvey projects folder."""
         logger = woodchips.get(Config.logger_name)
-        decoded_output = ''
+        command_output = ''
 
         try:
             command = ['git', '-C', project_path, 'pull', '--rebase']
             command_output = Git._git_subprocess(command)
-            decoded_output = command_output.decode()
-            logger.debug(f'{decoded_output}')
+            logger.debug(f'{command_output}')
         except subprocess.TimeoutExpired:
             kill_deployment(
                 message='Harvey timed out during git pull operation.',
@@ -77,8 +75,7 @@ class Git:
             try:
                 command = ['git', '-C', project_path, 'stash']
                 command_output = Git._git_subprocess(command)
-                decoded_output = command_output.decode()
-                logger.debug(f'{decoded_output}')
+                logger.debug(f'{command_output}')
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 kill_deployment(
                     message='Harvey could not stash local changes!',
@@ -90,17 +87,17 @@ class Git:
             # Must use an int here vs bool so we don't have an infinite loop.
             if pull_attempt == 1:
                 pull_attempt += 1
-                decoded_output = Git.pull_repo(project_path, webhook, pull_attempt)
+                command_output = Git.pull_repo(project_path, webhook, pull_attempt)
 
-        return decoded_output
+        return command_output
 
     @staticmethod
-    def _git_subprocess(command: List[str]) -> bytes:
+    def _git_subprocess(command: List[str]) -> str:
         """Runs a git command via subprocess."""
         command_output = subprocess.check_output(  # nosec
             command,
-            stdin=None,
-            stderr=None,
+            stderr=subprocess.STDOUT,
+            text=True,
             timeout=Config.operation_timeout,
         )
 

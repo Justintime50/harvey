@@ -155,8 +155,8 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
             '--force-recreate',
             '--quiet-pull',
         ],
-        stdin=None,
-        stderr=None,
+        stderr=-2,
+        text=True,
         timeout=300,
     )
 
@@ -173,7 +173,7 @@ def test_deploy_stage_subprocess_timeout(mock_subprocess, mock_utils_kill, mock_
 @patch('os.path.exists', return_value=True)
 @patch('harvey.deployments.kill_deployment')
 @patch(
-    'subprocess.check_output', side_effect=subprocess.CalledProcessError(returncode=1, cmd='subprocess.check_output')
+    'subprocess.check_output', side_effect=subprocess.CalledProcessError(cmd='subprocess.check_output', returncode=1)
 )
 def test_deploy_stage_subprocess_error(mock_subprocess, mock_utils_kill, mock_path_exists, mock_webhook):  # noqa
     _ = Deployment.deploy(mock_config('deploy'), dict(mock_webhook), MOCK_OUTPUT)
@@ -203,7 +203,7 @@ def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mo
             '--force-recreate',
             '--quiet-pull',
         ],
-        stdin=None,
-        stderr=None,
+        stderr=-2,
+        text=True,
         timeout=300,
     )

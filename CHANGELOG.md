@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Fixes a bug where subprocess errors would get clobbered, now output from subprocesses should be printed as a string instead of bytes or being stripped out
+
 ## v0.23.0 (2023-03-29)
 
 - Stores webhooks to the database so we can use them later for things like redeploying or reference

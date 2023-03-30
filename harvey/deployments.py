@@ -270,13 +270,12 @@ class Deployment:
         try:
             compose_output = subprocess.check_output(  # nosec
                 compose_command,
-                stdin=None,
-                stderr=None,
+                stderr=subprocess.STDOUT,
+                text=True,
                 timeout=Config.operation_timeout,
             )
-            decoded_output = compose_output.decode('UTF-8')
             execution_time = f'Deploy stage execution time: {datetime.datetime.utcnow() - start_time}'
-            final_output = f'{decoded_output}\n{execution_time}'
+            final_output = f'{compose_output}\n{execution_time}'
             logger.info(final_output)
         except subprocess.TimeoutExpired:
             final_output = 'Harvey timed out deploying!'
@@ -285,7 +284,7 @@ class Deployment:
                 webhook=webhook,
             )
         except subprocess.CalledProcessError as error:
-            final_output = f'{output}\nHarvey could not finish the deploy: {error}'
+            final_output = f'{output}\nHarvey could not finish the deploy: {error.output}'
             kill_deployment(
                 message=final_output,
                 webhook=webhook,

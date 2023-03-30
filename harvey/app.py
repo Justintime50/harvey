@@ -255,10 +255,10 @@ def bootstrap(debug_mode):
     # Ensure the correct Docker Compose version is available
     docker_compose_version = subprocess.check_output(  # nosec
         ['docker-compose', '--version'],
-        stdin=None,
-        stderr=None,
+        stderr=subprocess.STDOUT,
+        text=True,
         timeout=3,
-    ).decode('UTF-8')
+    )
     if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
         raise HarveyError(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
 
