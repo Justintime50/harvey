@@ -1,20 +1,22 @@
 # CHANGELOG
 
-## Next Release
+## v0.23.0 (2023-03-29)
 
 - Stores webhooks to the database so we can use them later for things like redeploying or reference
 - Adds a new `/projects/<project_name>/redeploy` endpoint that allows you to redeploy a project with the local webhook data
-- Simplifies the uwsgi worker config greatly in the hopes to fix thread locking issues (closes #72)
-- Fixes connections getting refused after ~24 hours of uptime due to using the http socket instead of the uwsgi socket
+- Fixes the long-running and multi-bug issues related to workers, connections, and timeouts stopping harvey from running
+  - Simplifies the uwsgi worker config greatly in the hopes to fix thread locking issues (closes #72)
+  - Fixes connections getting refused after ~24 hours of uptime due to using the http socket instead of the uwsgi socket
   - Patches segfault on macOS by not using proxies
   - Adjusts various timeouts and limits across the board to assist with edge-case connection and errors related to the server
 - Unifies `git_timeout` and `deploy_timeout` to new `operation_timeout` with a default of 300 seconds.
   - Lowers Docker API timeout from 30 seconds to 10 seconds
-- Deployments now store the `log`, `timestamp` and `status` keys inside an `attempts` array allowing for multiple saved records of each attempt of a deploy. This is helpful when a commit is redeployed later ensuring that the information from every attempt at deploying a specific commit are retained. Previously, you would only have the most recent details available because the log, status, and timestamp were overridden on each new deploy of the same commit. There is still a `timestamp` at the roo level of deployments that will update to the most recent attempts timestamp (closes #74)
+- Deployments now store the `log`, `timestamp` and `status` keys inside an `attempts` array allowing for multiple saved records of each attempt of a deploy. This is helpful when a commit is redeployed later ensuring that the information from every attempt at deploying a specific commit are retained. Previously, you would only have the most recent details available because the log, status, and timestamp were overridden on each new deploy of the same commit. There is still a `timestamp` at the root level of deployments that will update to the most recent attempt's timestamp (closes #74)
 - Overhauls logging
   - Adjusts log sizes from 200kb to 2mb
   - Logs now delete on a uWSGI cron each day if they are older than 14 days
   - We no longer log harvey and uwsgi logs separately since they were both going into the uwsgi logs (closes #78)
+- Bumps all dependencies
 
 ## v0.22.1 (2023-01-01)
 

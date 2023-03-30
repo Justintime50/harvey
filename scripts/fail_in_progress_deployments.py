@@ -12,11 +12,12 @@ DEPLOYMENTS_TABLE_NAME = 'deployments'
 def main():
     with SqliteDict(filename=DATABASE_LOCATION, tablename=DEPLOYMENTS_TABLE_NAME) as deployments_table:
         for key, data in deployments_table.items():
-            if deployments_table[key]['status'] == 'In-Progress':
-                # sqlitedict doesn't know about dictionaries in memory, must be assigned back
-                data['status'] = 'Failure'
-                deployments_table[key] = data
-                print(f'{key} status updated from "In-Progress" to "Failure"!')
+            for attempt_index, attempt in enumerate(data['attempts']):
+                if deployments_table[key]['attempts'][attempt_index]['status'] == 'In-Progress':
+                    # sqlitedict doesn't know about dictionaries in memory, must be assigned back
+                    data['attempts'][attempt_index]['status'] = 'Failure'
+                    deployments_table[key] = data
+                    print(f'{key} status updated from "In-Progress" to "Failure"!')
 
         deployments_table.commit()
 

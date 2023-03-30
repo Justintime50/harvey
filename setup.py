@@ -7,11 +7,11 @@ with open('README.md', 'r') as fh:
 REQUIREMENTS = [
     'docker == 6.0.*',
     'flask == 2.*',
-    'python-dotenv == 0.20.*',
+    'python-dotenv == 0.21.*',
     'pyyaml == 6.*',
     'requests == 2.*',
     'requests_unixsocket == 0.3.*',
-    'sentry-sdk == 1.7.*',
+    'sentry-sdk == 1.*',
     'slackclient == 2.*',
     'sqlitedict == 2.1.*',
     'uwsgi == 2.0.21',
@@ -20,22 +20,22 @@ REQUIREMENTS = [
 
 DEV_REQUIREMENTS = [
     'bandit == 1.7.*',
-    'black == 22.*',
-    'build == 0.8.*',
-    'flake8 == 4.*',
+    'black == 23.*',
+    'build == 0.10.*',
+    'flake8 == 5.*',
     'isort == 5.*',
-    'mypy == 0.961',
+    'mypy == 1.1.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
     'twine == 4.*',
     'types-PyYAML',
     'types-requests',
-    'wheel == 0.38.*',
+    'wheel == 0.40.*',
 ]
 
 setuptools.setup(
     name='harvey-cd',
-    version='0.22.1',
+    version='0.23.0',
     description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",
