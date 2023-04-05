@@ -1,6 +1,6 @@
 import os
 import subprocess  # nosec
-from threading import Thread
+import threading
 from typing import (
     Any,
     Dict,
@@ -166,7 +166,8 @@ def redeploy_project_endpoint(project_name):
         if not webhook:
             raise HarveyError(f'Webhook does not exist for {project_name}')
         else:
-            Thread(
+            threading.Thread(
+                name=project_name,
                 target=Deployment.run_deployment,
                 args=(webhook,),
             ).start()
@@ -243,6 +244,19 @@ def retrieve_lock_endpoint(project_name: str):
     except Exception as error:
         log_error(error)
         return abort(404)
+
+
+@APP.route('/threads', methods=['GET'])
+@Api.check_api_key
+def retrieve_threads_endpoint():
+    """Retrieves a list of running threads for Harvey. Threads indicate ongoing deployments."""
+    threads = []
+    for thread in threading.enumerate():
+        if thread.name.startswith(('Main', 'Thread')):
+            continue
+        threads.append(thread.name)
+
+    return {'threads': threads}
 
 
 def bootstrap(debug_mode):

@@ -2,6 +2,7 @@
 
 ## Next Release
 
+- Threads via Harvey are now named (after a project) and can be retrieved via the new `/threads` endpoint
 - Fixes a bug where subprocess errors would get clobbered, now output from subprocesses should be printed as a string instead of bytes or being stripped out
 
 ## v0.23.0 (2023-03-29)

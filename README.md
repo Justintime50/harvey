@@ -67,6 +67,7 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 - Harvey does not handle renamed or transferred repos for you. If you rename a repo, you may need to intervene manually to shut down the old container, remove it from Harvey, and startup the new one initially on your own
 - Initial deployments are not gracefully handled. Because Harvey requires no configuration for a project, it assumes everything is already setup on the server. This means that on an initial deploy, you will need to set environment variables on your server, migrate databases, and whatever else may be required, at which point you may need to redeploy the project for the changes to take affect
 - Harvey automatically rotates log files and keeps them for 2 weeks before purging them
+- Because we use threads, you cannot kill an ongoing deployment because you cannot reliably kill a thread
 
 ### Harvey Configuration
 
@@ -166,6 +167,7 @@ The following endpoints are available to interact with Harvey:
 - `/projects/{project_name}/webhook` (GET) - Retrieves the current webhook of a project
 - `/locks` (GET) - Retrieve a list of locks
 - `/locks/{project_name}` (GET) - Retrieve the lock status of a project
+- `/threads` (GET) - Retrieves a list of threads (named after projects) running via Harvey. A thread indicates an ongoing deployment
 
 #### Example API Calls
 

@@ -75,7 +75,8 @@ class Api:
         signature = request.headers.get('X-Hub-Signature-256')
 
         if payload_json:
-            logger.info(f'Webhook received for: {Webhook.repo_full_name(payload_json)}')
+            repo_full_name = Webhook.repo_full_name(payload_json)
+            logger.info(f'Webhook received for: {repo_full_name}')
 
             # The `ref` field from GitHub looks like `refs/heads/main`, so we split on the final
             # slash to get the branch name and check against the user-allowed list of branches.
@@ -89,24 +90,25 @@ class Api:
                 Config.deploy_on_tag and tag_commit in payload_json['ref']
             ):
                 Thread(
+                    name=repo_full_name,
                     target=Deployment.run_deployment,
                     args=(payload_json,),
                 ).start()
 
-                message = f'Started deployment for {Webhook.repo_full_name(payload_json)}'
+                message = f'Started deployment for {repo_full_name}'
                 status_code = 200
                 success = True
 
                 logger.info(message)
 
                 update_webhook(
-                    project_name=Webhook.repo_full_name(payload_json),
+                    project_name=repo_full_name,
                     webhook=payload_json,
                 )
             else:
                 message = (
                     'Harvey received a webhook event for a branch that is not included in the'
-                    f' ALLOWED_BRANCHES for {Webhook.repo_full_name(payload_json)}.'
+                    f' ALLOWED_BRANCHES for {repo_full_name}.'
                 )
                 status_code = 422
 
