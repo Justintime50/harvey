@@ -252,8 +252,6 @@ def retrieve_threads_endpoint():
     """Retrieves a list of running threads for Harvey. Threads indicate ongoing deployments."""
     threads = []
     for thread in threading.enumerate():
-        if thread.name.startswith(('Main', 'Thread')):
-            continue
         threads.append(thread.name)
 
     return {'threads': threads}
