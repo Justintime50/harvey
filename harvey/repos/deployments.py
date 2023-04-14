@@ -95,11 +95,13 @@ def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
         for _, value in database_table.items():
             # If a project name is provided, only return deployments for that project
             if project_name and value['project'] == project_name:
-                value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
+                if value.get('attempts'):
+                    value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
                 deployments['deployments'].append(value)
             # This block is for a generic list of deployments (all deployments)
             elif not project_name:
-                value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
+                if value.get('attempts'):
+                    value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
                 deployments['deployments'].append(value)
             # If a project name was specified but doesn't match, don't add to list
             else:
