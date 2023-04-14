@@ -2,6 +2,7 @@
 
 ## Next Release
 
+- Adds `runtime` to each deployment attempt's data structure so you can track that over time
 - Threads via Harvey are now named (after a project) and can be retrieved via the new `/threads` endpoint
 - Fixes a bug where subprocess errors would get clobbered, now output from subprocesses should be printed as a string instead of bytes or being stripped out
 - Overhauls the deployment logs to show more or less information depending on if you are running in debug mode or not
