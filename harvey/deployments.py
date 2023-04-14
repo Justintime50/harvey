@@ -90,14 +90,14 @@ class Deployment:
         )
         logger.info(preamble)
 
-        configuration = f'Configuration:\n{json.dumps(config, indent=4)}' if Config.log_level == 'DEBUG' else ''
-        commit_details = f'Commit author: {Webhook.repo_commit_author(webhook)}\n'
+        configuration = f'\n\nConfiguration:\n{json.dumps(config, indent=4)}' if Config.log_level == 'DEBUG' else ''
+        commit_details = f'Commit author: {Webhook.repo_commit_author(webhook)}'
         if Config.log_level == 'DEBUG':
-            commit_details += f'Commit Details: {Webhook.repo_commit_message(webhook)}'
-        git_output = git if Config.log_level == 'DEBUG' else ''
+            commit_details += f'\nCommit Details: {Webhook.repo_commit_message(webhook)}'
+        git_output = f'\n\n{git}' if Config.log_level == 'DEBUG' else ''
         execution_time = f'Startup execution time: {datetime.datetime.utcnow() - start_time}'
 
-        output = f'{preamble}\n\n{configuration}\n\n{commit_details}\n\n{git_output}\n\n{execution_time}'
+        output = f'{preamble}{configuration}\n\n{commit_details}{git_output}\n\n{execution_time}'
         logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
 
         return config, output, start_time
