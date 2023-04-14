@@ -79,6 +79,8 @@ def retrieve_deployment(deployment_id: str) -> Dict[str, Any]:
         for key, value in database_table.items():
             transformed_key = key.split('@')
             if deployment_id == f'{transformed_key[0]}-{transformed_key[1]}':
+                if value.get('attempts'):
+                    value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
                 return value
 
     raise HarveyError(f'Could not retrieve deployment details for {deployment_id}!')
