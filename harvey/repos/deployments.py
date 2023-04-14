@@ -52,22 +52,24 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
         else:
             attempts = []
 
+        sorted_attempts = sorted(attempts, key=lambda x: x['timestamp'])
+
         if deployment_status == 'In-Progress':
-            attempt_number = len(attempts) + 1
+            attempt_number = len(sorted_attempts) + 1
             attempt['attempt'] = attempt_number
-            attempts.append(attempt)
+            sorted_attempts.append(attempt)
         else:
             # If we get here, we failed or succeeded, take the previous "In-Progress entry and update it"
-            attempt_number = len(attempts)
+            attempt_number = len(sorted_attempts)
             attempt['attempt'] = attempt_number
-            attempts[-1] = attempt
+            sorted_attempts[-1] = attempt
 
         database_table[Webhook.deployment_id(webhook)] = {
             'project': Webhook.repo_full_name(webhook).replace("/", "-"),
             'commit': Webhook.repo_commit_id(webhook),
             # This timestamp will be the most recent attempt's timestamp, important to have at the root for sorting
             'timestamp': now,
-            'attempts': attempts,
+            'attempts': sorted_attempts,
         }
 
         database_table.commit()
