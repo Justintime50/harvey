@@ -52,24 +52,22 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
         else:
             attempts = []
 
-        sorted_attempts = sorted(attempts, key=lambda x: x['timestamp'])
-
         if deployment_status == 'In-Progress':
-            attempt_number = len(sorted_attempts) + 1
+            attempt_number = len(attempts) + 1
             attempt['attempt'] = attempt_number
-            sorted_attempts.append(attempt)
+            attempts.append(attempt)
         else:
             # If we get here, we failed or succeeded, take the previous "In-Progress entry and update it"
-            attempt_number = len(sorted_attempts)
+            attempt_number = len(attempts)
             attempt['attempt'] = attempt_number
-            sorted_attempts[-1] = attempt
+            attempts[-1] = attempt
 
         database_table[Webhook.deployment_id(webhook)] = {
             'project': Webhook.repo_full_name(webhook).replace("/", "-"),
             'commit': Webhook.repo_commit_id(webhook),
             # This timestamp will be the most recent attempt's timestamp, important to have at the root for sorting
             'timestamp': now,
-            'attempts': sorted_attempts,
+            'attempts': attempts,
         }
 
         database_table.commit()
@@ -97,9 +95,11 @@ def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
         for _, value in database_table.items():
             # If a project name is provided, only return deployments for that project
             if project_name and value['project'] == project_name:
+                value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
                 deployments['deployments'].append(value)
             # This block is for a generic list of deployments (all deployments)
             elif not project_name:
+                value['attempts'] = sorted(value['attempts'], key=lambda x: x['attempt'], reverse=True)
                 deployments['deployments'].append(value)
             # If a project name was specified but doesn't match, don't add to list
             else:
