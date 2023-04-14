@@ -39,10 +39,8 @@ class Deployment:
             # Kill the deployment if the project is locked
             if lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
                 kill_deployment(
-                    (
-                        f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
-                        ' deployments.'
-                    ),
+                    f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                    ' deployments.',
                     webhook,
                 )
         except Exception:
@@ -83,17 +81,17 @@ class Deployment:
             Message.send_slack_message(deployment_started_message)
 
         preamble = (
-            f'Harvey v{Config.harvey_version} ({deployment_type.title()} Deployment)\n'
+            f'{Webhook.repo_full_name(webhook)} {deployment_type.title()}\n'
+            f'Harvey: v{Config.harvey_version}\n'
             f'Deployment Started: {start_time}\n'
             f'Deployment ID: {Webhook.repo_commit_id(webhook)}'
         )
         logger.info(preamble)
 
         configuration = f'Configuration:\n{json.dumps(config, indent=4)}' if Config.log_level == 'DEBUG' else ''
-        commit_details = (
-            f'New commit by: {Webhook.repo_commit_author(webhook)} to {Webhook.repo_full_name(webhook)}.\n'
-            f'Commit Details: {Webhook.repo_commit_message(webhook)}'
-        )
+        commit_details = f'Commit author: {Webhook.repo_commit_author(webhook)}\n'
+        if Config.log_level == 'DEBUG':
+            commit_details += f'Commit Details: {Webhook.repo_commit_message(webhook)}'
         git_output = git if Config.log_level == 'DEBUG' else ''
         execution_time = f'Startup execution time: {datetime.datetime.utcnow() - start_time}'
 
@@ -117,7 +115,7 @@ class Deployment:
                 deploy_output = Deployment.deploy(webhook_config, webhook, webhook_output)
 
                 healthcheck = webhook_config.get('healthcheck')
-                healthcheck_messages = 'Healthchecks:\n'
+                healthcheck_messages = ''
                 docker_client = Container.create_client()
 
                 if healthcheck:
@@ -162,7 +160,7 @@ class Deployment:
             # We wrap this entire block in a try/catch in an attempt to catch anything that bubbles to the
             # top before hitting sentry as this function is the top-level function called when a thread has
             # been spawned.
-            kill_deployment(f'Deployment failed: {error}.', webhook)
+            kill_deployment(str(error), webhook)
 
     @staticmethod
     def open_project_config(webhook: Dict[str, Any]):
@@ -251,7 +249,6 @@ class Deployment:
                 'up', '-d',
                 '--build',
                 '--force-recreate',
-                '--quiet-pull',
             ]
             # fmt: on
         else:
@@ -263,7 +260,6 @@ class Deployment:
                 'up', '-d',
                 '--build',
                 '--force-recreate',
-                '--quiet-pull',
             ]
             # fmt: on
 
