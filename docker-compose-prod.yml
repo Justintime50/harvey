@@ -1,4 +1,3 @@
-version: "3.8"
 services:
   harvey-nginx:
     deploy:
@@ -10,6 +9,11 @@ services:
         reservations:
           cpus: "0.25"
           memory: "128M"
+    healthcheck:
+      test: ['CMD', 'curl', '-f', 'host.docker.internal:5000/health']
+      interval: 10s
+      timeout: 10s
+      retries: 3
     labels:
       - "traefik.http.routers.harveyapi.rule=Host(`harveyapi.justinpaulhammond.com`, `www.harveyapi.justinpaulhammond.com`)"
       - "traefik.http.routers.harveyapi.tls=true"
