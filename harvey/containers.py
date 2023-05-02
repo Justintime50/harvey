@@ -13,6 +13,7 @@ import woodchips
 from harvey.config import Config
 from harvey.errors import HarveyError
 from harvey.utils.deployments import kill_deployment
+from harvey.utils.utils import get_utc_timestamp
 
 
 class Container:
@@ -116,7 +117,7 @@ class Container:
         Docker appears to store dates in RFC 3339 Nano and UTC time so we chop off the ending digits and
         convert to a Python datetime here for comparison.
         """
-        now = datetime.datetime.now(datetime.timezone.utc)
+        now = get_utc_timestamp()
         container_start_datetime = datetime.datetime.strptime(
             container_dictionary['attrs']['State'].get('StartedAt', '')[:-4], '%Y-%m-%dT%H:%M:%S.%f'
         ).replace(tzinfo=datetime.timezone.utc)

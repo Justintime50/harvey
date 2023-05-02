@@ -1,3 +1,5 @@
+import datetime
+
 import woodchips
 
 from harvey.config import Config
@@ -19,3 +21,8 @@ def setup_logger():
         level=Config.log_level,
     )
     logger.log_to_console(formatter='%(asctime)s - %(module)s.%(funcName)s - %(levelname)s - %(message)s')
+
+
+def get_utc_timestamp():
+    """Returns the UTC timestamp of right now."""
+    return datetime.datetime.now(datetime.timezone.utc)

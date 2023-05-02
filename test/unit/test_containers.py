@@ -1,13 +1,13 @@
-import datetime
 from unittest.mock import (
     Mock,
     patch,
 )
 
 from harvey.containers import Container
+from harvey.utils.utils import get_utc_timestamp
 
 
-MOCK_RFC_3339_TIME = datetime.datetime.now(datetime.timezone.utc).isoformat()[:-4]
+MOCK_RFC_3339_TIME = get_utc_timestamp().isoformat()[:-4]
 
 
 @patch('logging.Logger.debug')

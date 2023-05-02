@@ -24,6 +24,7 @@ from harvey.utils.deployments import (
     kill_deployment,
     succeed_deployment,
 )
+from harvey.utils.utils import get_utc_timestamp
 from harvey.webhooks import Webhook
 
 
@@ -48,7 +49,7 @@ class Deployment:
         except Exception:
             logger.error('Could not determine project lock status!')
 
-        start_time = datetime.datetime.utcnow()
+        start_time = get_utc_timestamp()
 
         _ = update_project_lock(
             project_name=Webhook.repo_full_name(webhook),
@@ -95,7 +96,7 @@ class Deployment:
         if Config.log_level == 'DEBUG':
             commit_details += f'\nCommit Details: {Webhook.repo_commit_message(webhook)}'
         git_output = f'\n\n{git}' if Config.log_level == 'DEBUG' else ''
-        execution_time = f'Startup execution time: {datetime.datetime.utcnow() - start_time}'
+        execution_time = f'Startup execution time: {get_utc_timestamp() - start_time}'
 
         output = f'{preamble}{configuration}\n\n{commit_details}{git_output}\n\n{execution_time}'
         logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
@@ -136,7 +137,7 @@ class Deployment:
                 else:
                     all_healthchecks_passed = True  # Set to true here since we cannot determine, won't kill the deploy
 
-                end_time = datetime.datetime.utcnow()
+                end_time = get_utc_timestamp()
                 execution_time = f'Deployment execution time: {end_time - start_time}'
                 logger.debug(f'{Webhook.repo_full_name(webhook)} {execution_time}')
                 final_output = f'{webhook_output}\n{deploy_output}\n{execution_time}\n{healthcheck_messages}\n'
@@ -209,7 +210,7 @@ class Deployment:
         """
         logger = woodchips.get(Config.logger_name)
 
-        start_time = datetime.datetime.utcnow()
+        start_time = get_utc_timestamp()
 
         repo_path = os.path.join(Config.projects_path, Webhook.repo_full_name(webhook))
 
@@ -272,7 +273,7 @@ class Deployment:
                 text=True,
                 timeout=Config.operation_timeout,
             )
-            execution_time = f'Deploy stage execution time: {datetime.datetime.utcnow() - start_time}'
+            execution_time = f'Deploy stage execution time: {get_utc_timestamp() - start_time}'
             final_output = f'{compose_output}\n{execution_time}'
             logger.info(final_output)
         except subprocess.TimeoutExpired:

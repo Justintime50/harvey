@@ -1,4 +1,3 @@
-import datetime
 import subprocess
 from unittest.mock import (
     ANY,
@@ -7,10 +6,11 @@ from unittest.mock import (
 )
 
 from harvey.deployments import Deployment
+from harvey.utils.utils import get_utc_timestamp
 
 
 MOCK_OUTPUT = 'mock output'
-MOCK_TIME = datetime.datetime.utcnow()
+MOCK_TIME = get_utc_timestamp()
 
 
 def mock_config(deployment_type='deploy', prod_compose=False):

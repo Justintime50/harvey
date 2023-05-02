@@ -1,4 +1,3 @@
-import datetime
 from typing import (
     Any,
     Dict,
@@ -12,6 +11,7 @@ from sqlitedict import SqliteDict  # type: ignore
 from harvey.config import Config
 from harvey.errors import HarveyError
 from harvey.utils.api_utils import get_page_size
+from harvey.utils.utils import get_utc_timestamp
 from harvey.webhooks import Webhook
 
 
@@ -36,7 +36,7 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
         else:
             deployment_status = 'Failure'
 
-        now = str(datetime.datetime.utcnow())
+        now = str(get_utc_timestamp())
 
         deployment_runtime = final_output.partition('Deployment execution time: ')[2].split('\n\n')[0]
 
