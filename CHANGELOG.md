@@ -7,6 +7,7 @@
 - Fixes a bug where subprocess errors would get clobbered, now output from subprocesses should be printed as a string instead of bytes or being stripped out
 - Overhauls the deployment logs to show more or less information depending on if you are running in debug mode or not
 - Properly sorts attempts in desc order by `timestamp` so clients don't need to
+- Fix a bug where deploys were miscategorized as success when they were actually a failure
 
 ## v0.23.0 (2023-03-29)
 

@@ -29,7 +29,10 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         # Naively check the logs for an indicator of the status being success
-        if 'success' in final_output.lower() or 'succeeded' in final_output.lower():
+        # Check for failure first since phrases like "did not complete successfully" will give a false positive
+        if 'failed' in final_output.lower() or 'failure' in final_output.lower():
+            deployment_status = 'Failure'
+        elif 'success' in final_output.lower() or 'succeeded' in final_output.lower():
             deployment_status = 'Success'
         elif final_output == 'NA':
             deployment_status = 'In-Progress'
