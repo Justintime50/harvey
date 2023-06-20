@@ -77,8 +77,7 @@ class Deployment:
             )
 
         deployment_started_message = (
-            f'{Message.work_emoji} Harvey has started a deployment ({deployment_type}) for'
-            f' `{Webhook.repo_full_name(webhook)}`.'
+            f'{Message.work_emoji} Harvey has started a {deployment_type} for `{Webhook.repo_full_name(webhook)}`.'
         )
         if Config.use_slack:
             Message.send_slack_message(deployment_started_message)

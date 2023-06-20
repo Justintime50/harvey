@@ -35,7 +35,7 @@ DEV_REQUIREMENTS = [
 
 setuptools.setup(
     name='harvey-cd',
-    version='0.23.0',
+    version='0.24.0',
     description='The lightweight Docker Compose deployment platform.',
     long_description=long_description,
     long_description_content_type="text/markdown",

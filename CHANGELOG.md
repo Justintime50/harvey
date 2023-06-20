@@ -1,11 +1,12 @@
 # CHANGELOG
 
-## Next Release
+## v0.24.0 (2023-06-20)
 
 - Adds `runtime` to each deployment attempt's data structure so you can track that over time
 - Threads via Harvey are now named (after a project) and can be retrieved via the new `/threads` endpoint
 - Fixes a bug where subprocess errors would get clobbered, now output from subprocesses should be printed as a string instead of bytes or being stripped out
 - Overhauls the deployment logs to show more or less information depending on if you are running in debug mode or not
+- Unifies message structure when sending to Slack, stdout/stderr, and storing to database
 - Properly sorts attempts in desc order by `timestamp` so clients don't need to
 - Fix a bug where deploys were miscategorized as success when they were actually a failure
 
