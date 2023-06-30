@@ -135,7 +135,7 @@ Harvey's entrypoint (eg: `http://127.0.0.1:5000/deploy`) accepts a webhook from 
 
 ### App Configuration
 
-```
+```text
 Environment Variables:
     USE_SLACK         Set to "true" to send slack messages. Default: False
     SLACK_CHANNEL     The Slack channel to send messages to
