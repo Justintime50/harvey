@@ -28,7 +28,7 @@ clean:
 
 # Test the project and generate an HTML coverage report
 coverage:
-    {{VIRTUAL_BIN}}/pytest {{TEST_DIR}}/unit --cov={{PROJECT_NAME}} --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing
+    {{VIRTUAL_BIN}}/pytest {{TEST_DIR}}/unit --cov={{PROJECT_NAME}} --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing --cov-fail-under=75
 
 # Run flake8 checks against the project
 flake8:
