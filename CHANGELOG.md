@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+Drop support for Python 3.7
+
 ## v0.24.0 (2023-06-20)
 
 - Adds `runtime` to each deployment attempt's data structure so you can track that over time

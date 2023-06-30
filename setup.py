@@ -24,7 +24,7 @@ DEV_REQUIREMENTS = [
     'build == 0.10.*',
     'flake8 == 5.*',
     'isort == 5.*',
-    'mypy == 1.1.*',
+    'mypy == 1.3.*',
     'pytest == 7.*',
     'pytest-cov == 4.*',
     'twine == 4.*',
@@ -64,5 +64,5 @@ setuptools.setup(
     entry_points={
         'console_scripts': ['harvey=harvey.app:main'],
     },
-    python_requires='>=3.7, <4',
+    python_requires='>=3.8, <4',
 )
