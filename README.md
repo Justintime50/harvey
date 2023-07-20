@@ -37,7 +37,7 @@ Because Harvey interacts directly with the Docker daemon (using sockets), to bui
 # Install Harvey via GitHub
 git clone https://github.com/Justintime50/harvey.git
 cp .env-example .env
-make install
+just install
 ```
 
 1. Install Docker & login
@@ -50,10 +50,10 @@ make install
 
 ```bash
 # Run locally for development (runs via Flask)
-make run
+just run
 
 # Run in production (runs via uWSGI)
-make prod
+just prod
 
 # Spin up the optional reverse proxy (adjust the URLs in the docker-compose files)
 docker compose up -d # local
@@ -73,9 +73,8 @@ docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 
 #### Configuration Criteria
 
-- Each repo either needs a `.harvey.yml` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `.harvey.yml` file if there is no `data` key present)
+- Each repo either needs a `.harvey.yaml` file in the root directory stored in git (which will be used whenever a GitHub webhook fires) or a `data` key passed into the webhook delivered to Harvey (via something like GitHub Actions). This can be accomplished by using something like [workflow-webhook](https://github.com/distributhor/workflow-webhook) or another homegrown solution (requires the entire webhook payload from GitHub. Harvey will always fallback to the `.harvey.yml` file if there is no `data` key present)
 - You can specify one of `deploy` or `pull` as the `deployment_type` to run (`deploy` is the default)
-- This file must follow proper JSON standards (start and end with `{ }`, contain commas after each item, no trailing commas, and be surrounded by quotes)
 - Optional: `prod_compose: true` json can be passed to instruct Harvey to use a prod `docker-compose` file in addition to the base compose file. This will run the equivelant of the following when deploying: `docker-compose -f docker-compose.yml -f docker-compose-prod.yml`.
 
 #### .harvey.yaml Example
@@ -105,7 +104,7 @@ deploy:
             data: '{ "deployment_type": "deploy", "prod_compose" : true, "healthcheck": ["container_name_1", "container_name_2"] }'
 ```
 
-Harvey's entrypoint (eg: `http://127.0.0.1:5000/deploy`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, simply pass a JSON file like the following example to the Harvey webhook endpoint:
+Harvey's entrypoint (eg: `http://127.0.0.1:5000/deploy`) accepts a webhook from GitHub. If you'd like to simulate a GitHub webhook, pass JSON like the following example to the Harvey webhook endpoint:
 
 ```json
 {
@@ -183,7 +182,7 @@ curl -X GET http://127.0.0.1:5000/deployments/justintime50-justinpaulhammond
 
 ```bash
 # Get a comprehensive list of development tools
-make help
+just --list
 ```
 
 ### Releasing
