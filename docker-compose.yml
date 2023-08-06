@@ -7,9 +7,9 @@ services:
     labels:
       - traefik.enable=true
     extra_hosts:
-      - "host.docker.internal:host-gateway"
-
+      - 'host.docker.internal:host-gateway'
 
 networks:
   traefik:
     name: traefik
+    external: true
