@@ -284,7 +284,6 @@ class Deployment:
             kill_deployment(
                 message=final_output,
                 webhook=webhook,
-                raise_error=True,
             )
 
         return final_output

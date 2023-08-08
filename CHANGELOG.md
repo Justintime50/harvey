@@ -3,6 +3,7 @@
 ## Next Release
 
 - Drop support for Python 3.7
+- Don't raise errors for failed deploys, often this isn't a problem with Harvey and is instead a problem with the project being deployed
 
 ## v0.24.0 (2023-06-20)
 

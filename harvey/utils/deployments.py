@@ -28,13 +28,13 @@ def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional
     deployment_logs = error_message + '\n' + message
     store_deployment_details(webhook, _strip_emojis_from_logs(deployment_logs))
 
-    if Config.use_slack:
-        Message.send_slack_message(error_message)
-
     # Only unlock deployments that were locked by the system and not a user to preserve their preferences
     deployment_lock = lookup_project_lock(project_name=Webhook.repo_full_name(webhook))
     if deployment_lock.get('system_lock'):
-        _ = update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+        update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+
+    if Config.use_slack:
+        Message.send_slack_message(error_message)
 
     if raise_error:
         raise HarveyError(error_message)
@@ -52,10 +52,10 @@ def succeed_deployment(message: str, webhook: Dict[str, Any]):
     deployment_logs = success_message + '\n' + message
     store_deployment_details(webhook, _strip_emojis_from_logs(deployment_logs))
 
+    update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
+
     if Config.use_slack:
         Message.send_slack_message(success_message)
-
-    _ = update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
     sys.exit(1)
 
