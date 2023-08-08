@@ -40,10 +40,8 @@ class Deployment:
             # Kill the deployment if the project is locked
             if lookup_project_lock(Webhook.repo_full_name(webhook))['locked'] is True:
                 kill_deployment(
-                    (
-                        f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
-                        ' deployments.'
-                    ),
+                    f'{Webhook.repo_full_name(webhook)} deployments are locked. Please try again later or unlock'
+                    ' deployments.',
                     webhook,
                 )
         except Exception:
@@ -111,9 +109,9 @@ class Deployment:
             logger = woodchips.get(Config.logger_name)
 
             webhook_config, webhook_output, start_time = Deployment.initialize_deployment(webhook)
-            deployment = webhook_config.get('deployment_type', Config.default_deployment).lower()
+            deployment_type = webhook_config.get('deployment_type', Config.default_deployment).lower()
 
-            if deployment == 'deploy':
+            if deployment_type == 'deploy':
                 deploy_output = Deployment.deploy(webhook_config, webhook, webhook_output)
 
                 healthcheck = webhook_config.get('healthcheck')
@@ -148,7 +146,7 @@ class Deployment:
                         message=final_output,
                         webhook=webhook,
                     )
-            elif deployment == 'pull':
+            elif deployment_type == 'pull':
                 # We simply assign the final message because if we got this far, the repo has already been pulled
                 pull_success_message = (
                     f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}\n'

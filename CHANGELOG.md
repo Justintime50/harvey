@@ -3,7 +3,6 @@
 ## Next Release
 
 - Drop support for Python 3.7
-- When `raise_error` of `kill_deployment` is specified, we now pass the full `deployment_logs` to the message field
 
 ## v0.24.0 (2023-06-20)
 

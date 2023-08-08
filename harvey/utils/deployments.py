@@ -37,7 +37,7 @@ def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional
         _ = update_project_lock(project_name=Webhook.repo_full_name(webhook), locked=False)
 
     if raise_error:
-        raise HarveyError(_strip_emojis_from_logs(deployment_logs))
+        raise HarveyError(error_message)
 
     sys.exit(1)
 
