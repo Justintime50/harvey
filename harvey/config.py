@@ -1,7 +1,8 @@
 import os
 
-from _version import __version__
 from dotenv import load_dotenv
+
+from harvey._version import __version__
 
 
 load_dotenv()  # Must remain at the top of this file
