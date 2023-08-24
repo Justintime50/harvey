@@ -54,10 +54,6 @@ just run
 
 # Run in production (runs via uWSGI)
 just prod
-
-# Spin up the optional reverse proxy (adjust the URLs in the docker-compose files)
-docker compose up -d # local
-docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d # prod
 ```
 
 ### Things to Know
@@ -184,8 +180,3 @@ curl -X GET http://127.0.0.1:5000/deployments/justintime50-justinpaulhammond
 # Get a comprehensive list of development tools
 just --list
 ```
-
-### Releasing
-
-1. Update the version in `Config.harvey_version`
-1. Update the version in `setup.py`
