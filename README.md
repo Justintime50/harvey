@@ -108,7 +108,7 @@ Harvey's entrypoint (eg: `http://127.0.0.1:5000/deploy`) accepts a webhook from 
   "repository": {
     "name": "justinpaulhammond",
     "full_name": "Justintime50/justinpaulhammond",
-    "url": "https://github.com/Justintime50/justinpaulhammond",
+    "html_url": "https://github.com/Justintime50/justinpaulhammond",
     "ssh_url": "git@github.com:Justintime50/justinpaulhammond.git",
     "owner": {
       "name": "Justintime50"
