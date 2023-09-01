@@ -4,14 +4,17 @@ from unittest.mock import patch
 from harvey.webhooks import Webhook
 
 
+# To get the proper signature, you will need to print it out when the test code is run through the validator
+SIGNATURE = 'sha256=a617d4bc1406b19fc37fa29aa92f900e1c26bedb033a7d7dc2900eab57e36e2a'
+
+
 @patch('harvey.config.Config.webhook_secret', '123')
 @patch('logging.Logger.debug')
 def test_validate_webhook_secret(mock_logger, mock_webhook):
-    expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
     encoded_webhook = json.dumps(mock_webhook).encode()
     validated_webhook_secret = Webhook.validate_webhook_secret(
         webhook_body=encoded_webhook,
-        signature=expected_signature,
+        signature=SIGNATURE,
     )
 
     mock_logger.assert_called()
@@ -21,11 +24,10 @@ def test_validate_webhook_secret(mock_logger, mock_webhook):
 @patch('harvey.config.Config.webhook_secret', 'invalid_secret')
 @patch('logging.Logger.debug')
 def test_validate_webhook_secret_mismatch(mock_logger, mock_webhook):
-    expected_signature = 'sha256=4af0238859f28cb06c07486335e33b337328358f60abee450e7fbe6197e58c09'
     encoded_webhook = json.dumps(mock_webhook).encode()
     validated_webhook_secret = Webhook.validate_webhook_secret(
         webhook_body=encoded_webhook,
-        signature=expected_signature,
+        signature=SIGNATURE,
     )
 
     mock_logger.assert_called()
@@ -56,7 +58,7 @@ def test_repo_commit_author(mock_webhook):
 def test_repo_url(mock_webhook):
     result = Webhook.repo_url(mock_webhook)
 
-    assert result == 'https://test-url.com'
+    assert result == 'https://test-ssh-url.com'
 
 
 def test_repo_owner_name(mock_webhook):
