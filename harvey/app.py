@@ -48,215 +48,6 @@ REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 os.environ["no_proxy"] = "*"
 
 
-def create_response_dict(message: str, success: Optional[bool] = False, status_code: Optional[int] = 500):
-    """Response object that all Harvey responses return."""
-    return {
-        'message': message,
-        'success': success,
-    }, status_code
-
-
-def log_error(error):
-    """Logs an error with Woodchips."""
-    logger = woodchips.get(Config.logger_name)
-    logger.error(error)
-
-
-@APP.errorhandler(401)
-def not_authorized(error):
-    """Return a 401 if the request is not authorized."""
-    return create_response_dict(
-        message='You are not authorized to access this endpoint. Please check your credentials and try again.',
-        success=False,
-        status_code=401,
-    )
-
-
-@APP.errorhandler(404)
-def not_found(error) -> Dict[str, Any]:
-    """Return a 404 if the route is not found."""
-    return create_response_dict(
-        message='The endpoint you hit is either not valid or the record was not found.',
-        success=False,
-        status_code=404,
-    )
-
-
-@APP.errorhandler(500)
-def server_error(error) -> Dict[str, Any]:
-    """Return a 500 if there is a problem with Harvey."""
-    return create_response_dict(
-        message='An error has occured due to something on our end.',
-        success=False,
-        status_code=500,
-    )
-
-
-@APP.route('/health', methods=['GET'])
-def harvey_healthcheck_endpoint():
-    """Return a 200 if Harvey is running."""
-    return create_response_dict(
-        message='Ok',
-        success=True,
-        status_code=200,
-    )
-
-
-@APP.route('/deployments', methods=['GET'])
-@Api.check_api_key
-def retrieve_deployments_endpoint():
-    """Retrieves deployments from the Sqlite store.
-
-    - The keys will be `username-repo_name-commit_id`.
-    - The user can optionally pass a URL param of `page_size` to limit how many results are returned
-    - The user can optionally pass a URL param of `project` to filter what deployments get returned
-    """
-    try:
-        return retrieve_deployments(request)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/deployments/<deployment_id>', methods=['GET'])
-@Api.check_api_key
-def retrieve_deployment_endpoint(deployment_id: str):
-    """Retrieve a deployment's details by ID.
-
-    A `deployment_id` will be `username-repo_name-commit_id`.
-    """
-    try:
-        return retrieve_deployment(deployment_id)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-# Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
-@APP.route('/deploy', methods=['POST'])
-def deploy_project_endpoint():
-    """Deploy a project based on webhook data and the `docker-compose.yml` file.
-
-    This is the main entrypoint for Harvey.
-    """
-    try:
-        return Api.parse_github_webhook(request)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/projects', methods=['GET'])
-@Api.check_api_key
-def retrieve_projects_endpoint():
-    """Retrieves a list of project names from the git repos stored in Harvey."""
-    try:
-        return retrieve_projects(request)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/projects/<project_name>/redeploy', methods=['POST'])
-@Api.check_api_key
-def redeploy_project_endpoint(project_name):
-    """Redeploy a project based on local webhook data stored in the database from a previous deploy."""
-    try:
-        webhook = retrieve_webhook(project_name)
-        if not webhook:
-            raise HarveyError(f'Webhook does not exist for {project_name}')
-        else:
-            threading.Thread(
-                name=project_name,
-                target=Deployment.run_deployment,
-                args=(webhook,),
-            ).start()
-            return create_response_dict(
-                f'Redeploying {project_name}...',
-                success=True,
-                status_code=200,
-            )
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/projects/<project_name>/webhook', methods=['GET'])
-@Api.check_api_key
-def retrieve_project_webhook_endpoint(project_name):
-    """Retrieves the locally stored webhook of a project."""
-    try:
-        webhook = retrieve_webhook(project_name)
-        if not webhook:
-            return abort(404)  # This will throw an exception in the except block below
-        else:
-            return create_response_dict(
-                webhook,
-                success=True,
-                status_code=200,
-            )
-    except werkzeug.exceptions.NotFound:
-        raise
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/projects/<project_name>/lock', methods=['PUT'])
-@Api.check_api_key
-def lock_project_endpoint(project_name: str):
-    """Enables the deployment lock for a project."""
-    try:
-        return lock_project(project_name)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/projects/<project_name>/unlock', methods=['PUT'])
-@Api.check_api_key
-def unlock_project_endpoint(project_name: str):
-    """Disables the deployment lock for a project."""
-    try:
-        return unlock_project(project_name)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/locks', methods=['GET'])
-@Api.check_api_key
-def retrieve_locks_endpoint():
-    """Retrieves the list of locks"""
-    try:
-        return retrieve_locks(request)
-    except Exception as error:
-        log_error(error)
-        return abort(500)
-
-
-@APP.route('/locks/<project_name>', methods=['GET'])
-@Api.check_api_key
-def retrieve_lock_endpoint(project_name: str):
-    """Retrieves the lock status of a project by its name."""
-    try:
-        return retrieve_lock(project_name)
-    except Exception as error:
-        log_error(error)
-        return abort(404)
-
-
-@APP.route('/threads', methods=['GET'])
-@Api.check_api_key
-def retrieve_threads_endpoint():
-    """Retrieves a list of running threads for Harvey. Threads indicate ongoing deployments."""
-    threads = []
-    for thread in threading.enumerate():
-        threads.append(thread.name)
-
-    return {'threads': threads}
-
-
 def bootstrap(debug_mode):
     """Bootstrap the Harvey instance on startup.
 
@@ -289,15 +80,229 @@ def bootstrap(debug_mode):
     requests_unixsocket.monkeypatch()
 
 
+@APP.errorhandler(401)
+def not_authorized(error):
+    """Return a 401 if the request is not authorized."""
+    return _create_response_dict(
+        message='You are not authorized to access this endpoint. Please check your credentials and try again.',
+        success=False,
+        status_code=401,
+    )
+
+
+@APP.errorhandler(404)
+def not_found(error) -> Dict[str, Any]:
+    """Return a 404 if the route is not found."""
+    return _create_response_dict(
+        message='The endpoint you hit is either not valid or the record was not found.',
+        success=False,
+        status_code=404,
+    )
+
+
+@APP.errorhandler(500)
+def server_error(error) -> Dict[str, Any]:
+    """Return a 500 if there is a problem with Harvey."""
+    return _create_response_dict(
+        message='An error has occured due to something on our end.',
+        success=False,
+        status_code=500,
+    )
+
+
+@APP.route('/health', methods=['GET'])
+def harvey_healthcheck_endpoint():
+    """Return a 200 if Harvey is running."""
+    return _create_response_dict(
+        message='Ok',
+        success=True,
+        status_code=200,
+    )
+
+
+@APP.route('/deployments', methods=['GET'])
+@Api.check_api_key
+def retrieve_deployments_endpoint():
+    """Retrieves deployments from the Sqlite store.
+
+    - The keys will be `username-repo_name-commit_id`.
+    - The user can optionally pass a URL param of `page_size` to limit how many results are returned
+    - The user can optionally pass a URL param of `project` to filter what deployments get returned
+    """
+    try:
+        return retrieve_deployments(request)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/deployments/<deployment_id>', methods=['GET'])
+@Api.check_api_key
+def retrieve_deployment_endpoint(deployment_id: str):
+    """Retrieve a deployment's details by ID.
+
+    A `deployment_id` will be `username-repo_name-commit_id`.
+    """
+    try:
+        return retrieve_deployment(deployment_id)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+# Notably, we do not check the API key here because we'll check its presence later when we parse the webhook
+@APP.route('/deploy', methods=['POST'])
+def deploy_project_endpoint():
+    """Deploy a project based on webhook data and the `docker-compose.yml` file.
+
+    This is the main entrypoint for Harvey.
+    """
+    try:
+        return Api.parse_github_webhook(request)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects', methods=['GET'])
+@Api.check_api_key
+def retrieve_projects_endpoint():
+    """Retrieves a list of project names from the git repos stored in Harvey."""
+    try:
+        return retrieve_projects(request)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects/<project_name>/redeploy', methods=['POST'])
+@Api.check_api_key
+def redeploy_project_endpoint(project_name):
+    """Redeploy a project based on local webhook data stored in the database from a previous deploy."""
+    try:
+        webhook = retrieve_webhook(project_name)
+        if not webhook:
+            raise HarveyError(f'Webhook does not exist for {project_name}')
+        else:
+            threading.Thread(
+                name=project_name,
+                target=Deployment.run_deployment,
+                args=(webhook,),
+            ).start()
+            return _create_response_dict(
+                f'Redeploying {project_name}...',
+                success=True,
+                status_code=200,
+            )
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects/<project_name>/webhook', methods=['GET'])
+@Api.check_api_key
+def retrieve_project_webhook_endpoint(project_name):
+    """Retrieves the locally stored webhook of a project."""
+    try:
+        webhook = retrieve_webhook(project_name)
+        if not webhook:
+            return abort(404)  # This will throw an exception in the except block below
+        else:
+            return _create_response_dict(
+                webhook,
+                success=True,
+                status_code=200,
+            )
+    except werkzeug.exceptions.NotFound:
+        raise
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects/<project_name>/lock', methods=['PUT'])
+@Api.check_api_key
+def lock_project_endpoint(project_name: str):
+    """Enables the deployment lock for a project."""
+    try:
+        return lock_project(project_name)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/projects/<project_name>/unlock', methods=['PUT'])
+@Api.check_api_key
+def unlock_project_endpoint(project_name: str):
+    """Disables the deployment lock for a project."""
+    try:
+        return unlock_project(project_name)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/locks', methods=['GET'])
+@Api.check_api_key
+def retrieve_locks_endpoint():
+    """Retrieves the list of locks"""
+    try:
+        return retrieve_locks(request)
+    except Exception as error:
+        _log_error(error)
+        return abort(500)
+
+
+@APP.route('/locks/<project_name>', methods=['GET'])
+@Api.check_api_key
+def retrieve_lock_endpoint(project_name: str):
+    """Retrieves the lock status of a project by its name."""
+    try:
+        return retrieve_lock(project_name)
+    except Exception as error:
+        _log_error(error)
+        return abort(404)
+
+
+@APP.route('/threads', methods=['GET'])
+@Api.check_api_key
+def retrieve_threads_endpoint():
+    """Retrieves a list of running threads for Harvey. Threads indicate ongoing deployments."""
+    threads = []
+    for thread in threading.enumerate():
+        threads.append(thread.name)
+
+    return {'threads': threads}
+
+
+def _create_response_dict(message: str, success: Optional[bool] = False, status_code: Optional[int] = 500):
+    """Response object that all Harvey responses return."""
+    return {
+        'message': message,
+        'success': success,
+    }, status_code
+
+
+def _log_error(error):
+    """Logs an error with Woodchips."""
+    logger = woodchips.get(Config.logger_name)
+    logger.error(error)
+
+
+def _get_debug_bool(log_level) -> bool:
+    """Returns True if `log_level` is `DEBUG`."""
+    return log_level == 'DEBUG'
+
+
 if __name__ == '__main__':
     # These tasks take place when run via Flask
-    debug_mode = Config.log_level == 'DEBUG'
-    bootstrap(debug_mode)
+    debug = _get_debug_bool(Config.log_level)
+    bootstrap(debug)
 
-    APP.run(host=Config.host, port=Config.port, debug=debug_mode)
+    APP.run(host=Config.host, port=Config.port, debug=debug)
 
 
 if __name__ != '__main__':
     # These tasks take place when run via uWSGI, the remaining config can be found in `wsgi.py`
-    debug_mode = Config.log_level == 'DEBUG'
-    bootstrap(debug_mode)
+    debug = _get_debug_bool(Config.log_level)
+    bootstrap(debug)
