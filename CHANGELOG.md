@@ -1,16 +1,18 @@
 # CHANGELOG
 
-## Next Release
+## v1.0.0 (2023-09-01)
 
-- Drop support for Python 3.7
+- Drops support for Python 3.7
 - Adds `USE_HTTPS_AUTH` option to use HTTPS URLs instead of the default SSH URLs
 - Use `docker compose version` invocation on startup to verify version instead of older `docker-compose --version` now that v1 is deprecated
-- Don't raise errors for failed deploys, often this isn't a problem with Harvey and is instead a problem with the project being deployed
 - Unify the version of the released package and the version in the config under a single variable (this has drifted often in the past)
 - Removes the `raise_error` parameter of `kill_deployment` since killing a deployment will inherently raise an unhandled exception when we exit with a status of 1.
   - Corrects the status of `succeed_deployment` from 1 to 0
 - Properly expands `harvey_path`
+- `.env` files are now sourced from both the relative root of the project and the `$HARVEY_PATH` to allow for greater flexibility
 - Bump dependencies
+- Corrects and clarifies all documentation
+- Drops ability to install from Pip (no longer release to PyPi) since the invocation hasn't worked for some time and needs local commands
 
 ## v0.24.0 (2023-06-20)
 

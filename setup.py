@@ -44,9 +44,9 @@ DEV_REQUIREMENTS = [
 ]
 
 setuptools.setup(
-    name='harvey-cd',
+    name='harvey-runner',
     version=version,
-    description='The lightweight Docker Compose deployment platform.',
+    description='The lightweight Docker Compose deployment runner.',
     long_description=long_description,
     long_description_content_type="text/markdown",
     url='http://github.com/justintime50/harvey',
@@ -70,9 +70,6 @@ setuptools.setup(
     install_requires=REQUIREMENTS,
     extras_require={
         'dev': DEV_REQUIREMENTS,
-    },
-    entry_points={
-        'console_scripts': ['harvey=harvey.app:main'],
     },
     python_requires='>=3.8, <4',
 )

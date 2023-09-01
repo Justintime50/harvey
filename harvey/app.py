@@ -37,7 +37,10 @@ from harvey.repos.webhooks import retrieve_webhook
 from harvey.utils.utils import setup_logger
 
 
-load_dotenv()  # Must remain at the top of this file
+# Must remain at the top of this file to take effect, we load both from the path and locally
+load_dotenv(dotenv_path=Config.harvey_path)
+load_dotenv()
+
 APP = Flask(__name__)
 REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 
@@ -48,12 +51,13 @@ REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 os.environ["no_proxy"] = "*"
 
 
-def bootstrap(debug_mode):
+def bootstrap() -> bool:
     """Bootstrap the Harvey instance on startup.
 
     Any task required for Harvey to work that only needs to be instantiated once should go here.
     """
     setup_logger()
+    debug = _get_debug_bool(Config.log_level)
 
     # Ensure the correct Docker Compose version is available
     docker_compose_version = subprocess.check_output(  # nosec
@@ -69,7 +73,7 @@ def bootstrap(debug_mode):
     if Config.sentry_url:
         sentry_sdk.init(
             Config.sentry_url,
-            debug=debug_mode,
+            debug=debug,
         )
 
     # Setup the directory for the SQLite databases
@@ -78,6 +82,8 @@ def bootstrap(debug_mode):
 
     # Allows us to use requests_unixsocket via requests
     requests_unixsocket.monkeypatch()
+
+    return debug
 
 
 @APP.errorhandler(401)
@@ -295,14 +301,12 @@ def _get_debug_bool(log_level) -> bool:
 
 
 if __name__ == '__main__':
-    # These tasks take place when run via Flask
-    debug = _get_debug_bool(Config.log_level)
-    bootstrap(debug)
+    """These tasks take place when run via Flask."""
+    debug = bootstrap()
 
     APP.run(host=Config.host, port=Config.port, debug=debug)
 
 
 if __name__ != '__main__':
-    # These tasks take place when run via uWSGI, the remaining config can be found in `wsgi.py`
-    debug = _get_debug_bool(Config.log_level)
-    bootstrap(debug)
+    """These tasks take place when run via uWSGI, the remaining config can be found in `wsgi.py`."""
+    bootstrap()
