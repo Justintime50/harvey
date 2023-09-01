@@ -16,7 +16,7 @@ MOCK_TIME = get_utc_timestamp()
 def mock_config(deployment_type='deploy', prod_compose=False):
     """A mock configuration object similar to what would be stored in `harvey.yaml`."""
     mock_config = {
-        'deployment': deployment_type,
+        'deployment_type': deployment_type,
         'prod_compose': prod_compose,
         'healthcheck': ['mock_container_name'],
     }
@@ -101,13 +101,19 @@ def test_run_deployment_pull(
     mock_path_exists,
     mock_webhook,
 ):
+    """Test the `pull` deployment_type. Pulls happen before getting to deployments, we don't expect a deployment
+    to have occured when pulling.
+    """
     _ = Deployment.run_deployment(mock_webhook)
 
     mock_initialize_deployment.assert_called_once_with(mock_webhook)
-    mock_deploy_deployment.assert_called_once()
-    mock_client.assert_called_once()
-    mock_healthcheck.assert_called_once()
-    mock_utils_success.assert_called_once()
+    mock_deploy_deployment.assert_not_called()
+    mock_client.assert_not_called()
+    mock_healthcheck.assert_not_called()
+    mock_utils_success.assert_called_once_with(
+        'mock output\nHarvey pulled test_user/test-repo-name successfully. Success!\n',
+        ANY,
+    )
 
 
 @patch('os.path.exists', return_value=True)

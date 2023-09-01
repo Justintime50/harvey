@@ -14,3 +14,6 @@ def test_store_deployment_details(mock_logger, mock_output, mock_webhook):
         store_deployment_details(mock_webhook, mock_output)
 
         mock_logger.assert_called()
+
+
+# TODO: Dev database where we can retrieve deployments
