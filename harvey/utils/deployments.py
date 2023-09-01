@@ -2,13 +2,11 @@ import sys
 from typing import (
     Any,
     Dict,
-    Optional,
 )
 
 import woodchips
 
 from harvey.config import Config
-from harvey.errors import HarveyError
 from harvey.messages import Message
 from harvey.repos.deployments import store_deployment_details
 from harvey.repos.locks import (
@@ -18,7 +16,7 @@ from harvey.repos.locks import (
 from harvey.webhooks import Webhook
 
 
-def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional[bool] = False):
+def kill_deployment(message: str, webhook: Dict[str, Any]):
     """Log output, send message, and cleanup on deployment failure."""
     logger = woodchips.get(Config.logger_name)
 
@@ -35,9 +33,6 @@ def kill_deployment(message: str, webhook: Dict[str, Any], raise_error: Optional
 
     if Config.use_slack:
         Message.send_slack_message(error_message)
-
-    if raise_error:
-        raise HarveyError(error_message)
 
     sys.exit(1)
 
@@ -57,7 +52,7 @@ def succeed_deployment(message: str, webhook: Dict[str, Any]):
     if Config.use_slack:
         Message.send_slack_message(success_message)
 
-    sys.exit(1)
+    sys.exit(0)
 
 
 def _strip_emojis_from_logs(output: str) -> str:

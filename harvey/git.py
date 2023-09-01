@@ -46,7 +46,6 @@ class Git:
             kill_deployment(
                 message=final_output,
                 webhook=webhook,
-                raise_error=True,
             )
 
         return command_output
@@ -80,7 +79,6 @@ class Git:
                 kill_deployment(
                     message='Harvey could not stash local changes!',
                     webhook=webhook,
-                    raise_error=True,
                 )
 
             # Recursively call this function again so we can try pulling after a stash when we fail the first time.

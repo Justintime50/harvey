@@ -103,7 +103,6 @@ class Container:
                 kill_deployment(
                     message=message,
                     webhook=webhook,
-                    raise_error=True,
                 )
 
         return container_healthy

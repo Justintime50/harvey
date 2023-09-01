@@ -7,6 +7,8 @@
 - Use `docker compose version` invocation on startup to verify version instead of older `docker-compose --version` now that v1 is deprecated
 - Don't raise errors for failed deploys, often this isn't a problem with Harvey and is instead a problem with the project being deployed
 - Unify the version of the released package and the version in the config under a single variable (this has drifted often in the past)
+- Removes the `raise_error` parameter of `kill_deployment` since killing a deployment will inherently raise an unhandled exception when we exit with a status of 1.
+  - Corrects the status of `succeed_deployment` from 1 to 0
 - Properly expands `harvey_path`
 - Bump dependencies
 
