@@ -47,8 +47,8 @@ class Webhook:
 
     @staticmethod
     def repo_url(webhook: Dict[str, Any]) -> str:
-        """Return the repo's URL from the webhook JSON."""
-        return webhook['repository']['ssh_url']  # Use SSH URL so private repos can be cloned/pulled
+        """Return the repo's URL from the webhook JSON depending on the config selected."""
+        return webhook['repository']['html_url'] if Config.use_https_auth else webhook['repository']['ssh_url']
 
     @staticmethod
     def repo_owner_name(webhook: Dict[str, Any]) -> str:

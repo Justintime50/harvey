@@ -266,7 +266,7 @@ def bootstrap(debug_mode):
 
     # Ensure the correct Docker Compose version is available
     docker_compose_version = subprocess.check_output(  # nosec
-        ['docker-compose', '--version'],
+        ['docker', 'compose', 'version'],
         stderr=subprocess.STDOUT,
         text=True,
         timeout=3,

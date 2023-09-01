@@ -4,7 +4,7 @@ import os
 import requests
 
 
-# USAGE: Run Harvey in the background `make run`, then do `make integration`. Confirm the deployment succeeds
+# USAGE: Run Harvey in the background `just run`, then do `just integration`. Confirm the deployment succeeds
 
 
 mock_webhook_path = os.path.join('test', 'integration', 'mock_webhook.json')

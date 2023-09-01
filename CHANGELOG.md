@@ -3,6 +3,8 @@
 ## Next Release
 
 - Drop support for Python 3.7
+- Adds `USE_HTTPS_AUTH` option to use HTTPS URLs instead of the default SSH URLs
+- Use `docker compose version` invocation on startup to verify version instead of older `docker-compose --version` now that v1 is deprecated
 - Don't raise errors for failed deploys, often this isn't a problem with Harvey and is instead a problem with the project being deployed
 - Unify the version of the released package and the version in the config under a single variable (this has drifted often in the past)
 - Properly expands `harvey_path`

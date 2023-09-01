@@ -28,7 +28,7 @@ def test_clone_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhoo
 
     mock_logger.assert_called()
     mock_subprocess.assert_called_once_with(
-        ['git', 'clone', '--depth=1', 'https://test-url.com', 'harvey/projects/test_user/test-repo-name'],
+        ['git', 'clone', '--depth=1', 'https://test-ssh-url.com', 'harvey/projects/test_user/test-repo-name'],
         stderr=-2,
         text=True,
         timeout=300,

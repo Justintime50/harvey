@@ -19,7 +19,8 @@ def mock_webhook(branch='main'):
         "repository": {
             "name": "TEST-repo-name",
             "full_name": "TEST_user/TEST-repo-name",
-            "ssh_url": "https://test-url.com",
+            "html_url": "https://test-html-url.com",
+            "ssh_url": "https://test-ssh-url.com",
             "owner": {
                 "name": "TEST_owner",
             },

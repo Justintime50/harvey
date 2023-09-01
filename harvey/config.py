@@ -19,6 +19,7 @@ class Config:
     slack_bot_token = os.getenv('SLACK_BOT_TOKEN')
     slack_channel = os.getenv('SLACK_CHANNEL', 'general')
     harvey_path = os.path.expanduser(os.getenv('HARVEY_PATH', os.path.join('~', 'harvey')))
+    use_https_auth = os.getenv('USE_HTTPS_AUTH')  # Use HTTPS URLs instead of SSH URLs for Git operations
 
     # Harvey settings
     host = os.getenv('HOST', '127.0.0.1')
