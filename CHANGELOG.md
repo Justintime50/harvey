@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.1 (2023-09-05)
+
+- Fixes a bug where `page_size` for the `/projects` endpoint wasn't respected
+
 ## v1.0.0 (2023-09-01)
 
 - Drops support for Python 3.7

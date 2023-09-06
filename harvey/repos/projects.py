@@ -14,6 +14,7 @@ from harvey.utils.api_utils import get_page_size
 def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
     """Retrieve a list of projects stored in Harvey by scanning the `projects` directory."""
     projects: Dict[str, Any] = {'projects': []}
+    total_projects = 0
     project_owners = os.listdir(Config.projects_path)
     page_size = get_page_size(request)
 
@@ -25,11 +26,11 @@ def retrieve_projects(request: flask.Request) -> Dict[str, List[Any]]:
             project_names.remove('.DS_Store')
         for project_name in project_names:
             final_project_name = f'{project_owner}-{project_name}'
-            projects['projects'].append(final_project_name)
+            total_projects += 1
 
-        if len(projects['projects']) > page_size:
-            break
+            if len(projects['projects']) < page_size:
+                projects['projects'].append(final_project_name)
 
-    projects['total_count'] = len(projects['projects'])
+    projects['total_count'] = total_projects
 
     return projects
