@@ -1,6 +1,6 @@
 # CHANGELOG
 
-## Next Release
+## v1.0.2 (2023-10-09)
 
 - Fixes a bug that couldn't deserialize subprocess output correctly due to ascii encoding (closes #81)
 
