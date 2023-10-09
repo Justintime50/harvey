@@ -3,13 +3,13 @@ import subprocess  # nosec
 from typing import (
     Any,
     Dict,
-    List,
 )
 
 import woodchips
 
 from harvey.config import Config
 from harvey.utils.deployments import kill_deployment
+from harvey.utils.utils import run_subprocess_command
 from harvey.webhooks import Webhook
 
 
@@ -33,8 +33,9 @@ class Git:
         command_output = ''
 
         try:
-            command = ['git', 'clone', '--depth=1', Webhook.repo_url(webhook), project_path]
-            command_output = Git._git_subprocess(command)
+            command_output = run_subprocess_command(
+                ['git', 'clone', '--depth=1', Webhook.repo_url(webhook), project_path]
+            )
             logger.debug(command_output)
         except subprocess.TimeoutExpired:
             kill_deployment(
@@ -57,8 +58,7 @@ class Git:
         command_output = ''
 
         try:
-            command = ['git', '-C', project_path, 'pull', '--rebase']
-            command_output = Git._git_subprocess(command)
+            command_output = run_subprocess_command(['git', '-C', project_path, 'pull', '--rebase'])
             logger.debug(f'{command_output}')
         except subprocess.TimeoutExpired:
             kill_deployment(
@@ -72,8 +72,7 @@ class Git:
             logger.info(f'Attempting to stash {Webhook.repo_full_name(webhook)} before pulling again...')
 
             try:
-                command = ['git', '-C', project_path, 'stash']
-                command_output = Git._git_subprocess(command)
+                command_output = run_subprocess_command(['git', '-C', project_path, 'stash'])
                 logger.debug(f'{command_output}')
             except (subprocess.CalledProcessError, subprocess.TimeoutExpired):
                 kill_deployment(
@@ -86,17 +85,5 @@ class Git:
             if pull_attempt == 1:
                 pull_attempt += 1
                 command_output = Git.pull_repo(project_path, webhook, pull_attempt)
-
-        return command_output
-
-    @staticmethod
-    def _git_subprocess(command: List[str]) -> str:
-        """Runs a git command via subprocess."""
-        command_output = subprocess.check_output(  # nosec
-            command,
-            stderr=subprocess.STDOUT,
-            text=True,
-            timeout=Config.operation_timeout,
-        )
 
         return command_output

@@ -162,6 +162,7 @@ def test_deploy_stage_success(mock_subprocess, mock_healthcheck, mock_path_exist
         ],
         stderr=-2,
         text=True,
+        encoding='utf8',
         timeout=300,
     )
 
@@ -209,5 +210,6 @@ def test_deploy_stage_prod_compose_success(mock_subprocess, mock_healthcheck, mo
         ],
         stderr=-2,
         text=True,
+        encoding='utf8',
         timeout=300,
     )

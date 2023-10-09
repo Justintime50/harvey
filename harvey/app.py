@@ -1,5 +1,4 @@
 import os
-import subprocess  # nosec
 import threading
 from typing import (
     Any,
@@ -34,7 +33,10 @@ from harvey.repos.deployments import (
 from harvey.repos.locks import retrieve_locks
 from harvey.repos.projects import retrieve_projects
 from harvey.repos.webhooks import retrieve_webhook
-from harvey.utils.utils import setup_logger
+from harvey.utils.utils import (
+    run_subprocess_command,
+    setup_logger,
+)
 
 
 # Must remain at the top of this file to take effect, we load both from the path and locally
@@ -60,12 +62,7 @@ def bootstrap() -> bool:
     debug = _get_debug_bool(Config.log_level)
 
     # Ensure the correct Docker Compose version is available
-    docker_compose_version = subprocess.check_output(  # nosec
-        ['docker', 'compose', 'version'],
-        stderr=subprocess.STDOUT,
-        text=True,
-        timeout=3,
-    )
+    docker_compose_version = run_subprocess_command(['docker', 'compose', 'version'])
     if REQUIRED_DOCKER_COMPOSE_VERSION not in docker_compose_version:
         raise HarveyError(f'Harvey requires Docker Compose {REQUIRED_DOCKER_COMPOSE_VERSION}.')
 

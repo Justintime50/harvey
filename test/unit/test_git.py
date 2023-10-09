@@ -31,6 +31,7 @@ def test_clone_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhoo
         ['git', 'clone', '--depth=1', 'https://test-ssh-url.com', 'harvey/projects/test_user/test-repo-name'],
         stderr=-2,
         text=True,
+        encoding='utf8',
         timeout=300,
     )
 
@@ -63,6 +64,7 @@ def test_pull_repo(mock_subprocess, mock_logger, mock_project_path, mock_webhook
         ['git', '-C', 'harvey/projects/test_user/test-repo-name', 'pull', '--rebase'],
         stderr=-2,
         text=True,
+        encoding='utf8',
         timeout=300,
     )
 

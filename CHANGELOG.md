@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Fixes a bug that couldn't deserialize subprocess output correctly due to ascii encoding (closes #81)
+
 ## v1.0.1 (2023-09-05)
 
 - Fixes a bug where `page_size` for the `/projects` endpoint wasn't respected

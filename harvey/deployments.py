@@ -24,7 +24,10 @@ from harvey.utils.deployments import (
     kill_deployment,
     succeed_deployment,
 )
-from harvey.utils.utils import get_utc_timestamp
+from harvey.utils.utils import (
+    get_utc_timestamp,
+    run_subprocess_command,
+)
 from harvey.webhooks import Webhook
 
 
@@ -264,12 +267,7 @@ class Deployment:
             # fmt: on
 
         try:
-            compose_output = subprocess.check_output(  # nosec
-                compose_command,
-                stderr=subprocess.STDOUT,
-                text=True,
-                timeout=Config.operation_timeout,
-            )
+            compose_output = run_subprocess_command(compose_command)
             execution_time = f'Deploy stage execution time: {get_utc_timestamp() - start_time}'
             final_output = f'{compose_output}\n{execution_time}'
             logger.info(final_output)

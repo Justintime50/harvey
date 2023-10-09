@@ -1,4 +1,6 @@
 import datetime
+import subprocess  # nosec
+from typing import List
 
 import woodchips
 
@@ -26,3 +28,16 @@ def setup_logger():
 def get_utc_timestamp():
     """Returns the UTC timestamp of right now."""
     return datetime.datetime.now(datetime.timezone.utc)
+
+
+def run_subprocess_command(command: List[str]) -> str:
+    """Runs a shell command via subprocess."""
+    command_output = subprocess.check_output(  # nosec
+        command,
+        stderr=subprocess.STDOUT,
+        text=True,
+        encoding='utf8',
+        timeout=Config.operation_timeout,
+    )
+
+    return command_output
