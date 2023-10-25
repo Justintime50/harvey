@@ -1,4 +1,4 @@
-import slack
+import slack_sdk
 import woodchips
 
 from harvey.config import Config
@@ -15,7 +15,7 @@ class Message:
         """Send a Slack message via a Slackbot."""
         logger = woodchips.get(Config.logger_name)
 
-        slack_client = slack.WebClient(Config.slack_bot_token)
+        slack_client = slack_sdk.WebClient(Config.slack_bot_token)
 
         try:
             slack_client.chat_postMessage(
@@ -23,7 +23,7 @@ class Message:
                 text=message,
             )
             logger.debug('Slack message sent!')
-        except slack.errors.SlackApiError:
+        except slack_sdk.errors.SlackApiError:
             error_message = 'Harvey could not send the Slack message.'
             logger.error(error_message)
             raise HarveyError(error_message)

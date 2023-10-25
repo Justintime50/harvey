@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## v1.0.3 (2023-10-25)
+
+- Swaps the deprecated `slackclient` for the new `slack_sdk`, no user impact expected
+
 ## v1.0.2 (2023-10-09)
 
 - Fixes a bug that couldn't deserialize subprocess output correctly due to ascii encoding (closes #81)

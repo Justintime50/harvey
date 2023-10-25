@@ -1,7 +1,7 @@
 from unittest.mock import patch
 
 import pytest
-import slack
+import slack_sdk
 
 from harvey.errors import HarveyError
 from harvey.messages import Message
@@ -10,7 +10,7 @@ from harvey.messages import Message
 @patch('harvey.config.Config.slack_channel', 'mock-channel')
 @patch('harvey.config.Config.slack_bot_token', '123')
 @patch('logging.Logger.debug')
-@patch('slack.WebClient.chat_postMessage')
+@patch('slack_sdk.WebClient.chat_postMessage')
 def test_send_slack_message_success(mock_slack, mock_logger):
     message = 'mock message'
     Message.send_slack_message(message)
@@ -21,8 +21,8 @@ def test_send_slack_message_success(mock_slack, mock_logger):
 
 @patch('logging.Logger.error')
 @patch(
-    'slack.WebClient.chat_postMessage',
-    side_effect=slack.errors.SlackApiError(
+    'slack_sdk.WebClient.chat_postMessage',
+    side_effect=slack_sdk.errors.SlackApiError(
         message='The request to the Slack API failed.',
         response={
             'ok': False,

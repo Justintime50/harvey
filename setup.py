@@ -22,7 +22,7 @@ REQUIREMENTS = [
     'requests == 2.*',
     'requests_unixsocket == 0.3.*',
     'sentry-sdk == 1.*',
-    'slackclient == 2.*',
+    'slack_sdk == 3.*',
     'sqlitedict == 2.1.*',
     'uwsgi == 2.0.22',
     'woodchips == 1.*',
