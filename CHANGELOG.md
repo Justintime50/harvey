@@ -3,6 +3,7 @@
 ## v1.0.3 (2023-10-25)
 
 - Swaps the deprecated `slackclient` for the new `slack_sdk`, no user impact expected
+- Locks max Python version to 3.11 as `uwsgi` is not yet compatible with the new Python 3.12
 
 ## v1.0.2 (2023-10-09)
 
