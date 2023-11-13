@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Adds support for Python 3.12
+
 ## v1.0.3 (2023-10-25)
 
 - Swaps the deprecated `slackclient` for the new `slack_sdk`, no user impact expected

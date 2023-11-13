@@ -24,7 +24,7 @@ REQUIREMENTS = [
     'sentry-sdk == 1.*',
     'slack_sdk == 3.*',
     'sqlitedict == 2.1.*',
-    'uwsgi == 2.0.22',  # TODO: Not compatible with Python 3.12+
+    'uwsgi == 2.0.23',
     'woodchips == 1.*',
 ]
 
@@ -71,5 +71,5 @@ setuptools.setup(
     extras_require={
         'dev': DEV_REQUIREMENTS,
     },
-    python_requires='>=3.8, <3.12',
+    python_requires='>=3.8, <4.0',
 )
