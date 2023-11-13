@@ -109,9 +109,9 @@ def retrieve_deployments(request: flask.Request) -> Dict[str, List[Any]]:
                 pass
 
     sorted_deployments = sorted(deployments['deployments'], key=lambda i: i['timestamp'], reverse=True)[:page_size]
-    deployments['total_count'] = len(
-        [attempt for deployment in deployments['deployments'] for attempt in deployment.get('attempts', [])]
-    )
+    deployments['total_count'] = len([
+        attempt for deployment in deployments['deployments'] for attempt in deployment.get('attempts', [])
+    ])
     deployments['deployments'] = sorted_deployments
 
     return deployments

@@ -63,12 +63,10 @@ def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
 
     with SqliteDict(filename=Config.database_file, tablename=DATABASE_TABLE_NAME) as database_table:
         for key, values in database_table.items():
-            locks['locks'].append(
-                {
-                    'project': key,
-                    'locked': values['locked'],
-                }
-            )
+            locks['locks'].append({
+                'project': key,
+                'locked': values['locked'],
+            })
 
     sorted_locks = sorted(locks['locks'], key=lambda x: x['project'])[:page_size]
     locks['total_count'] = len(locks['locks'])

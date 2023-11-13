@@ -33,9 +33,9 @@ class Git:
         command_output = ''
 
         try:
-            command_output = run_subprocess_command(
-                ['git', 'clone', '--depth=1', Webhook.repo_url(webhook), project_path]
-            )
+            command_output = run_subprocess_command([
+                'git', 'clone', '--depth=1', Webhook.repo_url(webhook), project_path
+            ])
             logger.debug(command_output)
         except subprocess.TimeoutExpired:
             kill_deployment(
