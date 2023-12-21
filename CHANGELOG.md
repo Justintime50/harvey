@@ -3,6 +3,7 @@
 ## Next Release
 
 - Adds support for Python 3.12
+- Prints deployment log to the error logger if `log_level` is set to `DEBUG`
 
 ## v1.0.3 (2023-10-25)
 

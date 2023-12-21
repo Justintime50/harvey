@@ -26,6 +26,9 @@ def kill_deployment(message: str, webhook: Dict[str, Any]):
     deployment_logs = error_message + '\n' + message
     store_deployment_details(webhook, _strip_emojis_from_logs(deployment_logs))
 
+    if Config.log_level == 'DEBUG':
+        logger.error(deployment_logs)
+
     # Only unlock deployments that were locked by the system and not a user to preserve their preferences
     deployment_lock = lookup_project_lock(project_name=Webhook.repo_full_name(webhook))
     if deployment_lock.get('system_lock'):
