@@ -56,14 +56,12 @@ def test_open_project_config(mock_json, mock_isfile):
         "repository": {
             "full_name": "TEST_user/TEST-repo-name",
         },
-        "commits": [
-            {
-                "id": 123456,
-                "author": {
-                    "name": "test_user",
-                },
-            }
-        ],
+        "commits": [{
+            "id": 123456,
+            "author": {
+                "name": "test_user",
+            },
+        }],
     }
     with patch('builtins.open', mock_open()):
         config = Deployment.open_project_config(mock_webhook)

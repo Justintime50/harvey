@@ -25,15 +25,13 @@ def mock_webhook(branch='main'):
                 "name": "TEST_owner",
             },
         },
-        "commits": [
-            {
-                "id": 123456,
-                "author": {
-                    "name": "test_user",
-                },
-                "message": "Mock message",
-            }
-        ],
+        "commits": [{
+            "id": 123456,
+            "author": {
+                "name": "test_user",
+            },
+            "message": "Mock message",
+        }],
     }
 
     return mock_webhook
