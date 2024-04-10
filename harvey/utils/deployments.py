@@ -37,7 +37,7 @@ def kill_deployment(message: str, webhook: Dict[str, Any]):
     if Config.use_slack:
         Message.send_slack_message(error_message)
 
-    HarveyError(error_message)
+    raise HarveyError(error_message)
 
 
 def succeed_deployment(message: str, webhook: Dict[str, Any]):

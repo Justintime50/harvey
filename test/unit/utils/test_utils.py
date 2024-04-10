@@ -1,5 +1,8 @@
 from unittest.mock import patch
 
+import pytest
+
+from harvey.errors import HarveyError
 from harvey.utils.deployments import (
     kill_deployment,
     succeed_deployment,
@@ -10,61 +13,56 @@ from harvey.utils.utils import (
 )
 
 
-@patch('sys.exit')
 @patch('harvey.utils.deployments.lookup_project_lock')
 @patch('harvey.utils.deployments.store_deployment_details')
 @patch('logging.Logger.info')
-def test_kill(mock_logger, mock_store_deployment_details, mock_lookup_lock, mock_exit, mock_output, mock_webhook):
-    kill_deployment(mock_output, mock_webhook)
+def test_kill_deployment(mock_logger, mock_store_deployment_details, mock_lookup_lock, mock_output, mock_webhook):
+    with pytest.raises(HarveyError, match='Failure! `test_user/test-repo-name` deployment failed!'):
+        kill_deployment(mock_output, mock_webhook)
 
     mock_store_deployment_details.assert_called_once()
     mock_lookup_lock.assert_called_once()
-    mock_exit.assert_called_once()
+    mock_logger.assert_called()
 
 
-@patch('sys.exit')
-@patch('harvey.utils.deployments.lookup_project_lock')
 @patch('harvey.config.Config.use_slack', True)
+@patch('harvey.utils.deployments.lookup_project_lock')
 @patch('harvey.messages.Message.send_slack_message')
 @patch('harvey.utils.deployments.store_deployment_details')
 @patch('logging.Logger.error')
-def test_kill_with_slack(
-    mock_logger, mock_store_deployment_details, mock_slack, mock_lookup_lock, mock_exit, mock_output, mock_webhook
+def test_kill_deployment_with_slack(
+    mock_logger, mock_store_deployment_details, mock_slack, mock_lookup_lock, mock_output, mock_webhook
 ):
-    kill_deployment(mock_output, mock_webhook)
+    with pytest.raises(HarveyError, match='Failure! `test_user/test-repo-name` deployment failed!'):
+        kill_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_store_deployment_details.assert_called_once()
     mock_slack.assert_called_once()
     mock_lookup_lock.assert_called_once()
-    mock_exit.assert_called_once()
 
 
-@patch('sys.exit')
 @patch('harvey.utils.deployments.store_deployment_details')
 @patch('logging.Logger.info')
-def test_success(mock_logger, mock_store_deployment_details, mock_exit, mock_output, mock_webhook):
+def test_succeed_deployment(mock_logger, mock_store_deployment_details, mock_output, mock_webhook):
     succeed_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_store_deployment_details.assert_called_once()
-    mock_exit.assert_called_once()
 
 
-@patch('sys.exit')
 @patch('harvey.config.Config.use_slack', True)
 @patch('harvey.messages.Message.send_slack_message')
 @patch('harvey.utils.deployments.store_deployment_details')
 @patch('logging.Logger.info')
-def test_success_with_slack(
-    mock_logger, mock_store_deployment_details, mock_slack, mock_exit, mock_output, mock_webhook
+def test_succeed_deployment_with_slack(
+    mock_logger, mock_store_deployment_details, mock_slack, mock_output, mock_webhook
 ):
     succeed_deployment(mock_output, mock_webhook)
 
     mock_logger.assert_called()
     mock_store_deployment_details.assert_called_once()
     mock_slack.assert_called_once()
-    mock_exit.assert_called_once()
 
 
 @patch('woodchips.Logger')

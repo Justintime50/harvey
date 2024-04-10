@@ -33,8 +33,7 @@ def test_send_slack_message_success(mock_slack, mock_logger):
 def test_send_slack_message_exception(mock_slack, mock_logger):
     message = 'mock message'
 
-    with pytest.raises(HarveyError) as error:
+    with pytest.raises(HarveyError, match='Harvey could not send the Slack message.'):
         Message.send_slack_message(message)
 
-    assert str(error.value) == 'Harvey could not send the Slack message.'
     mock_logger.assert_called()
