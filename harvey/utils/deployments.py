@@ -1,4 +1,3 @@
-import sys
 from typing import (
     Any,
     Dict,
@@ -7,6 +6,7 @@ from typing import (
 import woodchips
 
 from harvey.config import Config
+from harvey.errors import HarveyError
 from harvey.messages import Message
 from harvey.repos.deployments import store_deployment_details
 from harvey.repos.locks import (
@@ -37,7 +37,7 @@ def kill_deployment(message: str, webhook: Dict[str, Any]):
     if Config.use_slack:
         Message.send_slack_message(error_message)
 
-    sys.exit(1)
+    HarveyError(error_message)
 
 
 def succeed_deployment(message: str, webhook: Dict[str, Any]):
@@ -54,8 +54,6 @@ def succeed_deployment(message: str, webhook: Dict[str, Any]):
 
     if Config.use_slack:
         Message.send_slack_message(success_message)
-
-    sys.exit(0)
 
 
 def _strip_emojis_from_logs(output: str) -> str:

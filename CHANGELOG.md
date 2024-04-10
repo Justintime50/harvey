@@ -4,6 +4,7 @@
 
 - Adds support for Python 3.12
 - Prints deployment log to the error logger if `log_level` is set to `DEBUG`
+- Raises a `HarveyError` on deployment fail instead of `sys.exit(1)`, removes redundant `sys.exit(0)` on success
 
 ## v1.0.3 (2023-10-25)
 
