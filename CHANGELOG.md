@@ -3,6 +3,7 @@
 ## Next Release
 
 - Adds support for Python 3.12
+- Adds a healthcheck to the nginx Docker container
 - Prints deployment log to the error logger if `log_level` is set to `DEBUG`
 - Raises a `HarveyError` on deployment fail instead of `sys.exit(1)`, removes redundant `sys.exit(0)` on success
 

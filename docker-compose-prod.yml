@@ -2,14 +2,15 @@ services:
   harvey-nginx:
     deploy:
       replicas: 2
-      resources:
-        limits:
-          cpus: "0.50"
-          memory: "512M"
-        reservations:
-          cpus: "0.25"
-          memory: "128M"
+    mem_limit: '512m'
+    healthcheck:
+      test: ['CMD-SHELL', 'if [ ! -e /var/run/nginx.pid ]; then exit 1; else exit 0; fi']
+      start_period: 10s
+      start_interval: 1s
+      interval: 30s
+      timeout: 10s
+      retries: 3
     labels:
-      - "traefik.http.routers.harveyapi.rule=Host(`harveyapi.justinpaulhammond.com`, `www.harveyapi.justinpaulhammond.com`)"
-      - "traefik.http.routers.harveyapi.tls=true"
-      - "traefik.http.routers.harveyapi.tls.certresolver=letsencrypt"
+      - 'traefik.http.routers.harveyapi.rule=Host(`harveyapi.justinpaulhammond.com`, `www.harveyapi.justinpaulhammond.com`)'
+      - 'traefik.http.routers.harveyapi.tls=true'
+      - 'traefik.http.routers.harveyapi.tls.certresolver=letsencrypt'
