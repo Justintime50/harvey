@@ -6,6 +6,7 @@
 - Adds a healthcheck to the nginx Docker container
 - Prints deployment log to the error logger if `log_level` is set to `DEBUG`
 - Raises a `HarveyError` on deployment fail instead of `sys.exit(1)`, removes redundant `sys.exit(0)` on success
+- Captures Slack errors via Sentry but no longer raises an exception to ensure builds continue even if there is a problem with message delivery
 
 ## v1.0.3 (2023-10-25)
 
