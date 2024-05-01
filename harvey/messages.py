@@ -1,6 +1,6 @@
 import slack_sdk
 import woodchips
-from sentry_sdk import capture_exception
+from sentry_sdk import capture_message
 
 from harvey.config import Config
 
@@ -24,6 +24,6 @@ class Message:
             )
             logger.debug('Slack message sent!')
         except slack_sdk.errors.SlackApiError as error:
-            error_message = f'Harvey could not send the Slack message: {error}'
+            error_message = f'Harvey could not send the Slack message: {str(error)}'
             logger.error(error_message)
-            capture_exception(error_message)
+            capture_message(error_message)

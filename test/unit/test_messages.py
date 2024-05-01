@@ -1,9 +1,7 @@
 from unittest.mock import patch
 
-import pytest
 import slack_sdk
 
-from harvey.errors import HarveyError
 from harvey.messages import Message
 
 
@@ -15,11 +13,12 @@ def test_send_slack_message_success(mock_slack, mock_logger):
     message = 'mock message'
     Message.send_slack_message(message)
 
-    mock_logger.assert_called()
+    mock_logger.assert_called_once()
     mock_slack.assert_called_once_with(channel='mock-channel', text=message)
 
 
 @patch('logging.Logger.error')
+@patch('sentry_sdk.hub.Hub.capture_message')
 @patch(
     'slack_sdk.WebClient.chat_postMessage',
     side_effect=slack_sdk.errors.SlackApiError(
@@ -30,10 +29,15 @@ def test_send_slack_message_success(mock_slack, mock_logger):
         },
     ),
 )
-def test_send_slack_message_exception(mock_slack, mock_logger):
+def test_send_slack_message_exception(mock_slack, mock_sentry, mock_logger):
     message = 'mock message'
 
-    with pytest.raises(HarveyError, match='Harvey could not send the Slack message.'):
-        Message.send_slack_message(message)
+    Message.send_slack_message(message)
 
-    mock_logger.assert_called()
+    mock_logger.assert_called_once()
+    mock_sentry.assert_called_once_with(
+        "Harvey could not send the Slack message: The request to the Slack API failed.\nThe server responded with:"
+        " {'ok': False, 'error': 'not_authed'}",
+        None,
+        scope=None,
+    )
