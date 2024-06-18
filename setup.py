@@ -15,32 +15,32 @@ with open('harvey/_version.py', 'r') as version_file:
         raise RuntimeError('Unable to find version string!')
 
 REQUIREMENTS = [
-    'docker == 6.1.*',
-    'flask == 2.*',
+    'docker == 7.1.*',
+    'flask == 3.*',
     'python-dotenv == 1.*',
     'pyyaml == 6.*',
     'requests == 2.*',
     'requests_unixsocket == 0.3.*',
-    'sentry-sdk == 1.*',
+    'sentry-sdk == 2.*',
     'slack_sdk == 3.*',
     'sqlitedict == 2.1.*',
-    'uwsgi == 2.0.23',
+    'uwsgi == 2.0.26',
     'woodchips == 1.*',
 ]
 
 DEV_REQUIREMENTS = [
     'bandit == 1.7.*',
-    'black == 23.*',
-    'build == 0.10.*',
-    'flake8 == 6.*',
+    'black == 24.*',
+    'build == 1.2.*',
+    'flake8 == 7.*',
     'isort == 5.*',
-    'mypy == 1.5.*',
-    'pytest == 7.*',
-    'pytest-cov == 4.*',
-    'twine == 4.*',
+    'mypy == 1.10.*',
+    'pytest == 8.*',
+    'pytest-cov == 5.*',
+    'twine == 5.*',
     'types-PyYAML',
     'types-requests',
-    'wheel == 0.41.*',
+    'wheel == 0.43.*',
 ]
 
 setuptools.setup(

@@ -18,7 +18,7 @@ def test_send_slack_message_success(mock_slack, mock_logger):
 
 
 @patch('logging.Logger.error')
-@patch('sentry_sdk.hub.Hub.capture_message')
+@patch('sentry_sdk.Scope.capture_message')
 @patch(
     'slack_sdk.WebClient.chat_postMessage',
     side_effect=slack_sdk.errors.SlackApiError(
@@ -31,13 +31,9 @@ def test_send_slack_message_success(mock_slack, mock_logger):
 )
 def test_send_slack_message_exception(mock_slack, mock_sentry, mock_logger):
     message = 'mock message'
+    expected_error_message = "Harvey could not send the Slack message: The request to the Slack API failed.\nThe server responded with: {'ok': False, 'error': 'not_authed'}"  # noqa
 
     Message.send_slack_message(message)
 
-    mock_logger.assert_called_once()
-    mock_sentry.assert_called_once_with(
-        "Harvey could not send the Slack message: The request to the Slack API failed.\nThe server responded with:"
-        " {'ok': False, 'error': 'not_authed'}",
-        None,
-        scope=None,
-    )
+    mock_logger.assert_called_once_with(expected_error_message)
+    mock_sentry.assert_called_once_with(expected_error_message, None, scope=None)
