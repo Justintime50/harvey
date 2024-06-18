@@ -5,6 +5,7 @@
 - Adds support for Python 3.12
 - Bumps all dependencies
 - Adds a healthcheck to the nginx Docker container
+- Returns `system_lock` bool on retrieving locks
 - Prints deployment log to the error logger if `log_level` is set to `DEBUG`
 - Raises a `HarveyError` on deployment fail instead of `sys.exit(1)`, removes redundant `sys.exit(0)` on success
   - Prints complete error instead of unhelpful "deployment failed" message

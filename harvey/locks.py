@@ -7,10 +7,13 @@ from harvey.repos.locks import (
 
 
 def retrieve_lock(project_name: str) -> Dict[str, bool]:
-    """Retrieve the `lock` status of a project via its fully-qualified repo name."""
+    """Retrieve the `lock` details of a project via its fully-qualified repo name."""
     lock_status = lookup_project_lock(project_name)
 
-    return {'locked': lock_status['locked']}
+    return {
+        'locked': lock_status['locked'],
+        'system_lock': lock_status['system_lock'],
+    }
 
 
 def lock_project(project_name: str):
