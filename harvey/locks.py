@@ -1,4 +1,7 @@
-from typing import Dict
+from typing import (
+    Any,
+    Dict,
+)
 
 from harvey.repos.locks import (
     lookup_project_lock,
@@ -6,7 +9,7 @@ from harvey.repos.locks import (
 )
 
 
-def retrieve_lock(project_name: str) -> Dict[str, bool]:
+def retrieve_lock(project_name: str) -> Dict[str, Any]:
     """Retrieve the `lock` details of a project via its fully-qualified repo name."""
     lock_status = lookup_project_lock(project_name)
 
