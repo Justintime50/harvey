@@ -12,7 +12,7 @@ def retrieve_lock(project_name: str) -> Dict[str, bool]:
 
     return {
         'locked': lock_status['locked'],
-        'system_lock': lock_status['system_lock'],
+        'system_lock': lock_status.get('system_lock'),
     }
 
 

@@ -67,7 +67,7 @@ def retrieve_locks(request: flask.Request) -> Dict[str, List[Any]]:
                 {
                     'project': key,
                     'locked': values['locked'],
-                    'system_lock': values['system_lock'],
+                    'system_lock': values.get('system_lock'),
                 }
             )
 
