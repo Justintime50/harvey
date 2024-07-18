@@ -10,6 +10,7 @@
 - Raises a `HarveyError` on deployment fail instead of `sys.exit(1)`, removes redundant `sys.exit(0)` on success
   - Prints complete error instead of unhelpful "deployment failed" message
 - Captures Slack errors via Sentry but no longer raises an exception to ensure builds continue even if there is a problem with message delivery
+- Adds `py-call-uwsgi-fork-hooks` flag to assist threading with uwsgi and sentry (closes #83)
 
 ## v1.0.3 (2023-10-25)
 
