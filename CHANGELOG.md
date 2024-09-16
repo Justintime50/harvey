@@ -1,5 +1,9 @@
 # CHANGELOG
 
+## Next Release
+
+- Pull deploys should now show runtimes
+
 ## v1.1.0 (2024-07-18)
 
 - Adds support for Python 3.12

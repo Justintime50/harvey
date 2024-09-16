@@ -37,7 +37,7 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
 
         now = str(get_utc_timestamp())
 
-        deployment_runtime = final_output.partition('Deployment execution time: ')[2].split('\n\n')[0]
+        deployment_runtime = final_output.partition('execution time: ')[2].split('\n\n')[0]
 
         attempt: Dict[str, Any] = {
             'log': final_output,

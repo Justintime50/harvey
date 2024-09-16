@@ -154,8 +154,10 @@ class Deployment:
                 pull_success_message = (
                     f'Harvey pulled {Webhook.repo_full_name(webhook)} successfully. {Message.success_emoji}\n'
                 )
+                end_time = get_utc_timestamp()
+                execution_time = f'Pull execution time: {end_time - start_time}'
                 logger.info(pull_success_message)
-                final_output = f'{webhook_output}\n{pull_success_message}'
+                final_output = f'{webhook_output}\n{execution_time}\n{pull_success_message}'
                 succeed_deployment(final_output, webhook)
             else:
                 kill_deployment(f'deployment_type invalid, must be one of {Config.supported_deployments}', webhook)
