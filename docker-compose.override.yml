@@ -1,4 +1,8 @@
 services:
-  harvey-nginx:
+  harvey:
     labels:
-      - "traefik.http.routers.harveyapi.rule=Host(`harveyapi.localhost`)"
+      - 'traefik.enable=true'
+      - 'traefik.http.routers.harveyapi.rule=Host(`harveyapi.localhost`)'
+      - 'traefik.http.services.harveyapi.loadbalancer.server.port=5000'
+    volumes:
+      - /Users/jhammond/harvey:/lala

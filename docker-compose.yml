@@ -1,14 +1,13 @@
 services:
-  harvey-nginx:
+  harvey:
     build: .
     restart: always
     networks:
       - traefik
-    labels:
-      - traefik.enable=true
-      - 'traefik.docker.network=traefik'
-    extra_hosts:
-      - 'host.docker.internal:host-gateway'
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - /Users/jhammond/harvey:/lala
+      - ./:/app
 
 networks:
   traefik:

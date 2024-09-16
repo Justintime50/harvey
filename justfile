@@ -47,7 +47,7 @@ install:
 
 # Test the project end-to-end
 integration:
-    venv/bin/python {{TEST_DIR}}/integration/test_deployment.py
+    python {{TEST_DIR}}/integration/test_deployment.py
 
 # Sorts imports throughout the project
 isort:

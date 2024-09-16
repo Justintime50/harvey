@@ -12,7 +12,7 @@ with open(mock_webhook_path, 'r') as file:
     data = json.load(file)
 
 request = requests.post(
-    'http://127.0.0.1:5000/deploy',
+    'http://harvey.localhost/deploy',
     json=data,
     headers={
         'Content-Type': 'application/json',
