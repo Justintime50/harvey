@@ -60,12 +60,10 @@ isort-check:
 # Run the service in production
 prod:
     docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --build
-    venv/bin/uwsgi --ini uwsgi.ini --virtualenv venv
 
 # Run the service locally
 run:
     docker compose up -d --build
-    venv/bin/python harvey/app.py
 
 # Run mypy type checking on the project
 mypy:
