@@ -41,12 +41,14 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
             total_runtime = final_output.partition('Deployment execution time: ')[2].split('\n\n')[0]
         elif 'Pull execution time:' in final_output:
             total_runtime = final_output.partition('Pull execution time: ')[2].split('\n\n')[0]
+        else:
+            total_runtime = None
 
         attempt: Dict[str, Any] = {
             'log': final_output,
             'status': deployment_status,
             'timestamp': now,
-            'runtime': total_runtime if total_runtime else None,
+            'runtime': total_runtime,
         }
 
         if database_table.get(Webhook.deployment_id(webhook)):
