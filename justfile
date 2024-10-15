@@ -69,7 +69,7 @@ run:
 
 # Run mypy type checking on the project
 mypy:
-    {{VIRTUAL_BIN}}/mypy {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/
+    {{VIRTUAL_BIN}}/mypy --install-types --non-interactive {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/
 
 # Test the project
 test:

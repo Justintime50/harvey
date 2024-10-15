@@ -24,7 +24,7 @@ REQUIREMENTS = [
     'sentry-sdk == 2.*',
     'slack_sdk == 3.*',
     'sqlitedict == 2.1.*',
-    'uwsgi == 2.0.26',
+    'uwsgi == 2.0.27',
     'woodchips == 1.*',
 ]
 
@@ -34,13 +34,10 @@ DEV_REQUIREMENTS = [
     'build == 1.2.*',
     'flake8 == 7.*',
     'isort == 5.*',
-    'mypy == 1.10.*',
+    'mypy == 1.12.*',
     'pytest == 8.*',
     'pytest-cov == 5.*',
-    'twine == 5.*',
-    'types-PyYAML',
-    'types-requests',
-    'wheel == 0.43.*',
+    'wheel == 0.43.*',  # Needed to build uwsgi
 ]
 
 setuptools.setup(
