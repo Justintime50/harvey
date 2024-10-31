@@ -45,7 +45,7 @@ setuptools.setup(
     version=version,
     description='The lightweight Docker Compose deployment runner.',
     long_description=long_description,
-    long_description_content_type="text/markdown",
+    long_description_content_type='text/markdown',
     url='http://github.com/justintime50/harvey',
     author='Justintime50',
     license='MIT',
@@ -60,9 +60,9 @@ setuptools.setup(
         ]
     },
     classifiers=[
-        "Programming Language :: Python :: 3",
-        "License :: OSI Approved :: MIT License",
-        "Operating System :: OS Independent",
+        'Programming Language :: Python :: 3',
+        'License :: OSI Approved :: MIT License',
+        'Operating System :: OS Independent',
     ],
     install_requires=REQUIREMENTS,
     extras_require={

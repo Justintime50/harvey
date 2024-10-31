@@ -20,7 +20,7 @@ def main():
         file_created_at = os.stat(file_location).st_ctime
         file_age = file_created_at + LOG_LIFE
         if current_time > file_age:
-            print(f"Deleting: {file_location}...")
+            print(f'Deleting: {file_location}...')
             os.remove(file_location)
 
 

@@ -9,14 +9,6 @@ SCRIPTS_DIR := "scripts"
 bandit:
     {{VIRTUAL_BIN}}/bandit -r {{PROJECT_NAME}}/
 
-# Runs the Black Python formatter against the project
-black:
-    {{VIRTUAL_BIN}}/black {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/
-
-# Checks if the project is formatted correctly against the Black rules
-black-check:
-    {{VIRTUAL_BIN}}/black {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/ --check
-
 # Builds the project in preparation for release
 build:
     {{VIRTUAL_BIN}}/python -m build
@@ -30,15 +22,11 @@ clean:
 coverage:
     {{VIRTUAL_BIN}}/pytest {{TEST_DIR}}/unit --cov={{PROJECT_NAME}} --cov-branch --cov-report=html --cov-report=lcov --cov-report=term-missing --cov-fail-under=75
 
-# Run flake8 checks against the project
-flake8:
-    {{VIRTUAL_BIN}}/flake8 {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/
-
 # Lints the project
-lint: black-check isort-check flake8 mypy bandit
+lint: ruff-check mypy bandit
 
 # Runs all formatting tools against the project
-lint-fix: black isort
+lint-fix: ruff
 
 # Install the project locally
 install:
@@ -49,18 +37,19 @@ install:
 integration:
     venv/bin/python {{TEST_DIR}}/integration/test_deployment.py
 
-# Sorts imports throughout the project
-isort:
-    {{VIRTUAL_BIN}}/isort {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/
-
-# Checks that imports throughout the project are sorted correctly
-isort-check:
-    {{VIRTUAL_BIN}}/isort {{PROJECT_NAME}}/ {{TEST_DIR}}/ {{SCRIPTS_DIR}}/ --check-only
-
 # Run the service in production
 prod:
     docker compose -f docker-compose.yml -f docker-compose-prod.yml up -d --build
     venv/bin/uwsgi --ini uwsgi.ini --virtualenv venv
+
+# Formats the project
+ruff:
+    {{VIRTUAL_BIN}}/ruff check --fix
+    {{VIRTUAL_BIN}}/ruff format
+
+# Checks the project for formatting issues
+ruff-check:
+    {{VIRTUAL_BIN}}/ruff check
 
 # Run the service locally
 run:

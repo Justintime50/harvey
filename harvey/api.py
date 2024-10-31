@@ -119,9 +119,12 @@ class Api:
 
             logger.error(message)
 
-        response = {
-            'success': success,
-            'message': message,
-        }, status_code
+        response = (
+            {
+                'success': success,
+                'message': message,
+            },
+            status_code,
+        )
 
         return response

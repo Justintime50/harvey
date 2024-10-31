@@ -50,7 +50,7 @@ REQUIRED_DOCKER_COMPOSE_VERSION = 'v2'
 # - https://bugs.python.org/issue30385
 # - https://github.com/unbit/uwsgi/issues/1722
 # - https://github.com/Justintime50/harvey/issues/72
-os.environ["no_proxy"] = "*"
+os.environ['no_proxy'] = '*'
 
 
 def bootstrap() -> bool:

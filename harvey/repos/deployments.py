@@ -67,7 +67,7 @@ def store_deployment_details(webhook: Dict[str, Any], final_output: str = 'NA'):
             attempts[-1] = attempt
 
         database_table[Webhook.deployment_id(webhook)] = {
-            'project': Webhook.repo_full_name(webhook).replace("/", "-"),
+            'project': Webhook.repo_full_name(webhook).replace('/', '-'),
             'commit': Webhook.repo_commit_id(webhook),
             # This timestamp will be the most recent attempt's timestamp, important to have at the root for sorting
             'timestamp': now,

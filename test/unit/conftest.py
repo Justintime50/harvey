@@ -15,23 +15,23 @@ def mock_client():
 @pytest.fixture
 def mock_webhook(branch='main'):
     mock_webhook = {
-        "ref": f'refs/heads/{branch}',
-        "repository": {
-            "name": "TEST-repo-name",
-            "full_name": "TEST_user/TEST-repo-name",
-            "html_url": "https://test-html-url.com",
-            "ssh_url": "https://test-ssh-url.com",
-            "owner": {
-                "name": "TEST_owner",
+        'ref': f'refs/heads/{branch}',
+        'repository': {
+            'name': 'TEST-repo-name',
+            'full_name': 'TEST_user/TEST-repo-name',
+            'html_url': 'https://test-html-url.com',
+            'ssh_url': 'https://test-ssh-url.com',
+            'owner': {
+                'name': 'TEST_owner',
             },
         },
-        "commits": [
+        'commits': [
             {
-                "id": 123456,
-                "author": {
-                    "name": "test_user",
+                'id': 123456,
+                'author': {
+                    'name': 'test_user',
                 },
-                "message": "Mock message",
+                'message': 'Mock message',
             }
         ],
     }
@@ -43,10 +43,10 @@ def mock_webhook(branch='main'):
 def mock_webhook_object(branch='main'):
     webhook = MagicMock()
     webhook.json = {
-        "ref": f'refs/heads/{branch}',
-        "repository": {
-            "name": "TEST-repo-name",
-            "full_name": "TEST_user/TEST-repo-name",
+        'ref': f'refs/heads/{branch}',
+        'repository': {
+            'name': 'TEST-repo-name',
+            'full_name': 'TEST_user/TEST-repo-name',
         },
     }
 

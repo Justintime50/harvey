@@ -1,18 +1,22 @@
-[tool.black]
-preview = true
+[tool.ruff]
 line-length = 120
-skip-string-normalization = true
 
-[tool.isort]
-profile = "black"
-line_length = 120
-indent = 4
-force_grid_wrap = 2
-multi_line_output = 3
-sections = "FUTURE,STDLIB,THIRDPARTY,FIRSTPARTY,LOCALFOLDER"
-lines_after_imports = 2
-include_trailing_comma = true
-use_parentheses = true
+[tool.ruff.lint]
+# `E` and `F` for error/warning codes, `I` for isort support
+select = ["E", "F", "I"]
+
+[tool.ruff.format]
+quote-style = "single"
+
+[tool.ruff.lint.isort]
+section-order = [
+    "future",
+    "standard-library",
+    "third-party",
+    "first-party",
+    "local-folder",
+]
+lines-after-imports = 2
 
 [tool.mypy]
 disable_error_code = "import-untyped"

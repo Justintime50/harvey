@@ -53,14 +53,14 @@ def test_open_project_config(mock_json, mock_isfile):
     # We re-declare a basic mock webhook here because os.path.join on Python 3.7 gets
     # angry with MagicMock objects being passed in
     mock_webhook = {
-        "repository": {
-            "full_name": "TEST_user/TEST-repo-name",
+        'repository': {
+            'full_name': 'TEST_user/TEST-repo-name',
         },
-        "commits": [
+        'commits': [
             {
-                "id": 123456,
-                "author": {
-                    "name": "test_user",
+                'id': 123456,
+                'author': {
+                    'name': 'test_user',
                 },
             }
         ],

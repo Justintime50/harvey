@@ -9,7 +9,7 @@ from harvey.config import Config
 
 def format_project_name(project_name: str) -> str:
     """Formats a project name for use throughout Harvey."""
-    return project_name.replace("/", "-")
+    return project_name.replace('/', '-')
 
 
 def setup_logger():
