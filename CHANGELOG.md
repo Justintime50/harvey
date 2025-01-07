@@ -1,8 +1,8 @@
 # CHANGELOG
 
-## Next Release
+## v1.1.1 (2025-01-07)
 
-- Pull deploys should now show runtimes
+- Fixes a bug where Pull deployments where not showing runtimes
 
 ## v1.1.0 (2024-07-18)
 

@@ -13,6 +13,8 @@ The lightweight Docker Compose deployment runner.
 
 </div>
 
+> NOTE: Harvey was used by me for years in production; however, it's a bit rough around the edges still. I eventually had to bite the bullet and switch to Docker Swarm but Harvey remains a viable options for small projects and deployments. I will no longer be actively maintaining the project since I no longer use it daily but welcome any work on the project to smooth over any lingering oddities. A good place to start is the [Harvey Wishlist](https://github.com/Justintime50/harvey/issues/87).
+
 ## Why Docker Compose Deployments
 
 I've long been a fan of the simplicity of a `docker-compose` file and its usage. Deploying with systems such as Rancher or a self-hosted GitLab seemed too daunting with uneccessary overhead for simple projects. **Why can't I use the same setup in production as I do in development?** Skip the environment variable injection and key stores, configuring production machines, and separate workflow configuration by having Harvey spin up my project by [using Docker Compose in production](https://docs.docker.com/compose/production/), just like I do locally.
