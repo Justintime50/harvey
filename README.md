@@ -13,7 +13,7 @@ The lightweight Docker Compose deployment runner.
 
 </div>
 
-> NOTE: Harvey was used by me for years in production; however, it's a bit rough around the edges still. I eventually had to bite the bullet and switch to Docker Swarm but Harvey remains a viable options for small projects and deployments. I will no longer be actively maintaining the project since I no longer use it daily but welcome any work on the project to smooth over any lingering oddities. A good place to start is the [Harvey Wishlist](https://github.com/Justintime50/harvey/issues/87).
+> NOTE: Harvey was used by me for years in production; however, it's a bit rough around the edges still. I eventually had to bite the bullet and switch to Docker Swarm but Harvey remains a viable options for small projects and deployments. I will no longer be actively maintaining the project since I no longer use it daily.
 
 ## Why Docker Compose Deployments
 
@@ -192,3 +192,19 @@ curl -X GET http://127.0.0.1:5000/deployments/justintime50-justinpaulhammond
 # Get a comprehensive list of development tools
 just --list
 ```
+
+### TODO
+
+The following are a wishlist of items I'd like to build if the project continued:
+
+- [ ] It’s possible that Harvey has a memory/CPU leak and eventually kills Docker
+  - [ ] Is this only a problem on macOS? Does this occur on Linux?
+- [ ] List the remote address so you can see if a repo is using git urls or https urls
+- [ ] Can’t we just listen on the docker socket and run Harvey in a container?
+- [ ] Use sqlite for Harvey UI to pull user logins from now that we can point a laravel project to it easily
+- [ ] Provide an interface where we can `git log` quickly and select a commit to deploy so we can “rollback” a bad deploy
+- [ ] Show commit messages in logs
+- [ ] Failed deployments aren’t showing runtimes
+- [ ] Add monorepo support, a config file that listed the dirs to deploy and how (server-infra)
+- [ ] If we can’t do a fail fast “git status” on the project remotely then fail, don’t wait for the 300s timeout because an SSH key isn’t loaded
+- [ ] Harvey CLI
